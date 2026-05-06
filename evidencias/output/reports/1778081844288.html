@@ -1,0 +1,245 @@
+
+  <html>
+  <head>
+    <title>Accessibility Report</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #0f172a, #020617);
+        color: white;
+        padding: 40px;
+      }
+
+      h1 {
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        color: #94a3b8;
+        margin-bottom: 30px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .card {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      }
+
+      .score-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 10px solid #facc15;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: bold;
+        margin: 20px auto;
+      }
+
+      .bar {
+        height: 10px;
+        border-radius: 10px;
+        background: #1e293b;
+        overflow: hidden;
+        margin-top: 10px;
+      }
+
+      .bar-fill {
+        height: 100%;
+        width: 77%;
+        background: #facc15;
+        transition: width 1s ease;
+      }
+
+      .issues {
+        margin-top: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .issue {
+        background: rgba(255,255,255,0.03);
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-left: 5px solid;
+        transition: transform 0.2s;
+      }
+
+
+      .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      .footer {
+        margin-top: 40px;
+        color: #64748b;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Accessibility Report</h1>
+    <p class="subtitle">https://www.picpay.com</p>
+
+    <div class="grid">
+      
+      <div class="card">
+        <h2>Lighthouse Score</h2>
+
+        <div class="score-circle">
+          77
+        </div>
+
+        <div class="bar">
+          <div class="bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Resumo</h2>
+        <p>Total de issues: <strong>10</strong></p>
+        <p>Críticas: <strong>2</strong></p>
+        <p>Sérias: <strong>3</strong></p>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <h2>Issues detectadas (Axe)</h2>
+
+      <div class="issues">
+        
+          <div class="issue" style="border-color:#ff4d4f">
+            <div class="badge" style="background:#ff4d4f">
+              critical
+            </div>
+
+            <strong>button-name</strong><br/>
+            Ensure buttons have discernible text<br/>
+            <small>Elementos afetados: 3</small>
+          </div>
+        
+          <div class="issue" style="border-color:#fa8c16">
+            <div class="badge" style="background:#fa8c16">
+              serious
+            </div>
+
+            <strong>color-contrast</strong><br/>
+            Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds<br/>
+            <small>Elementos afetados: 1</small>
+          </div>
+        
+          <div class="issue" style="border-color:#52c41a">
+            <div class="badge" style="background:#52c41a">
+              minor
+            </div>
+
+            <strong>empty-heading</strong><br/>
+            Ensure headings have discernible text<br/>
+            <small>Elementos afetados: 1</small>
+          </div>
+        
+          <div class="issue" style="border-color:#fadb14">
+            <div class="badge" style="background:#fadb14">
+              moderate
+            </div>
+
+            <strong>heading-order</strong><br/>
+            Ensure the order of headings is semantically correct<br/>
+            <small>Elementos afetados: 6</small>
+          </div>
+        
+          <div class="issue" style="border-color:#ff4d4f">
+            <div class="badge" style="background:#ff4d4f">
+              critical
+            </div>
+
+            <strong>image-alt</strong><br/>
+            Ensure <img> elements have alternative text or a role of none or presentation<br/>
+            <small>Elementos afetados: 4</small>
+          </div>
+        
+          <div class="issue" style="border-color:#fadb14">
+            <div class="badge" style="background:#fadb14">
+              moderate
+            </div>
+
+            <strong>landmark-contentinfo-is-top-level</strong><br/>
+            Ensure the contentinfo landmark is at top level<br/>
+            <small>Elementos afetados: 1</small>
+          </div>
+        
+          <div class="issue" style="border-color:#fadb14">
+            <div class="badge" style="background:#fadb14">
+              moderate
+            </div>
+
+            <strong>landmark-no-duplicate-contentinfo</strong><br/>
+            Ensure the document has at most one contentinfo landmark<br/>
+            <small>Elementos afetados: 1</small>
+          </div>
+        
+          <div class="issue" style="border-color:#fadb14">
+            <div class="badge" style="background:#fadb14">
+              moderate
+            </div>
+
+            <strong>landmark-unique</strong><br/>
+            Ensure landmarks are unique<br/>
+            <small>Elementos afetados: 2</small>
+          </div>
+        
+          <div class="issue" style="border-color:#fa8c16">
+            <div class="badge" style="background:#fa8c16">
+              serious
+            </div>
+
+            <strong>link-name</strong><br/>
+            Ensure links have discernible text<br/>
+            <small>Elementos afetados: 3</small>
+          </div>
+        
+          <div class="issue" style="border-color:#fa8c16">
+            <div class="badge" style="background:#fa8c16">
+              serious
+            </div>
+
+            <strong>scrollable-region-focusable</strong><br/>
+            Ensure elements that have scrollable content are accessible by keyboard in Safari<br/>
+            <small>Elementos afetados: 1</small>
+          </div>
+        
+      </div>
+    </div>
+
+    <div class="footer">
+      Gerado com Lighthouse + Axe
+    </div>
+  </body>
+  </html>
+  
