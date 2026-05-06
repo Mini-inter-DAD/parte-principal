@@ -56,20 +56,20 @@
 
 • Prototipação UI/UX no Figma
 
-Bibia
+Beatriz Frisina Battista
 
 • Desenvolvimento do Frontend (JS Vanilla e implementação de A11y).
 
-Lui
+Luigi Azevedo Biondo
 
 • Desenvolvimento do Backend e modelagem do Banco de Dados.
 
-Rodrigo
+Rodrigo Bolgheroni
 
-Kluska
+Lucas Kluska Donini
 
-Chris
+Enzo Christowam Joaquim
 
 • Documentação contínua.
 
-Kluska
+Lucas Kluska Donini
