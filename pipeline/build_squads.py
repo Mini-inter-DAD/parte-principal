@@ -4,8 +4,8 @@ import requests
 import unicodedata
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from services.fifa_service import get_players
-from services.football_apiService import FootballApiService
+from pipeline.source.fifa_source import get_players
+from pipeline.source.photo_source import FootballApiService
 
 SQUADS_URL = "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.squads.json"
 

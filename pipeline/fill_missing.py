@@ -4,8 +4,6 @@ import json
 import re
 import time
 from groq import Groq
-from services.football_api_service import FootballApiService
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from dotenv import load_dotenv
 
@@ -55,7 +53,6 @@ def main():
     with open("output/players.json", encoding="utf-8") as f:
         players = json.load(f)
 
-    api = FootballApiService()
 
     BATCH_SIZE = 10
     generated = []

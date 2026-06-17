@@ -1,6 +1,4 @@
 import time
-import sys
-
 from pipeline.build_squads import main as build_squads
 from pipeline.fill_missing import main as fill_missing
 from metrics.summer_squads import main as show_metrics
