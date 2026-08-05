@@ -55,7 +55,7 @@ CREATE TABLE user_players (
                     REFERENCES players(id)
                     ON DELETE RESTRICT,
 
-    squad_position  VARCHAR(5),
+    squad_position  VARCHAR(10),
 
     is_starter      BOOLEAN NOT NULL DEFAULT FALSE,
 

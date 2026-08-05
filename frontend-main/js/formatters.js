@@ -43,13 +43,45 @@ const POSITION_GROUPS = Object.freeze({
   attacker: ['LW', 'PE', 'RW', 'PD', 'CF', 'SA', 'ST', 'CA', 'FW'],
 });
 
+const SLOT_BASE_POSITIONS = Object.freeze({
+  GK: 'GK',
+  LB: 'LB',
+  CB1: 'CB',
+  CB2: 'CB',
+  CB3: 'CB',
+  RB: 'RB',
+  LWB: 'LWB',
+  RWB: 'RWB',
+  CDM: 'CDM',
+  CDM1: 'CDM',
+  CDM2: 'CDM',
+  CM1: 'CM',
+  CM2: 'CM',
+  CM3: 'CM',
+  CAM: 'CAM',
+  LM: 'LM',
+  RM: 'RM',
+  LW: 'LW',
+  RW: 'RW',
+  ST: 'ST',
+  ST1: 'ST',
+  ST2: 'ST',
+});
+
+function getSlotBasePosition(slot) {
+  return SLOT_BASE_POSITIONS[String(slot || '').trim().toUpperCase()];
+}
+
 function formatPosition(position) {
   const value = String(position || '').trim();
-  return POSITION_LABELS[value.toUpperCase()] || value || '--';
+  const normalized = value.toUpperCase();
+  const basePosition = getSlotBasePosition(normalized) || normalized;
+  return POSITION_LABELS[basePosition] || value || '--';
 }
 
 function getPositionGroup(position) {
-  const value = String(position || '').trim().toUpperCase();
+  const normalized = String(position || '').trim().toUpperCase();
+  const value = getSlotBasePosition(normalized) || normalized;
   return Object.entries(POSITION_GROUPS)
     .find(([, positions]) => positions.includes(value))?.[0];
 }

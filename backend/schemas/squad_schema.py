@@ -15,7 +15,7 @@ class StarterUpdate(BaseModel):
     user_id: int = Field(gt=0)
     player_id: int = Field(gt=0)
     is_starter: bool = True
-    squad_position: str | None = Field(default=None, max_length=5)
+    squad_position: str | None = Field(default=None, max_length=10)
 
 
 class SubstituteRequest(BaseModel):
@@ -33,7 +33,7 @@ class SubstituteResponse(BaseModel):
 class AssignPositionRequest(BaseModel):
     user_id: int = Field(gt=0)
     player_id: int = Field(gt=0)
-    target_position: str = Field(min_length=1, max_length=5)
+    target_position: str = Field(min_length=1, max_length=10)
 
 
 class AssignPositionResponse(BaseModel):

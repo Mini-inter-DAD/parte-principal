@@ -7,80 +7,80 @@ renderNavbar('squad');
 
 const FORMATIONS = {
   '4-3-3': [
-    { pos: 'GOL', x: 50, y: 90 },
-    { pos: 'LE',  x: 18, y: 72 }, { pos: 'ZAG', x: 37, y: 72 },
-    { pos: 'ZAG', x: 63, y: 72 }, { pos: 'LD',  x: 82, y: 72 },
-    { pos: 'MC',  x: 25, y: 52 }, { pos: 'MC',  x: 50, y: 52 },
-    { pos: 'MC',  x: 75, y: 52 },
-    { pos: 'PE',  x: 18, y: 28 }, { pos: 'CA',  x: 50, y: 24 },
-    { pos: 'PD',  x: 82, y: 28 },
+    { slot: 'GK',  basePosition: 'GK', x: 50, y: 90 },
+    { slot: 'LB',  basePosition: 'LB', x: 18, y: 72 }, { slot: 'CB1', basePosition: 'CB', x: 37, y: 72 },
+    { slot: 'CB2', basePosition: 'CB', x: 63, y: 72 }, { slot: 'RB',  basePosition: 'RB', x: 82, y: 72 },
+    { slot: 'CM1', basePosition: 'CM', x: 25, y: 52 }, { slot: 'CM2', basePosition: 'CM', x: 50, y: 52 },
+    { slot: 'CM3', basePosition: 'CM', x: 75, y: 52 },
+    { slot: 'LW',  basePosition: 'LW', x: 18, y: 28 }, { slot: 'ST',  basePosition: 'ST', x: 50, y: 24 },
+    { slot: 'RW',  basePosition: 'RW', x: 82, y: 28 },
   ],
   '4-4-2': [
-    { pos: 'GOL', x: 50, y: 90 },
-    { pos: 'LE',  x: 18, y: 72 }, { pos: 'ZAG', x: 37, y: 72 },
-    { pos: 'ZAG', x: 63, y: 72 }, { pos: 'LD',  x: 82, y: 72 },
-    { pos: 'PE',  x: 15, y: 52 }, { pos: 'MC',  x: 37, y: 52 },
-    { pos: 'MC',  x: 63, y: 52 }, { pos: 'PD',  x: 85, y: 52 },
-    { pos: 'CA',  x: 35, y: 28 }, { pos: 'CA',  x: 65, y: 28 },
+    { slot: 'GK',  basePosition: 'GK', x: 50, y: 90 },
+    { slot: 'LB',  basePosition: 'LB', x: 18, y: 72 }, { slot: 'CB1', basePosition: 'CB', x: 37, y: 72 },
+    { slot: 'CB2', basePosition: 'CB', x: 63, y: 72 }, { slot: 'RB',  basePosition: 'RB', x: 82, y: 72 },
+    { slot: 'LM',  basePosition: 'LM', x: 15, y: 52 }, { slot: 'CM1', basePosition: 'CM', x: 37, y: 52 },
+    { slot: 'CM2', basePosition: 'CM', x: 63, y: 52 }, { slot: 'RM',  basePosition: 'RM', x: 85, y: 52 },
+    { slot: 'ST1', basePosition: 'ST', x: 35, y: 28 }, { slot: 'ST2', basePosition: 'ST', x: 65, y: 28 },
   ],
   '4-2-3-1': [
-    { pos: 'GOL', x: 50, y: 90 },
-    { pos: 'LE',  x: 18, y: 72 }, { pos: 'ZAG', x: 37, y: 72 },
-    { pos: 'ZAG', x: 63, y: 72 }, { pos: 'LD',  x: 82, y: 72 },
-    { pos: 'VOL', x: 37, y: 56 }, { pos: 'VOL', x: 63, y: 56 },
-    { pos: 'PE',  x: 18, y: 38 }, { pos: 'MEI', x: 50, y: 38 },
-    { pos: 'PD',  x: 82, y: 38 },
-    { pos: 'CA',  x: 50, y: 20 },
+    { slot: 'GK',   basePosition: 'GK',  x: 50, y: 90 },
+    { slot: 'LB',   basePosition: 'LB',  x: 18, y: 72 }, { slot: 'CB1', basePosition: 'CB', x: 37, y: 72 },
+    { slot: 'CB2',  basePosition: 'CB',  x: 63, y: 72 }, { slot: 'RB',  basePosition: 'RB', x: 82, y: 72 },
+    { slot: 'CDM1', basePosition: 'CDM', x: 37, y: 56 }, { slot: 'CDM2', basePosition: 'CDM', x: 63, y: 56 },
+    { slot: 'LW',   basePosition: 'LW',  x: 18, y: 38 }, { slot: 'CAM', basePosition: 'CAM', x: 50, y: 38 },
+    { slot: 'RW',   basePosition: 'RW',  x: 82, y: 38 },
+    { slot: 'ST',   basePosition: 'ST',  x: 50, y: 20 },
   ],
   '4-2-4': [
-    { pos: 'GOL', x: 50, y: 90 },
-    { pos: 'LE',  x: 18, y: 72 }, { pos: 'ZAG', x: 37, y: 72 },
-    { pos: 'ZAG', x: 63, y: 72 }, { pos: 'LD',  x: 82, y: 72 },
-    { pos: 'VOL', x: 37, y: 54 }, { pos: 'VOL', x: 63, y: 54 },
-    { pos: 'PE',  x: 15, y: 26 }, { pos: 'CA',  x: 37, y: 22 },
-    { pos: 'CA',  x: 63, y: 22 }, { pos: 'PD',  x: 85, y: 26 },
+    { slot: 'GK',   basePosition: 'GK',  x: 50, y: 90 },
+    { slot: 'LB',   basePosition: 'LB',  x: 18, y: 72 }, { slot: 'CB1', basePosition: 'CB', x: 37, y: 72 },
+    { slot: 'CB2',  basePosition: 'CB',  x: 63, y: 72 }, { slot: 'RB',  basePosition: 'RB', x: 82, y: 72 },
+    { slot: 'CM1',  basePosition: 'CM',  x: 37, y: 54 }, { slot: 'CM2', basePosition: 'CM', x: 63, y: 54 },
+    { slot: 'LW',   basePosition: 'LW',  x: 15, y: 26 }, { slot: 'ST1', basePosition: 'ST', x: 37, y: 22 },
+    { slot: 'ST2',  basePosition: 'ST',  x: 63, y: 22 }, { slot: 'RW',  basePosition: 'RW', x: 85, y: 26 },
   ],
   '3-5-2': [
-    { pos: 'GOL', x: 50, y: 90 },
-    { pos: 'ZAG', x: 25, y: 72 }, { pos: 'ZAG', x: 50, y: 72 },
-    { pos: 'ZAG', x: 75, y: 72 },
-    { pos: 'AE',  x: 12, y: 52 }, { pos: 'MC',  x: 32, y: 52 },
-    { pos: 'MEI', x: 50, y: 52 }, { pos: 'MC',  x: 68, y: 52 },
-    { pos: 'AD',  x: 88, y: 52 },
-    { pos: 'CA',  x: 35, y: 26 }, { pos: 'CA',  x: 65, y: 26 },
+    { slot: 'GK',  basePosition: 'GK',  x: 50, y: 90 },
+    { slot: 'CB1', basePosition: 'CB',  x: 25, y: 72 }, { slot: 'CB2', basePosition: 'CB', x: 50, y: 72 },
+    { slot: 'CB3', basePosition: 'CB',  x: 75, y: 72 },
+    { slot: 'LWB', basePosition: 'LWB', x: 12, y: 52 }, { slot: 'CM1', basePosition: 'CM', x: 32, y: 52 },
+    { slot: 'CAM', basePosition: 'CAM', x: 50, y: 52 }, { slot: 'CM2', basePosition: 'CM', x: 68, y: 52 },
+    { slot: 'RWB', basePosition: 'RWB', x: 88, y: 52 },
+    { slot: 'ST1', basePosition: 'ST',  x: 35, y: 26 }, { slot: 'ST2', basePosition: 'ST', x: 65, y: 26 },
   ],
   '5-3-2': [
-    { pos: 'GOL', x: 50, y: 90 },
-    { pos: 'LE',  x: 10, y: 72 }, { pos: 'ZAG', x: 28, y: 72 },
-    { pos: 'ZAG', x: 50, y: 72 }, { pos: 'ZAG', x: 72, y: 72 },
-    { pos: 'LD',  x: 90, y: 72 },
-    { pos: 'MC',  x: 25, y: 50 }, { pos: 'MEI', x: 50, y: 50 },
-    { pos: 'MC',  x: 75, y: 50 },
-    { pos: 'CA',  x: 35, y: 26 }, { pos: 'CA',  x: 65, y: 26 },
+    { slot: 'GK',  basePosition: 'GK',  x: 50, y: 90 },
+    { slot: 'LB',  basePosition: 'LB',  x: 10, y: 72 }, { slot: 'CB1', basePosition: 'CB', x: 28, y: 72 },
+    { slot: 'CB2', basePosition: 'CB',  x: 50, y: 72 }, { slot: 'CB3', basePosition: 'CB', x: 72, y: 72 },
+    { slot: 'RB',  basePosition: 'RB',  x: 90, y: 72 },
+    { slot: 'CM1', basePosition: 'CM',  x: 25, y: 50 }, { slot: 'CAM', basePosition: 'CAM', x: 50, y: 50 },
+    { slot: 'CM2', basePosition: 'CM',  x: 75, y: 50 },
+    { slot: 'ST1', basePosition: 'ST',  x: 35, y: 26 }, { slot: 'ST2', basePosition: 'ST', x: 65, y: 26 },
   ],
   '4-5-1': [
-    { pos: 'GOL', x: 50, y: 90 },
-    { pos: 'LE',  x: 18, y: 72 }, { pos: 'ZAG', x: 37, y: 72 },
-    { pos: 'ZAG', x: 63, y: 72 }, { pos: 'LD',  x: 82, y: 72 },
-    { pos: 'PE',  x: 12, y: 50 }, { pos: 'MC',  x: 30, y: 50 },
-    { pos: 'MEI', x: 50, y: 50 }, { pos: 'MC',  x: 70, y: 50 },
-    { pos: 'PD',  x: 88, y: 50 },
-    { pos: 'CA',  x: 50, y: 24 },
+    { slot: 'GK',  basePosition: 'GK',  x: 50, y: 90 },
+    { slot: 'LB',  basePosition: 'LB',  x: 18, y: 72 }, { slot: 'CB1', basePosition: 'CB', x: 37, y: 72 },
+    { slot: 'CB2', basePosition: 'CB',  x: 63, y: 72 }, { slot: 'RB',  basePosition: 'RB', x: 82, y: 72 },
+    { slot: 'LW',  basePosition: 'LW',  x: 12, y: 50 }, { slot: 'CM1', basePosition: 'CM', x: 30, y: 50 },
+    { slot: 'CAM', basePosition: 'CAM', x: 50, y: 50 }, { slot: 'CM2', basePosition: 'CM', x: 70, y: 50 },
+    { slot: 'RW',  basePosition: 'RW',  x: 88, y: 50 },
+    { slot: 'ST',  basePosition: 'ST',  x: 50, y: 24 },
   ],
   '3-4-3': [
-    { pos: 'GOL', x: 50, y: 90 },
-    { pos: 'ZAG', x: 25, y: 72 }, { pos: 'ZAG', x: 50, y: 72 },
-    { pos: 'ZAG', x: 75, y: 72 },
-    { pos: 'AE',  x: 15, y: 54 }, { pos: 'MC',  x: 37, y: 54 },
-    { pos: 'MC',  x: 63, y: 54 }, { pos: 'AD',  x: 85, y: 54 },
-    { pos: 'PE',  x: 18, y: 26 }, { pos: 'CA',  x: 50, y: 22 },
-    { pos: 'PD',  x: 82, y: 26 },
+    { slot: 'GK',  basePosition: 'GK',  x: 50, y: 90 },
+    { slot: 'CB1', basePosition: 'CB',  x: 25, y: 72 }, { slot: 'CB2', basePosition: 'CB', x: 50, y: 72 },
+    { slot: 'CB3', basePosition: 'CB',  x: 75, y: 72 },
+    { slot: 'LWB', basePosition: 'LWB', x: 15, y: 54 }, { slot: 'CM1', basePosition: 'CM', x: 37, y: 54 },
+    { slot: 'CM2', basePosition: 'CM',  x: 63, y: 54 }, { slot: 'RWB', basePosition: 'RWB', x: 85, y: 54 },
+    { slot: 'LW',  basePosition: 'LW',  x: 18, y: 26 }, { slot: 'ST',  basePosition: 'ST', x: 50, y: 22 },
+    { slot: 'RW',  basePosition: 'RW',  x: 82, y: 26 },
   ],
 };
 
 // Posições ofensivas e defensivas para cálculo do OVR breakdown
-const ATTACK_POS  = ['CA', 'PE', 'PD', 'MEI', 'AE', 'AD'];
-const DEFENSE_POS = ['GOL', 'ZAG', 'LD', 'LE', 'VOL'];
+const ATTACK_GROUPS = ['attacker'];
+const DEFENSE_GROUPS = ['goalkeeper', 'defender'];
 
 // ─── Estado ───────────────────────────────────────────────────────────────────
 const SQUAD_STATE = {
@@ -138,7 +138,7 @@ function bindReserveTarget() {
   });
 }
 
-async function loadSquad() {
+async function loadSquad({ failOnError = false } = {}) {
   const userId = Number(getSession().user?.id);
   if (!userId) {
     SQUAD_STATE.players = [];
@@ -151,6 +151,7 @@ async function loadSquad() {
     const data = await api.getSquad(userId);
     SQUAD_STATE.players = Array.isArray(data) ? data : [];
   } catch (error) {
+    if (failOnError) throw error;
     SQUAD_STATE.players = [];
     console.error('Não foi possível carregar o elenco:', error);
   }
@@ -173,7 +174,7 @@ function buildLineup() {
   SQUAD_STATE.lineup = slots.map(slot => {
     const player = starters.find(
       current => !renderedPlayerIds.has(Number(current.id))
-        && formatPosition(current.squad_position) === formatPosition(slot.pos)
+        && String(current.squad_position).toUpperCase() === slot.slot
     );
     if (player) renderedPlayerIds.add(Number(player.id));
     return { ...slot, player: player || null };
@@ -197,8 +198,9 @@ function renderField() {
   SQUAD_STATE.lineup.forEach(slot => {
 
     const el = document.createElement('div');
-    const selected = slot.pos === SQUAD_STATE.selectedSlotPosition;
-    const incompatible = selectedPlayer && !canPlayInPosition(selectedPlayer.position, slot.pos);
+    const selected = slot.slot === SQUAD_STATE.selectedSlotPosition;
+    const incompatible = selectedPlayer
+      && !canPlayInPosition(selectedPlayer.position, slot.basePosition);
     el.className = [
       'field-slot',
       slot.player ? '' : 'field-slot--empty',
@@ -215,13 +217,13 @@ function renderField() {
 
     if (slot.player) {
       // mostra APENAS a posição dentro da bolinha
-      token.textContent = formatPosition(slot.pos);
+      token.textContent = formatPosition(slot.basePosition);
       el.setAttribute(
         'title',
-        `${slot.player.name} · ${slot.pos}`
+        `${slot.player.name} · ${formatPosition(slot.basePosition)}`
       );
     } else {
-      token.textContent = formatPosition(slot.pos);
+      token.textContent = formatPosition(slot.basePosition);
     }
 
     const nameEl = document.createElement('span');
@@ -230,7 +232,7 @@ function renderField() {
     // mostra nome completo
     nameEl.textContent = slot.player
       ? slot.player.name
-      : formatPosition(slot.pos);
+      : formatPosition(slot.basePosition);
 
     el.appendChild(token);
     el.appendChild(nameEl);
@@ -268,7 +270,7 @@ function renderBoxscore() {
 
     const pos = document.createElement('span');
     pos.className = 'boxscore-item__pos-badge';
-    pos.textContent = formatPosition(slot.pos);
+    pos.textContent = formatPosition(slot.basePosition);
 
     const name = document.createElement('span');
     name.className = `boxscore-item__name${slot.player ? '' : ' boxscore-item__name--empty'}`;
@@ -376,7 +378,7 @@ function handlePlayerClick(playerId) {
 
 async function handleSlotClick(slot) {
   const selectedPlayer = getSelectedPlayer();
-  SQUAD_STATE.selectedSlotPosition = slot.pos;
+  SQUAD_STATE.selectedSlotPosition = slot.slot;
 
   if (!selectedPlayer) {
     renderField();
@@ -384,14 +386,14 @@ async function handleSlotClick(slot) {
     return;
   }
 
-  if (!canPlayInPosition(selectedPlayer.position, slot.pos)) {
+  if (!canPlayInPosition(selectedPlayer.position, slot.basePosition)) {
     showToast('Posição incompatível para este jogador.', true);
     clearSelection();
     renderField();
     renderBoxscore();
     return;
   }
-  await assignSelectedPlayer(slot.pos);
+  await assignSelectedPlayer(slot.slot);
 }
 
 async function assignSelectedPlayer(targetPosition) {
@@ -405,7 +407,17 @@ async function assignSelectedPlayer(targetPosition) {
       target_position: targetPosition,
     });
     clearSelection();
-    await loadSquad();
+    await loadSquad({ failOnError: true });
+    const updatedPlayer = SQUAD_STATE.players.find(
+      current => Number(current.id) === Number(player.id)
+    );
+    if (
+      !updatedPlayer
+      || !updatedPlayer.is_starter
+      || String(updatedPlayer.squad_position).toUpperCase() !== targetPosition.toUpperCase()
+    ) {
+      throw new Error('O jogador não foi confirmado na posição escolhida.');
+    }
     showToast('Escalação atualizada.');
   } catch (error) {
     showToast(error.message || 'Não foi possível atualizar a escalação.', true);
@@ -454,10 +466,10 @@ function updateOVR() {
 
   const all     = withPlayers.map(s => Number(s.player.overall ?? s.player.ovr ?? 0));
   const attack  = withPlayers
-    .filter(s => ATTACK_POS.includes(s.pos))
+    .filter(s => ATTACK_GROUPS.includes(getPositionGroup(s.basePosition)))
     .map(s => Number(s.player.overall ?? s.player.ovr ?? 0));
   const defense = withPlayers
-    .filter(s => DEFENSE_POS.includes(s.pos))
+    .filter(s => DEFENSE_GROUPS.includes(getPositionGroup(s.basePosition)))
     .map(s => Number(s.player.overall ?? s.player.ovr ?? 0));
 
   setOVRDisplay(avg(all), avg(attack), avg(defense));
