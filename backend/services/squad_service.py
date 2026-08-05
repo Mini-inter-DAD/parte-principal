@@ -1,6 +1,11 @@
 from backend.repositories import player_repository, squad_repository, user_repository
 from backend.services.errors import BusinessRuleError, ConflictError, NotFoundError
-from backend.services.position_rules import can_play_in_position, same_position
+from backend.services.position_rules import (
+    can_play_in_position,
+    can_play_in_slot,
+    get_slot_base_position,
+    same_slot,
+)
 from backend.services.player_service import serialize_player
 
 
@@ -72,7 +77,9 @@ def assign_position(
     player_id: int,
     target_position: str,
 ):
-    target_position = target_position.strip().upper()
+    target_slot = target_position.strip().upper()
+    if get_slot_base_position(target_slot) is None:
+        raise BusinessRuleError("Invalid squad slot")
     if user_repository.get_user(db, user_id) is None:
         raise NotFoundError("User not found")
     if player_id <= 0:
@@ -82,11 +89,12 @@ def assign_position(
         db,
         user_id,
         player_id,
+        target_slot,
     )
     player = rows.get(player_id)
     if player is None:
         raise NotFoundError("Player is not in the user's squad")
-    if not can_play_in_position(player["position"], target_position):
+    if not can_play_in_slot(player["position"], target_slot):
         raise BusinessRuleError("The player is not compatible with this position")
 
     replaced_player_ids = [
@@ -94,28 +102,48 @@ def assign_position(
         for current_id, current in rows.items()
         if current_id != player_id
         and current["is_starter"]
-        and same_position(current["squad_position"], target_position)
+        and same_slot(current["squad_position"], target_slot)
     ]
-    if player["is_starter"] and same_position(player["squad_position"], target_position):
+    if player["is_starter"] and same_slot(player["squad_position"], target_slot):
         return {
             "message": "O jogador já está nesta posição",
             "player_id": player_id,
-            "target_position": target_position,
+            "target_position": target_slot,
             "replaced_player_id": None,
         }
 
-    squad_repository.assign_player_to_position(
+    updated = squad_repository.assign_player_to_position(
         db,
         user_id,
         player_id,
-        target_position,
+        target_slot,
         replaced_player_ids,
     )
+    verified = squad_repository.get_user_player_for_update(db, user_id, player_id)
+    if (
+        updated is None
+        or verified is None
+        or not verified["is_starter"]
+        or not same_slot(verified["squad_position"], target_slot)
+    ):
+        db.rollback()
+        raise ConflictError("The player was not assigned to the target position")
+
+    for replaced_player_id in replaced_player_ids:
+        replaced = squad_repository.get_user_player_for_update(
+            db,
+            user_id,
+            replaced_player_id,
+        )
+        if replaced is None or replaced["is_starter"] or replaced["squad_position"] is not None:
+            db.rollback()
+            raise ConflictError("The previous starter was not moved to the bench")
+
     db.commit()
     return {
         "message": "Posição atribuída com sucesso",
         "player_id": player_id,
-        "target_position": target_position,
+        "target_position": target_slot,
         "replaced_player_id": replaced_player_ids[0] if len(replaced_player_ids) == 1 else None,
     }
 

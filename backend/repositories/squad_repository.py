@@ -116,6 +116,7 @@ def list_players_for_position_assignment(
     db: Session,
     user_id: int,
     player_id: int,
+    target_slot: str,
 ):
     result = db.execute(
         text("""
@@ -125,13 +126,17 @@ def list_players_for_position_assignment(
             WHERE up.user_id = :user_id
               AND (
                   up.player_id = :player_id
-                  OR up.is_starter = TRUE
+                  OR (
+                      up.is_starter = TRUE
+                      AND UPPER(up.squad_position) = :target_slot
+                  )
               )
             FOR UPDATE OF up
         """),
         {
             "user_id": user_id,
             "player_id": player_id,
+            "target_slot": target_slot,
         },
     )
     return {row["player_id"]: row for row in result.mappings().all()}
@@ -161,11 +166,12 @@ def assign_player_to_position(
         """),
         {"user_id": user_id, "player_id": player_id},
     )
-    db.execute(
+    result = db.execute(
         text("""
             UPDATE user_players
             SET is_starter = TRUE, squad_position = :target_position
             WHERE user_id = :user_id AND player_id = :player_id
+            RETURNING player_id, is_starter, squad_position
         """),
         {
             "user_id": user_id,
@@ -173,6 +179,7 @@ def assign_player_to_position(
             "target_position": target_position,
         },
     )
+    return result.mappings().first()
 
 
 def get_user_player_for_update(db: Session, user_id: int, player_id: int):
