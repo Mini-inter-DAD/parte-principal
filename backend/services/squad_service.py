@@ -1,7 +1,6 @@
 from backend.repositories import player_repository, squad_repository, user_repository
 from backend.services.errors import BusinessRuleError, ConflictError, NotFoundError
 from backend.services.position_rules import (
-    can_play_in_position,
     can_play_in_slot,
     get_slot_base_position,
     same_slot,
@@ -52,8 +51,8 @@ def substitute_players(
     if bench["is_starter"]:
         raise ConflictError("The selected player is not on the bench")
 
-    squad_position = starter["squad_position"] or starter["position"]
-    if not can_play_in_position(bench["position"], squad_position):
+    squad_position = starter["squad_position"]
+    if not squad_position or not can_play_in_slot(bench["position"], squad_position):
         raise BusinessRuleError("The bench player is not compatible with this position")
     squad_repository.substitute_players(
         db,
@@ -75,9 +74,9 @@ def assign_position(
     *,
     user_id: int,
     player_id: int,
-    target_position: str,
+    target_slot: str,
 ):
-    target_slot = target_position.strip().upper()
+    target_slot = target_slot.strip().upper()
     if get_slot_base_position(target_slot) is None:
         raise BusinessRuleError("Invalid squad slot")
     if user_repository.get_user(db, user_id) is None:
@@ -95,7 +94,7 @@ def assign_position(
     if player is None:
         raise NotFoundError("Player is not in the user's squad")
     if not can_play_in_slot(player["position"], target_slot):
-        raise BusinessRuleError("The player is not compatible with this position")
+        raise BusinessRuleError("Jogador não pode atuar nessa posição")
 
     replaced_player_ids = [
         current_id
@@ -108,6 +107,7 @@ def assign_position(
         return {
             "message": "O jogador já está nesta posição",
             "player_id": player_id,
+            "target_slot": target_slot,
             "target_position": target_slot,
             "replaced_player_id": None,
         }
@@ -143,6 +143,7 @@ def assign_position(
     return {
         "message": "Posição atribuída com sucesso",
         "player_id": player_id,
+        "target_slot": target_slot,
         "target_position": target_slot,
         "replaced_player_id": replaced_player_ids[0] if len(replaced_player_ids) == 1 else None,
     }
@@ -168,7 +169,7 @@ def set_starter(db, *, user_id: int, player_id: int, is_starter: bool, squad_pos
         raise NotFoundError("User not found")
     if player_repository.get_player(db, player_id) is None:
         raise NotFoundError("Player not found")
-    if is_starter and squad_position and not can_play_in_position(
+    if is_starter and squad_position and not can_play_in_slot(
         player_repository.get_player(db, player_id)["position"],
         squad_position,
     ):

@@ -59,7 +59,7 @@ def assign_position(request: AssignPositionRequest, db: Session = Depends(get_db
             db,
             user_id=request.user_id,
             player_id=request.player_id,
-            target_position=request.target_position,
+            target_slot=request.target_slot or request.target_position or "",
         )
     except (NotFoundError, ConflictError, BusinessRuleError) as exc:
         raise _service_error(exc) from exc

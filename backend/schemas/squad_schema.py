@@ -33,12 +33,14 @@ class SubstituteResponse(BaseModel):
 class AssignPositionRequest(BaseModel):
     user_id: int = Field(gt=0)
     player_id: int = Field(gt=0)
-    target_position: str = Field(min_length=1, max_length=10)
+    target_slot: str | None = Field(default=None, min_length=1, max_length=10)
+    target_position: str | None = Field(default=None, min_length=1, max_length=10)
 
 
 class AssignPositionResponse(BaseModel):
     message: str
     player_id: int
+    target_slot: str
     target_position: str
     replaced_player_id: int | None = None
 

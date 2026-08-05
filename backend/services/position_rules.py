@@ -1,75 +1,60 @@
-POSITION_GROUPS = {
-    "goalkeeper": {"GK", "GOL"},
-    "defender": {
-        "CB", "ZAG", "DF", "LB", "LE", "RB", "LD",
-        "LWB", "AE", "ADE", "RWB", "AD", "ADD",
-    },
-    "midfielder": {
-        "CDM", "VOL", "CM", "MC", "MF", "CAM", "MEI",
-        "LM", "ME", "RM", "MD",
-    },
-    "attacker": {"LW", "PE", "RW", "PD", "CF", "SA", "ST", "CA", "FW"},
+FORMATION_SLOTS = {
+    "GK": {"GK"},
+    "LB": {"LB", "LWB"},
+    "CB1": {"CB"},
+    "CB2": {"CB"},
+    "CB3": {"CB"},
+    "RB": {"RB", "RWB"},
+    "LWB": {"LWB", "LM", "LB"},
+    "RWB": {"RWB", "RM", "RB"},
+    "CDM": {"CDM"},
+    "CDM1": {"CDM", "CM"},
+    "CDM2": {"CDM", "CM"},
+    "CM1": {"CM", "CDM", "CAM"},
+    "CM2": {"CM", "CDM", "CAM"},
+    "CM3": {"CM", "CDM", "CAM"},
+    "CAM": {"CAM", "CM"},
+    "LM": {"LM", "LW", "CM"},
+    "RM": {"RM", "RW", "CM"},
+    "LW": {"LW", "LM"},
+    "RW": {"RW", "RM"},
+    "ST": {"ST", "CF"},
+    "ST1": {"ST", "CF"},
+    "ST2": {"ST", "CF"},
 }
 
-POSITION_LABELS = {
-    "GK": "GOL", "GOL": "GOL", "CB": "ZAG", "ZAG": "ZAG", "DF": "ZAG",
-    "LB": "LE", "LE": "LE", "RB": "LD", "LD": "LD", "LWB": "AE",
-    "AE": "AE", "ADE": "AE", "RWB": "AD", "AD": "AD", "ADD": "AD",
-    "CDM": "VOL", "VOL": "VOL", "CM": "MC", "MC": "MC", "MF": "MC",
-    "CAM": "MEI", "MEI": "MEI", "LM": "ME", "ME": "ME", "RM": "MD",
-    "MD": "MD", "LW": "PE", "PE": "PE", "RW": "PD", "PD": "PD",
-    "CF": "SA", "SA": "SA", "ST": "CA", "CA": "CA", "FW": "CA",
-}
 
-SLOT_BASE_POSITIONS = {
-    "GK": "GK",
-    "LB": "LB",
-    "CB1": "CB", "CB2": "CB", "CB3": "CB",
-    "RB": "RB",
-    "LWB": "LWB", "RWB": "RWB",
-    "CDM": "CDM", "CDM1": "CDM", "CDM2": "CDM",
-    "CM1": "CM", "CM2": "CM", "CM3": "CM",
-    "CAM": "CAM", "LM": "LM", "RM": "RM",
-    "LW": "LW", "RW": "RW",
-    "ST": "ST", "ST1": "ST", "ST2": "ST",
-}
+def normalize_position(value: str | None) -> str:
+    return str(value or "").strip().upper()
+
+
+def get_allowed_positions(slot: str | None) -> set[str] | None:
+    return FORMATION_SLOTS.get(normalize_position(slot))
 
 
 def get_slot_base_position(slot: str | None) -> str | None:
-    return SLOT_BASE_POSITIONS.get(str(slot or "").strip().upper())
-
-
-def get_position_group(position: str | None) -> str | None:
-    value = str(position or "").strip().upper()
-    value = SLOT_BASE_POSITIONS.get(value, value)
-    return next(
-        (group for group, positions in POSITION_GROUPS.items() if value in positions),
-        None,
-    )
-
-
-def canonical_position(position: str | None) -> str:
-    value = str(position or "").strip().upper()
-    return POSITION_LABELS.get(value, value)
-
-
-def same_position(left: str | None, right: str | None) -> bool:
-    return canonical_position(left) == canonical_position(right)
+    normalized_slot = normalize_position(slot)
+    allowed_positions = get_allowed_positions(normalized_slot)
+    if not allowed_positions:
+        return None
+    if normalized_slot.startswith("CB"):
+        return "CB"
+    if normalized_slot.startswith("CM"):
+        return "CM"
+    if normalized_slot.startswith("CDM"):
+        return "CDM"
+    if normalized_slot.startswith("ST"):
+        return "ST"
+    return normalized_slot
 
 
 def same_slot(left: str | None, right: str | None) -> bool:
-    return str(left or "").strip().upper() == str(right or "").strip().upper()
-
-
-def can_play_in_position(player_position: str | None, target_position: str | None) -> bool:
-    player_group = get_position_group(player_position)
-    target_group = get_position_group(target_position)
-    return bool(player_group and target_group and player_group == target_group)
+    return normalize_position(left) == normalize_position(right)
 
 
 def can_play_in_slot(player_position: str | None, target_slot: str | None) -> bool:
-    target_base_position = get_slot_base_position(target_slot)
+    allowed_positions = get_allowed_positions(target_slot)
     return bool(
-        target_base_position
-        and can_play_in_position(player_position, target_base_position)
+        allowed_positions
+        and normalize_position(player_position) in allowed_positions
     )
