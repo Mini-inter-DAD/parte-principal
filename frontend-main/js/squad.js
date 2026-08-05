@@ -79,8 +79,42 @@ const FORMATIONS = {
 };
 
 // Posições ofensivas e defensivas para cálculo do OVR breakdown
-const ATTACK_GROUPS = ['attacker'];
-const DEFENSE_GROUPS = ['goalkeeper', 'defender'];
+const SLOT_RULES = Object.freeze({
+  GK:   { label: 'GOL', allowedPositions: ['GK'] },
+  LB:   { label: 'LE',  allowedPositions: ['LB', 'LWB'] },
+  CB1:  { label: 'ZAG', allowedPositions: ['CB'] },
+  CB2:  { label: 'ZAG', allowedPositions: ['CB'] },
+  CB3:  { label: 'ZAG', allowedPositions: ['CB'] },
+  RB:   { label: 'LD',  allowedPositions: ['RB', 'RWB'] },
+  LWB:  { label: 'AE',  allowedPositions: ['LWB', 'LM', 'LB'] },
+  RWB:  { label: 'AD',  allowedPositions: ['RWB', 'RM', 'RB'] },
+  CDM:  { label: 'VOL', allowedPositions: ['CDM'] },
+  CDM1: { label: 'VOL', allowedPositions: ['CDM', 'CM'] },
+  CDM2: { label: 'VOL', allowedPositions: ['CDM', 'CM'] },
+  CM1:  { label: 'MC',  allowedPositions: ['CM', 'CDM', 'CAM'] },
+  CM2:  { label: 'MC',  allowedPositions: ['CM', 'CDM', 'CAM'] },
+  CM3:  { label: 'MC',  allowedPositions: ['CM', 'CDM', 'CAM'] },
+  CAM:  { label: 'MEI', allowedPositions: ['CAM', 'CM'] },
+  LM:   { label: 'ME',  allowedPositions: ['LM', 'LW', 'CM'] },
+  RM:   { label: 'MD',  allowedPositions: ['RM', 'RW', 'CM'] },
+  LW:   { label: 'PE',  allowedPositions: ['LW', 'LM'] },
+  RW:   { label: 'PD',  allowedPositions: ['RW', 'RM'] },
+  ST:   { label: 'CA',  allowedPositions: ['ST', 'CF'] },
+  ST1:  { label: 'CA',  allowedPositions: ['ST', 'CF'] },
+  ST2:  { label: 'CA',  allowedPositions: ['ST', 'CF'] },
+});
+
+Object.values(FORMATIONS).forEach(slots => {
+  slots.forEach(slot => {
+    const rule = SLOT_RULES[slot.slot];
+    slot.slotId = slot.slot;
+    slot.label = rule.label;
+    slot.allowedPositions = rule.allowedPositions;
+  });
+});
+
+const ATTACK_SLOTS = ['LW', 'RW', 'ST', 'ST1', 'ST2'];
+const DEFENSE_SLOTS = ['GK', 'LB', 'CB1', 'CB2', 'CB3', 'RB', 'LWB', 'RWB'];
 
 // ─── Estado ───────────────────────────────────────────────────────────────────
 const SQUAD_STATE = {
@@ -174,7 +208,7 @@ function buildLineup() {
   SQUAD_STATE.lineup = slots.map(slot => {
     const player = starters.find(
       current => !renderedPlayerIds.has(Number(current.id))
-        && String(current.squad_position).toUpperCase() === slot.slot
+        && String(current.squad_position).toUpperCase() === slot.slotId
     );
     if (player) renderedPlayerIds.add(Number(player.id));
     return { ...slot, player: player || null };
@@ -198,9 +232,9 @@ function renderField() {
   SQUAD_STATE.lineup.forEach(slot => {
 
     const el = document.createElement('div');
-    const selected = slot.slot === SQUAD_STATE.selectedSlotPosition;
+    const selected = slot.slotId === SQUAD_STATE.selectedSlotPosition;
     const incompatible = selectedPlayer
-      && !canPlayInPosition(selectedPlayer.position, slot.basePosition);
+      && !canPlayerEnterSlot(selectedPlayer, slot);
     el.className = [
       'field-slot',
       slot.player ? '' : 'field-slot--empty',
@@ -217,13 +251,13 @@ function renderField() {
 
     if (slot.player) {
       // mostra APENAS a posição dentro da bolinha
-      token.textContent = formatPosition(slot.basePosition);
+      token.textContent = slot.label;
       el.setAttribute(
         'title',
-        `${slot.player.name} · ${formatPosition(slot.basePosition)}`
+        `${slot.player.name} · ${slot.label}`
       );
     } else {
-      token.textContent = formatPosition(slot.basePosition);
+      token.textContent = slot.label;
     }
 
     const nameEl = document.createElement('span');
@@ -232,7 +266,7 @@ function renderField() {
     // mostra nome completo
     nameEl.textContent = slot.player
       ? slot.player.name
-      : formatPosition(slot.basePosition);
+      : slot.label;
 
     el.appendChild(token);
     el.appendChild(nameEl);
@@ -270,7 +304,7 @@ function renderBoxscore() {
 
     const pos = document.createElement('span');
     pos.className = 'boxscore-item__pos-badge';
-    pos.textContent = formatPosition(slot.basePosition);
+    pos.textContent = slot.label;
 
     const name = document.createElement('span');
     name.className = `boxscore-item__name${slot.player ? '' : ' boxscore-item__name--empty'}`;
@@ -339,6 +373,11 @@ function getSelectedPlayer() {
   ) || null;
 }
 
+function canPlayerEnterSlot(player, slot) {
+  const naturalPosition = String(player?.position || '').trim().toUpperCase();
+  return slot.allowedPositions.includes(naturalPosition);
+}
+
 function showToast(message, isError = false) {
   let toast = document.getElementById('squad-toast');
   if (!toast) {
@@ -378,7 +417,7 @@ function handlePlayerClick(playerId) {
 
 async function handleSlotClick(slot) {
   const selectedPlayer = getSelectedPlayer();
-  SQUAD_STATE.selectedSlotPosition = slot.slot;
+  SQUAD_STATE.selectedSlotPosition = slot.slotId;
 
   if (!selectedPlayer) {
     renderField();
@@ -386,14 +425,14 @@ async function handleSlotClick(slot) {
     return;
   }
 
-  if (!canPlayInPosition(selectedPlayer.position, slot.basePosition)) {
+  if (!canPlayerEnterSlot(selectedPlayer, slot)) {
     showToast('Posição incompatível para este jogador.', true);
     clearSelection();
     renderField();
     renderBoxscore();
     return;
   }
-  await assignSelectedPlayer(slot.slot);
+  await assignSelectedPlayer(slot.slotId);
 }
 
 async function assignSelectedPlayer(targetPosition) {
@@ -404,7 +443,7 @@ async function assignSelectedPlayer(targetPosition) {
     await api.assignPosition({
       user_id: userId,
       player_id: Number(player.id),
-      target_position: targetPosition,
+      target_slot: targetPosition,
     });
     clearSelection();
     await loadSquad({ failOnError: true });
@@ -466,10 +505,10 @@ function updateOVR() {
 
   const all     = withPlayers.map(s => Number(s.player.overall ?? s.player.ovr ?? 0));
   const attack  = withPlayers
-    .filter(s => ATTACK_GROUPS.includes(getPositionGroup(s.basePosition)))
+    .filter(s => ATTACK_SLOTS.includes(s.slotId))
     .map(s => Number(s.player.overall ?? s.player.ovr ?? 0));
   const defense = withPlayers
-    .filter(s => DEFENSE_GROUPS.includes(getPositionGroup(s.basePosition)))
+    .filter(s => DEFENSE_SLOTS.includes(s.slotId))
     .map(s => Number(s.player.overall ?? s.player.ovr ?? 0));
 
   setOVRDisplay(avg(all), avg(attack), avg(defense));
