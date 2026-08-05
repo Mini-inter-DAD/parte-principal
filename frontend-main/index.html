@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dream Cup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/accessibility.css" />
+  <link rel="stylesheet" href="css/landing.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════
+         NAVBAR
+    ════════════════════════════════════════ -->
+  <header class="nav" role="banner">
+    <a href="index.html" class="nav__logo" aria-label="Dream Cup — página inicial">
+      Dream Cup
+    </a>
+    <nav aria-label="Navegação principal">
+      <a href="auth.html" class="nav__cta" aria-label="Entrar ou criar conta">
+        JOGUE AGORA
+      </a>
+    </nav>
+  </header>
+
+  <main id="main-content">
+
+    <!-- ═══════════════════════════════════════
+           SEÇÃO 1 — HERO
+      ════════════════════════════════════════ -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="hero__glow" aria-hidden="true"></div>
+
+      <div class="hero__content">
+        <p class="hero__eyebrow">Dream Cup</p>
+        <h1 id="hero-heading" class="hero__title">
+          O seu novo simulador de
+          <span class="hero__title--highlight">futebol</span>
+          favorito
+        </h1>
+        <p class="hero__description">
+          Imagine um universo em que você pode montar a sua própria seleção dos sonhos,
+          disputar amistosos emocionantes e construir uma dinastia de craques vindos de
+          todo o mundo.
+        </p>
+        <a href="auth.html" class="btn btn--primary" aria-label="Começar a jogar agora">
+          JOGUE AGORA
+        </a>
+      </div>
+
+      <div class="hero__cards" aria-hidden="true">
+        <div class="card-mock card-mock--back-left">
+          <img src="assets/Mbappe.png" alt="Mbappé" class="card-mock__img" />
+        </div>
+        <div class="card-mock card-mock--back-right">
+          <img src="assets/Neymar Jr.png" alt="Neymar Jr" class="card-mock__img" />
+        </div>
+        <div class="card-mock card-mock--front">
+          <img src="assets/Lamine Yamal.png" alt="Lamine Yamal" class="card-mock__img" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+           SEÇÃO 2 — MONTE SUA SELEÇÃO
+      ════════════════════════════════════════ -->
+    <section class="feature feature--reverse" aria-labelledby="squad-heading">
+      <div class="feature__visual" aria-hidden="true">
+        <div class="squad-mock">
+          <img src="assets/squad-builder.png" alt="Mockup da tela de montagem de seleção" class="squad-mock__img" />
+        </div>
+      </div>
+
+      <div class="feature__text">
+        <p class="feature__eyebrow">Seu time, do seu jeito</p>
+        <h2 id="squad-heading" class="feature__title">
+          Monte e personalize a sua
+          <span class="feature__title--highlight">Seleção</span>
+        </h2>
+        <p class="feature__description">
+          Combine e colecione mais de <strong>1 trilhão</strong> de combinações
+          possíveis de seleções. Monte uma escalação com a sua cara e com os seus
+          jogadores favoritos de qualquer nação.
+        </p>
+        <a href="auth.html" class="btn btn--outline">MONTAR MINHA SELEÇÃO</a>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+           SEÇÃO 3 — COLECIONE AS CARTAS
+      ════════════════════════════════════════ -->
+    <section class="feature" aria-labelledby="cards-heading">
+      <div class="feature__text">
+        <p class="feature__eyebrow">Mais de 1200 cartas</p>
+        <h2 id="cards-heading" class="feature__title">
+          Colecione as
+          <span class="feature__title--highlight">+1200 Cartas</span>
+          de Jogadores
+        </h2>
+        <p class="feature__description">
+          Descubra e colecione as cartas dos melhores jogadores da Copa do Mundo.
+          Compare pontuações gerais, explore coleções e monte elencos únicos para
+          o seu estilo de jogo.
+        </p>
+        <a href="auth.html" class="btn btn--outline">VER JOGADORES</a>
+      </div>
+
+      <div class="feature__visual feature__visual--cards" aria-hidden="true">
+        <div class="cards-fan">
+          <div class="hero__cards" aria-hidden="true">
+            <div class="card-mock card-mock--back-left">
+              <img src="assets/Marquinhos.png" alt="Marquinhos" class="card-mock__img" />
+            </div>
+            <div class="card-mock card-mock--back-right">
+              <img src="assets/Vitinha.png" alt="Vtinha" class="card-mock__img" />
+            </div>
+            <div class="card-mock card-mock--front">
+              <img src="assets/Endrick.png" alt="Endrick" class="card-mock__img" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+           SEÇÃO 5 — CTA FINAL
+      ════════════════════════════════════════ -->
+    <section class="cta-final" aria-labelledby="cta-heading">
+      <h2 id="cta-heading" class="cta-final__title">
+        Pronto para montar a sua
+        <span class="feature__title--highlight">seleção dos sonhos?</span>
+      </h2>
+      <p class="cta-final__sub">
+        Cadastre-se gratuitamente e receba seu elenco inicial agora.
+      </p>
+      <a href="auth.html" class="btn btn--primary btn--large" aria-label="Criar conta gratuitamente e começar a jogar">
+        COMEÇAR AGORA
+      </a>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════
+         FOOTER
+    ════════════════════════════════════════ -->
+  <footer class="footer" role="contentinfo">
+    <p class="footer__logo" aria-label="Dream Cup">Dream Cup</p>
+    <p class="footer__copy">
+      Todos os Direitos Reservados · 2026
+    </p>
+  </footer>
+
+  <script src="js/accessibility.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/index.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", initAccessibility);</script>
+  <script src="js/notify.js"></script>
+</body>
+
+</html>

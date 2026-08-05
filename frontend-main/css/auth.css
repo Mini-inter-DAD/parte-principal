@@ -1,0 +1,437 @@
+/* Login / Cadastro */
+
+/* ─── NAVBAR (reaproveitada da landing) ──────────────────────────────────── */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 1.2rem 2.5rem;
+  background: rgba(15, 25, 35, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .nav {
+  background: rgba(240, 244, 248, 0.85);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.nav__logo {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text);
+}
+
+.nav__logo:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* ─── PAGE ───────────────────────────────────────────────────────────────── */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 1.5rem 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── CARD ───────────────────────────────────────────────────────────────── */
+
+.auth-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 600px;
+  background: var(--color-surface);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-card);
+  padding: 2.5rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .auth-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.1);
+}
+
+/* ─── ABAS ───────────────────────────────────────────────────────────────── */
+
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] .auth-tabs {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  margin-bottom: -1px;
+  min-height: 44px;
+}
+
+.auth-tab:hover {
+  color: var(--color-text);
+}
+
+.auth-tab--active {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.auth-tab:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: -2px;
+  border-radius: 4px 4px 0 0;
+}
+
+/* ─── TÍTULOS ────────────────────────────────────────────────────────────── */
+
+.auth-card__title {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--color-text);
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.02em;
+}
+
+.auth-card__subtitle {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1.75rem;
+  line-height: 1.5;
+}
+
+/* ─── FORMULÁRIO ─────────────────────────────────────────────────────────── */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.auth-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auth-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.auth-forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -0.5rem; /* aperta um pouco o espaço acima sem grudar */
+}
+
+.auth-forgot {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  font-size: 0.78rem;
+  font-family: var(--font-main);
+  cursor: pointer;
+  padding: 0.4rem 0;
+  min-height: unset;
+  line-height: 1;
+}
+
+.auth-forgot:hover {
+  text-decoration: underline;
+}
+
+.auth-forgot:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* ─── INPUTS ─────────────────────────────────────────────────────────────── */
+
+.auth-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-btn);
+  color: var(--color-text);
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  min-height: 44px;
+}
+
+[data-theme="light"] .auth-input {
+  background: #f5f7fa;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: var(--color-text);
+}
+
+.auth-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15);
+}
+
+.auth-input--error {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15);
+}
+
+/* Input com botão de mostrar senha */
+.auth-input-wrapper .auth-input {
+  padding-right: 2.8rem;
+}
+
+.auth-input__toggle-pw {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  min-height: unset;
+  transition: color 0.15s;
+}
+
+.auth-input__toggle-pw:hover {
+  color: var(--color-text);
+}
+
+.auth-input__toggle-pw:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── ERROS ──────────────────────────────────────────────────────────────── */
+
+.auth-error {
+  font-size: 0.78rem;
+  color: var(--color-danger);
+  min-height: 1rem;
+  display: block;
+}
+
+.auth-error--form {
+  text-align: center;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+/* ─── BOTÃO SUBMIT ───────────────────────────────────────────────────────── */
+
+.auth-submit {
+  width: 100%;
+  padding: 0.85rem;
+  margin-top: 0.5rem;
+  background-color: var(--color-accent);
+  color: #0f1923;
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-btn);
+  font-family: var(--font-main);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.15s, color 0.15s, box-shadow 0.15s;
+  position: relative;
+}
+
+.auth-submit:hover {
+  background-color: transparent;
+  color: var(--color-accent);
+  box-shadow: 0 0 24px rgba(0, 212, 255, 0.25);
+}
+
+.auth-submit:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.auth-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Spinner de loading */
+.auth-submit__spinner {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.auth-submit--loading .auth-submit__label {
+  opacity: 0.7;
+}
+
+.auth-submit--loading .auth-submit__spinner {
+  display: block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── LINK DE TROCA DE ABA ───────────────────────────────────────────────── */
+
+.auth-switch {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.auth-switch__link {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  font-family: var(--font-main);
+  font-size: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: unset;
+}
+
+.auth-switch__link:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* ─── BOTÃO VOLTAR (esqueci senha) ───────────────────────────────────────── */
+
+.auth-back {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 1.25rem;
+  min-height: 44px;
+  transition: color 0.15s;
+}
+
+.auth-back:hover {
+  color: var(--color-text);
+}
+
+.auth-back:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* ─── SUCESSO (esqueci senha) ────────────────────────────────────────────── */
+
+.auth-success {
+  text-align: center;
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.auth-success__icon {
+  font-size: 2.5rem;
+}
+
+.auth-success__text {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* ─── PAINEL OCULTO ──────────────────────────────────────────────────────── */
+
+.auth-panel--hidden {
+  display: none;
+}
+
+/* ─── RESPONSIVO ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 2rem 1.25rem;
+  }
+
+  .auth-page {
+    padding: 5rem 1rem 2rem;
+    align-items: flex-start;
+  }
+}
+
+/* ─── Reduz movimento ────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-submit__spinner {
+    animation: none;
+    border-top-color: currentColor;
+    opacity: 0.4;
+  }
+}

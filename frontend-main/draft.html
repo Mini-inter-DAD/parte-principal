@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jogar | Dream Cup</title>
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/accessibility.css" />
+  <link rel="stylesheet" href="css/draft.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+  <header class="nav" role="banner">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo" aria-label="Dream Cup — voltar para a página inicial">Dream Cup</a>
+      <div id="navbar" class="nav__links" aria-hidden="false"></div>
+      <div class="nav__actions" id="nav-actions">
+        <div class="nav__coins" id="header-coins" aria-label="Saldo de coins">⚽ 0</div>
+      </div>
+    </div>
+  </header>
+  <script src="js/accessibility.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/draft.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", initAccessibility);</script>
+  <script src="js/notify.js"></script>
+</body>
+
+</html>
