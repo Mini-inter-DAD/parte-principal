@@ -64,6 +64,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const isPassword = input.type === 'password';
       input.type = isPassword ? 'text' : 'password';
       btn.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
+      btn.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
+      btn.innerHTML = isPassword
+        ? '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 4.2A10.9 10.9 0 0 1 12 4c7 0 11 8 11 8a19.1 19.1 0 0 1-3.2 4.3"/><path d="M6.6 6.6C3.5 8.6 1 12 1 12s4 8 11 8a10.9 10.9 0 0 0 3.8-.7"/></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
     });
   });
 
@@ -85,6 +89,18 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.classList.toggle('auth-submit--loading', loading);
   }
 
+  async function loginWithFormError(body) {
+    const apiUrl = new URLSearchParams(window.location.search).get('api') || 'http://localhost:8000';
+    const response = await fetch(`${apiUrl}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.detail || 'Usuário ou senha incorretos.');
+    return data;
+  }
+
   // ─── LOGIN ───────────────────────────────────────────────────────────────
   formLogin?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -101,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setLoading(btn, true);
     try {
-      const data = await api.login({ username, password });
+      const data = await loginWithFormError({ username, password });
       saveSession({ token: data.token, user: data.user });
       
       // Substituição: sucesso após login
@@ -110,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = `market.html${window.location.search}`;
     } catch (err) {
       // Substituição: notificação de erro no login
-      notify.error(err.message || 'Usuário ou senha incorretos.');
+      setError('login-form-error', err.message || 'Usuário ou senha incorretos.');
     } finally {
       setLoading(btn, false);
     }

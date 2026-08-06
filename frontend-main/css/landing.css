@@ -14,7 +14,8 @@
   cursor: pointer;
   text-decoration: none;
   border: 2px solid transparent;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease,
+    color 0.15s ease, border-color 0.15s ease;
   min-height: 44px; /* tap target WCAG */
 }
 
@@ -52,7 +53,40 @@
 }
 
 [data-theme="light"] .btn--primary {
+  background-color: var(--a11y-btn-active-color);
   color: #ffffff;
+  border-color: var(--a11y-btn-active-color);
+}
+
+[data-theme="light"] .btn--primary:hover {
+  background-color: #004f9e;
+  color: #ffffff;
+  border-color: #004f9e;
+  box-shadow: 0 0 24px rgba(0, 100, 200, 0.25);
+}
+
+[data-theme="light"] .btn--outline {
+  color: #174a6e;
+  border-color: #5d7891;
+}
+
+[data-theme="light"] .btn--outline:hover {
+  background-color: #dcefff;
+  color: #0b4770;
+  border-color: #005a9c;
+}
+
+[data-theme="light"] .btn:focus-visible,
+[data-theme="light"] .nav__cta:focus-visible {
+  outline-color: #005a9c;
+}
+
+[data-theme="light"] .hero__eyebrow,
+[data-theme="light"] .hero__title--highlight,
+[data-theme="light"] .feature__eyebrow,
+[data-theme="light"] .feature__title--highlight,
+[data-theme="light"] .loop-step__arrow {
+  color: var(--a11y-btn-active-color);
 }
 
 /* ─── NAVBAR ─────────────────────────────────────────────────────────────── */
@@ -107,6 +141,17 @@
 .nav__cta:hover {
   border-color: var(--color-accent);
   color: var(--color-accent);
+}
+
+[data-theme="light"] .nav__cta {
+  border-color: #5d7891;
+  color: #174a6e;
+}
+
+[data-theme="light"] .nav__cta:hover {
+  background-color: #dcefff;
+  border-color: #005a9c;
+  color: #0b4770;
 }
 
 .nav__cta:focus-visible {
