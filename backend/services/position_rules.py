@@ -1,9 +1,9 @@
 FORMATION_SLOTS = {
     "GK": {"GK"},
     "LB": {"LB", "LWB"},
-    "CB1": {"CB"},
-    "CB2": {"CB"},
-    "CB3": {"CB"},
+    "CB1": {"CB", "DF"},
+    "CB2": {"CB", "DF"},
+    "CB3": {"CB", "DF"},
     "RB": {"RB", "RWB"},
     "LWB": {"LWB", "LM", "LB"},
     "RWB": {"RWB", "RM", "RB"},
@@ -18,9 +18,9 @@ FORMATION_SLOTS = {
     "RM": {"RM", "RW", "CM"},
     "LW": {"LW", "LM"},
     "RW": {"RW", "RM"},
-    "ST": {"ST", "CF"},
-    "ST1": {"ST", "CF"},
-    "ST2": {"ST", "CF"},
+    "ST": {"ST", "CF", "FW"},
+    "ST1": {"ST", "CF", "FW"},
+    "ST2": {"ST", "CF", "FW"},
 }
 
 

@@ -82,9 +82,9 @@ const FORMATIONS = {
 const SLOT_RULES = Object.freeze({
   GK:   { label: 'GOL', allowedPositions: ['GK'] },
   LB:   { label: 'LE',  allowedPositions: ['LB', 'LWB'] },
-  CB1:  { label: 'ZAG', allowedPositions: ['CB'] },
-  CB2:  { label: 'ZAG', allowedPositions: ['CB'] },
-  CB3:  { label: 'ZAG', allowedPositions: ['CB'] },
+  CB1:  { label: 'ZAG', allowedPositions: ['CB', 'DF'] },
+  CB2:  { label: 'ZAG', allowedPositions: ['CB', 'DF'] },
+  CB3:  { label: 'ZAG', allowedPositions: ['CB', 'DF'] },
   RB:   { label: 'LD',  allowedPositions: ['RB', 'RWB'] },
   LWB:  { label: 'AE',  allowedPositions: ['LWB', 'LM', 'LB'] },
   RWB:  { label: 'AD',  allowedPositions: ['RWB', 'RM', 'RB'] },
@@ -99,10 +99,33 @@ const SLOT_RULES = Object.freeze({
   RM:   { label: 'MD',  allowedPositions: ['RM', 'RW', 'CM'] },
   LW:   { label: 'PE',  allowedPositions: ['LW', 'LM'] },
   RW:   { label: 'PD',  allowedPositions: ['RW', 'RM'] },
-  ST:   { label: 'CA',  allowedPositions: ['ST', 'CF'] },
-  ST1:  { label: 'CA',  allowedPositions: ['ST', 'CF'] },
-  ST2:  { label: 'CA',  allowedPositions: ['ST', 'CF'] },
+  ST:   { label: 'CA',  allowedPositions: ['ST', 'CF', 'FW'] },
+  ST1:  { label: 'CA',  allowedPositions: ['ST', 'CF', 'FW'] },
+  ST2:  { label: 'CA',  allowedPositions: ['ST', 'CF', 'FW'] },
 });
+
+const BENCH_POSITION_ORDER = Object.freeze([
+  'GK', 'LB', 'LWB', 'CB', 'DF', 'RB', 'RWB',
+  'CDM', 'CM', 'MC', 'MF', 'CAM', 'LM', 'RM',
+  'LW', 'RW', 'CF', 'ST', 'FW',
+]);
+
+function getBenchPositionOrder(player) {
+  const position = String(player?.position || '').trim().toUpperCase();
+  const index = BENCH_POSITION_ORDER.indexOf(position);
+  return index === -1 ? BENCH_POSITION_ORDER.length : index;
+}
+
+function compareBenchPlayers(left, right) {
+  const positionDifference = getBenchPositionOrder(left) - getBenchPositionOrder(right);
+  if (positionDifference) return positionDifference;
+
+  const overallDifference = Number(right.overall ?? right.ovr ?? 0)
+    - Number(left.overall ?? left.ovr ?? 0);
+  if (overallDifference) return overallDifference;
+
+  return String(left.name || '').localeCompare(String(right.name || ''), 'pt-BR');
+}
 
 Object.values(FORMATIONS).forEach(slots => {
   slots.forEach(slot => {
@@ -217,7 +240,7 @@ function buildLineup() {
   // Todo jogador que nao entrou no campo continua visivel no elenco.
   SQUAD_STATE.bench = SQUAD_STATE.players.filter(
     player => !renderedPlayerIds.has(Number(player.id))
-  );
+  ).sort(compareBenchPlayers);
 }
 
 // ─── Renderiza o campo ────────────────────────────────────────────────────────
