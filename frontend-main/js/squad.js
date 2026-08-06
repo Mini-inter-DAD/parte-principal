@@ -435,7 +435,7 @@ async function handleSlotClick(slot) {
   await assignSelectedPlayer(slot.slotId);
 }
 
-async function assignSelectedPlayer(targetPosition) {
+async function assignSelectedPlayer(targetSlot) {
   const userId = Number(getSession().user?.id);
   const player = getSelectedPlayer();
   if (!userId || !player) return;
@@ -443,7 +443,7 @@ async function assignSelectedPlayer(targetPosition) {
     await api.assignPosition({
       user_id: userId,
       player_id: Number(player.id),
-      target_slot: targetPosition,
+      target_slot: targetSlot,
     });
     clearSelection();
     await loadSquad({ failOnError: true });
@@ -453,7 +453,7 @@ async function assignSelectedPlayer(targetPosition) {
     if (
       !updatedPlayer
       || !updatedPlayer.is_starter
-      || String(updatedPlayer.squad_position).toUpperCase() !== targetPosition.toUpperCase()
+      || String(updatedPlayer.squad_position).toUpperCase() !== targetSlot.toUpperCase()
     ) {
       throw new Error('O jogador não foi confirmado na posição escolhida.');
     }
