@@ -373,7 +373,7 @@ function renderPlayers() {
         <div class="player-card__name">${escapeHtml(formatPlayerName(player.name || 'Jogador'))}</div>
         <div class="player-card__meta">
           <span class="player-card__flag">${getFlag(player.country_code || player.nationality)} ${escapeHtml(translateNationality(player.nationality || 'Seleção'))}</span>
-          <span>${escapeHtml(player.position || 'Posição')}</span>
+          <span>${escapeHtml(formatPosition(player.position || 'Posição'))}</span>
         </div>
         <div class="player-card__price">⚽ ${formatCoins(player.price ?? player.value ?? player.cost ?? 0)}</div>
         <button class="btn btn-buy ${buttonClass}" type="button" ${buttonDisabled} onclick="addPlayerToCart('${escapeHtml(playerId)}')">${buttonLabel}</button>
