@@ -5,6 +5,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jogar | Dream Cup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/accessibility.css" />
   <link rel="stylesheet" href="css/draft.css" />
@@ -21,12 +25,129 @@
       </div>
     </div>
   </header>
+
+  <main class="draft-page" id="main-content">
+    <section class="draft-hero" aria-labelledby="draft-title">
+      <div>
+        <p class="draft-eyebrow">Modo Draft · amistoso único</p>
+        <h1 id="draft-title">Coloque seu elenco à prova.</h1>
+        <p class="draft-hero__copy">Enfrente uma seleção da Copa em uma partida automática. Cada vitória rende coins
+          para fortalecer sua seleção no Mercado.</p>
+      </div>
+    </section>
+
+    <div id="draft-status" class="sr-only" role="status" aria-live="polite"></div>
+
+    <section class="draft-panel draft-panel--preview" id="match-preview" aria-labelledby="preview-title">
+      <div class="panel-heading">
+        <div>
+          <p class="draft-eyebrow">Próximo confronto</p>
+          <h2 id="preview-title">Prepare-se para o apito inicial</h2>
+          <span class="match-badge">DRAFT · 90 MIN</span>
+        </div>
+        <div class="panel-heading__actions">
+          <div class="draft-reward" aria-label="Recompensa pela vitória"><span class="draft-reward__label">Recompensa
+              pela vitória</span><strong>⚽ 250</strong></div>
+        </div>
+      </div>
+      <div class="matchup-card">
+        <div class="team-card team-card--user"><span class="team-card__tag">Seu elenco</span>
+          <div class="team-card__crest team-card__crest--user">DC</div>
+          <h3 id="player-team-name">Dream Cup FC</h3>
+          <div class="team-card__ovr"><span id="player-team-ovr">82</span><small>OVR</small></div><span
+            class="team-card__meta">Formação 4-3-3</span>
+        </div>
+        <div class="matchup-divider" aria-hidden="true"><span>VS</span><i></i><small>AMISTOSO</small></div>
+        <div class="team-card team-card--opponent"><span class="team-card__tag">Seleção adversária</span>
+          <div class="team-card__crest" id="opponent-flag" aria-label="Bandeira da seleção adversária"></div>
+          <h3 id="opponent-team-name">Japão</h3>
+          <div class="team-card__ovr"><span id="opponent-team-ovr">79</span><small>OVR</small></div><span
+            class="team-card__meta">Seleção da Copa do Mundo</span>
+        </div>
+      </div>
+      <div class="preview-footer">
+        <p><span class="status-dot"></span> Pronto para jogar <strong>·</strong>Resultado em tempo real!</p>
+        <button class="btn btn--primary draft-cta" id="btn-start-draft" type="button">JOGAR DRAFT
+          <span>→</span></button>
+      </div>
+    </section>
+
+    <section class="draft-panel live-match" id="live-match" hidden aria-labelledby="live-title">
+      <div class="panel-heading panel-heading--live">
+        <div>
+          <p class="draft-eyebrow draft-eyebrow--live" id="live-kicker"><span class="live-dot"></span> Ao vivo</p>
+          <h2 id="live-title">A partida começou</h2>
+        </div>
+        <div class="live-clock"><span id="match-minute">00</span><small>'</small></div>
+      </div>
+      <div class="live-scoreboard">
+        <div class="live-team"><span class="live-team__crest live-team__crest--user">DC</span><strong
+            id="live-player-name">Dream Cup FC</strong></div>
+        <div class="live-score"><strong id="player-score">0</strong><span>—</span><strong id="opponent-score">0</strong>
+        </div>
+        <div class="live-team live-team--right"><strong id="live-opponent-name">Japão</strong><span
+            class="live-team__crest" id="live-opponent-flag" aria-label="Bandeira da seleção adversária"></span></div>
+      </div>
+      <div class="match-progress" aria-label="Progresso da partida"><span id="match-progress-bar"></span></div>
+      <div class="events-heading"><span>EVENTOS DA PARTIDA</span><span>MINUTO A MINUTO</span></div>
+      <div class="match-events" id="match-events" role="log" aria-live="polite" aria-label="Eventos da partida"></div>
+      <p class="live-hint" id="live-hint">A bola está rolando. Os principais lances aparecerão aqui.</p>
+      <button class="btn btn--primary live-next" id="btn-next-result" type="button" hidden>PRÓXIMO
+        <span>→</span></button>
+    </section>
+
+    <section class="draft-panel result-panel" id="match-result" hidden aria-labelledby="result-title">
+      <div class="result-panel__icon" id="result-icon">✓</div>
+      <p class="draft-eyebrow" id="result-kicker">Fim de jogo</p>
+      <h2 id="result-title">Vitória!</h2>
+      <p class="result-panel__score"><strong id="result-player-score">0</strong><span>—</span><strong
+          id="result-opponent-score">0</strong></p>
+      <p class="result-panel__copy" id="result-copy">Seu elenco foi superior e garantiu mais uma vitória.</p>
+      <div class="result-reward" id="result-reward">+ ⚽ 250</div><button class="btn btn--primary" id="btn-play-again"
+        type="button">JOGAR NOVAMENTE <span>→</span></button>
+    </section>
+
+    <section class="history-section" aria-labelledby="history-title">
+      <div class="section-heading">
+        <div>
+          <p class="draft-eyebrow">Seu caminho</p>
+          <h2 id="history-title">Histórico recente</h2>
+        </div><span class="history-count" id="history-count">3 partidas</span>
+      </div>
+      <div class="match-history" id="match-history">
+        <article class="history-row history-row--win">
+          <div class="history-row__phase">AMISTOSO<strong>FINALIZADO</strong></div>
+          <div class="history-row__opponent"><span class="flag-icon"><img src="https://flagcdn.com/w80/us.png"
+                alt="Bandeira dos Estados Unidos"></span><strong>Estados Unidos</strong><small>Hoje · 10:42</small>
+          </div>
+          <div class="history-row__score"><strong>3</strong><span>—</span><strong>1</strong></div>
+          <div class="history-row__reward">+250 ⚽</div><span class="history-row__status">VITÓRIA</span>
+        </article>
+        <article class="history-row history-row--loss">
+          <div class="history-row__phase">AMISTOSO<strong>FINALIZADO</strong></div>
+          <div class="history-row__opponent"><span class="flag-icon"><img src="https://flagcdn.com/w80/fr.png"
+                alt="Bandeira da França"></span><strong>França</strong><small>Ontem · 18:20</small></div>
+          <div class="history-row__score"><strong>1</strong><span>—</span><strong>2</strong></div>
+          <div class="history-row__reward">— <small>Sem recompensa</small></div><span
+            class="history-row__status">DERROTA</span>
+        </article>
+        <article class="history-row history-row--win">
+          <div class="history-row__phase">AMISTOSO<strong>FINALIZADO</strong></div>
+          <div class="history-row__opponent"><span class="flag-icon"><img src="https://flagcdn.com/w80/mx.png"
+                alt="Bandeira do México"></span><strong>México</strong><small>02 AGO · 14:08</small></div>
+          <div class="history-row__score"><strong>2</strong><span>—</span><strong>0</strong></div>
+          <div class="history-row__reward">+250 ⚽</div><span class="history-row__status">VITÓRIA</span>
+        </article>
+      </div>
+    </section>
+  </main>
+
   <script src="js/accessibility.js"></script>
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/navbar.js"></script>
   <script src="js/draft.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", initAccessibility);</script>
+  <script>document.addEventListener("DOMContentLoaded", () => { initDraft(); initAccessibility(); });</script>
   <script src="js/notify.js"></script>
 </body>
 
