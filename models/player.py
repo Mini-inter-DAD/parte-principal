@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from backend.services.player_pricing import calculate_player_price
+
 class Player(BaseModel):
     ea_id: int
     raw_name: str
@@ -13,4 +15,4 @@ class Player(BaseModel):
 
     @property
     def price(self):
-        return self.overall ** 2
+        return calculate_player_price(self.overall)

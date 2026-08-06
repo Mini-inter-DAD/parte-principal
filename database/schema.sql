@@ -6,7 +6,7 @@ CREATE TABLE users (
     username      VARCHAR(50) NOT NULL UNIQUE,
     email         VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    coins         INTEGER NOT NULL DEFAULT 500 CHECK (coins >= 0),
+    coins         INTEGER NOT NULL DEFAULT 15000 CHECK (coins >= 0),
     created_at    TIMESTAMP NOT NULL DEFAULT now()
 );
 
@@ -60,6 +60,26 @@ CREATE TABLE user_players (
     is_starter      BOOLEAN NOT NULL DEFAULT FALSE,
 
     acquired_at     TIMESTAMP NOT NULL DEFAULT now(),
+
+    UNIQUE(user_id, player_id)
+);
+
+-- ============================================================
+-- CART ITEMS
+-- Jogadores separados para compra pelo usuario
+-- ============================================================
+CREATE TABLE IF NOT EXISTS cart_items (
+    id          SERIAL PRIMARY KEY,
+
+    user_id     INTEGER NOT NULL
+                REFERENCES users(id)
+                ON DELETE CASCADE,
+
+    player_id   INTEGER NOT NULL
+                REFERENCES players(id)
+                ON DELETE CASCADE,
+
+    created_at  TIMESTAMP NOT NULL DEFAULT now(),
 
     UNIQUE(user_id, player_id)
 );
