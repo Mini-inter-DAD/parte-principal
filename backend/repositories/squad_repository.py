@@ -146,7 +146,7 @@ def assign_player_to_position(
     db: Session,
     user_id: int,
     player_id: int,
-    target_position: str,
+    target_slot: str,
     replaced_player_ids: list[int],
 ):
     for replaced_player_id in replaced_player_ids:
@@ -154,9 +154,16 @@ def assign_player_to_position(
             text("""
                 UPDATE user_players
                 SET is_starter = FALSE, squad_position = NULL
-                WHERE user_id = :user_id AND player_id = :player_id
+                WHERE user_id = :user_id
+                  AND player_id = :player_id
+                  AND is_starter = TRUE
+                  AND UPPER(squad_position) = :target_slot
             """),
-            {"user_id": user_id, "player_id": replaced_player_id},
+            {
+                "user_id": user_id,
+                "player_id": replaced_player_id,
+                "target_slot": target_slot,
+            },
         )
     db.execute(
         text("""
@@ -169,14 +176,14 @@ def assign_player_to_position(
     result = db.execute(
         text("""
             UPDATE user_players
-            SET is_starter = TRUE, squad_position = :target_position
+            SET is_starter = TRUE, squad_position = :target_slot
             WHERE user_id = :user_id AND player_id = :player_id
             RETURNING player_id, is_starter, squad_position
         """),
         {
             "user_id": user_id,
             "player_id": player_id,
-            "target_position": target_position,
+            "target_slot": target_slot,
         },
     )
     return result.mappings().first()
