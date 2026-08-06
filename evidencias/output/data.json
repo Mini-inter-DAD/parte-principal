@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1778081844288,
+    "url": "https://www.picpay.com",
+    "report_url": "output/reports/1778081844288.html",
+    "created_at": "2026-05-06T15:37:24.291Z",
+    "score": 77
+  },
+  {
+    "id": 1778081670913,
+    "url": "https://www.picpay.com",
+    "report_url": "output/reports/1778081670913.html",
+    "created_at": "2026-05-06T15:34:30.925Z",
+    "score": 77
+  },
+  {
+    "id": 1778081591843,
+    "url": "https://www.original.com.br/",
+    "report_url": "output/reports/1778081591843.html",
+    "created_at": "2026-05-06T15:33:11.846Z",
+    "score": 86
+  }
+]
