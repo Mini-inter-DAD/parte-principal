@@ -5,7 +5,7 @@ const MARKET_STATE = {
     section: '',
     nation: '',
     position: '',
-    ovrMin: 70,
+    ovrMin: 60,
     ovrMax: 99,
     priceMin: 0,
     priceMax: 999999,
@@ -250,7 +250,7 @@ function bindFilters() {
       section: '',
       nation: '',
       position: '',
-      ovrMin: 70,
+      ovrMin: 60,
       ovrMax: 99,
       priceMin: 0,
       priceMax: 999999,
@@ -260,7 +260,7 @@ function bindFilters() {
     query.value = '';
     nation.value = '';
     position.value = '';
-    ovrMin.value = 70;
+    ovrMin.value = 60;
     ovrMax.value = 99;
     if (priceMin) priceMin.value = 0;
     if (priceMax) priceMax.value = 999999;

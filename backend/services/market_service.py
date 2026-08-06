@@ -27,7 +27,7 @@ def list_market(
     price_min=None,
     price_max=None,
     section=None,
-    limit=100,
+    limit=10000,
 ):
     if overall_min is not None and overall_max is not None and overall_min > overall_max:
         raise BusinessRuleError("overall minimum cannot be greater than maximum")
@@ -43,7 +43,7 @@ def list_market(
         position=position,
         overall_min=overall_min,
         overall_max=overall_max,
-        limit=1000,
+        limit=10000,
     ):
         if normalized_query and normalized_query not in compact_search(player["name"]):
             continue
