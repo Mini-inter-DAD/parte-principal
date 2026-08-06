@@ -11,8 +11,14 @@ const MARKET_STATE = {
     priceMax: 999999,
     query: '',
   },
+  catalog: [],
+  catalogLoaded: false,
   sections: [],
   players: [],
+  pagination: {
+    page: 1,
+    pageSize: 26,
+  },
   cart: {
     items: [],
     total: 0,
@@ -101,6 +107,8 @@ async function initMarket() {
   ensureAuth();
   renderNavbar('market');
   bindFilters();
+  bindFilterToggle();
+  bindPagination();
   bindCartControls();
   await Promise.all([loadSections(), loadCart(), loadOwnedPlayers()]);
   await loadPlayers();
@@ -109,11 +117,24 @@ async function initMarket() {
 
 function bindCartControls() {
   const focusButton = document.getElementById('btn-cart-focus');
+  const closeButton = document.getElementById('btn-close-cart');
+  const cartPanel = document.getElementById('cart-panel');
   const clearButton = document.getElementById('btn-clear-cart');
   const checkoutButton = document.getElementById('btn-checkout');
 
+  const setCartOpen = (isOpen) => {
+    if (!cartPanel || !focusButton) return;
+    cartPanel.setAttribute('aria-hidden', String(!isOpen));
+    focusButton.setAttribute('aria-expanded', String(isOpen));
+  };
+
   focusButton?.addEventListener('click', () => {
-    document.getElementById('cart-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const isOpen = cartPanel?.getAttribute('aria-hidden') !== 'true';
+    setCartOpen(!isOpen);
+  });
+  closeButton?.addEventListener('click', () => setCartOpen(false));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setCartOpen(false);
   });
   clearButton?.addEventListener('click', clearCart);
   checkoutButton?.addEventListener('click', checkoutCart);
@@ -182,37 +203,44 @@ function bindFilters() {
 
   query.addEventListener('input', (event) => {
     MARKET_STATE.filters.query = event.target.value;
+    resetMarketPage();
     search();
   });
 
   nation.addEventListener('change', (event) => {
     MARKET_STATE.filters.nation = event.target.value;
+    resetMarketPage();
     loadPlayers();
   });
 
   position.addEventListener('change', (event) => {
     MARKET_STATE.filters.position = event.target.value;
+    resetMarketPage();
     loadPlayers();
   });
 
   ovrMin.addEventListener('change', (event) => {
     MARKET_STATE.filters.ovrMin = Number(event.target.value);
+    resetMarketPage();
     loadPlayers();
   });
 
   ovrMax.addEventListener('change', (event) => {
     MARKET_STATE.filters.ovrMax = Number(event.target.value);
+    resetMarketPage();
     loadPlayers();
   });
 
   if (priceMin && priceMax) {
     priceMin.addEventListener('change', (event) => {
       MARKET_STATE.filters.priceMin = Number(event.target.value || 0);
+      resetMarketPage();
       loadPlayers();
     });
 
     priceMax.addEventListener('change', (event) => {
       MARKET_STATE.filters.priceMax = Number(event.target.value || 0);
+      resetMarketPage();
       loadPlayers();
     });
   }
@@ -236,9 +264,56 @@ function bindFilters() {
     ovrMax.value = 99;
     if (priceMin) priceMin.value = 0;
     if (priceMax) priceMax.value = 999999;
+    resetMarketPage();
     loadPlayers();
     updateHeroSummary();
   });
+}
+
+function bindFilterToggle() {
+  const toggle = document.getElementById('btn-toggle-filters');
+  const fields = document.getElementById('filter-fields');
+  if (!toggle || !fields) return;
+
+  toggle.addEventListener('click', () => {
+    const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+    const nextExpanded = !isExpanded;
+    toggle.setAttribute('aria-expanded', String(nextExpanded));
+    fields.setAttribute('aria-hidden', String(!nextExpanded));
+    fields.classList.toggle('filter-card__body--collapsed', !nextExpanded);
+    fields.inert = !nextExpanded;
+
+    const label = toggle.querySelector('.filter-card__toggle-label');
+    const icon = toggle.querySelector('.filter-card__toggle-icon');
+    if (label) label.textContent = nextExpanded ? 'Ocultar filtros' : 'Mostrar filtros';
+    if (icon) icon.textContent = nextExpanded ? '⌃' : '⌄';
+  });
+}
+
+function bindPagination() {
+  const previous = document.getElementById('pagination-previous');
+  const next = document.getElementById('pagination-next');
+  if (!previous || !next) return;
+
+  previous.addEventListener('click', () => {
+    if (MARKET_STATE.pagination.page <= 1) return;
+    MARKET_STATE.pagination.page -= 1;
+    renderPlayers();
+  });
+
+  next.addEventListener('click', () => {
+    if (MARKET_STATE.pagination.page >= getPageCount()) return;
+    MARKET_STATE.pagination.page += 1;
+    renderPlayers();
+  });
+}
+
+function resetMarketPage() {
+  MARKET_STATE.pagination.page = 1;
+}
+
+function getPageCount() {
+  return Math.max(1, Math.ceil(MARKET_STATE.players.length / MARKET_STATE.pagination.pageSize));
 }
 
 async function loadSections() {
@@ -267,6 +342,7 @@ function renderSectionTabs() {
     button.textContent = section;
     button.addEventListener('click', () => {
       MARKET_STATE.filters.section = section === 'Todos' ? '' : section;
+      resetMarketPage();
       renderSectionTabs();
       loadPlayers();
     });
@@ -291,17 +367,18 @@ function buildFilterParams() {
 }
 
 async function loadPlayers() {
-  const params = buildFilterParams();
-
   try {
-    const data = await api.getMarket(params);
-    MARKET_STATE.players = Array.isArray(data) ? data : data.players || [];
-
-    if (!MARKET_STATE.players.length) {
-      MARKET_STATE.players = FALLBACK_PLAYERS.filter((player) => filterPlayer(player));
+    if (!MARKET_STATE.catalogLoaded) {
+      const data = await api.getMarket({});
+      MARKET_STATE.catalog = Array.isArray(data) ? data : data.players || [];
+      MARKET_STATE.catalogLoaded = true;
     }
-  } catch {
-    MARKET_STATE.players = FALLBACK_PLAYERS.filter((player) => filterPlayer(player));
+    MARKET_STATE.players = MARKET_STATE.catalog.filter((player) => filterPlayer(player));
+  } catch (error) {
+    MARKET_STATE.catalog = [];
+    MARKET_STATE.players = [];
+    MARKET_STATE.catalogLoaded = false;
+    notify.error(error.message || 'Não foi possível carregar os jogadores do mercado.');
   }
 
   renderPlayers();
@@ -346,14 +423,21 @@ function filterPlayer(player) {
 
 function renderPlayers() {
   const grid = document.getElementById('player-grid');
+  if (!grid) return;
   grid.innerHTML = '';
+
+  const pageCount = getPageCount();
+  MARKET_STATE.pagination.page = Math.min(MARKET_STATE.pagination.page, pageCount);
+  const pageStart = (MARKET_STATE.pagination.page - 1) * MARKET_STATE.pagination.pageSize;
+  const pagePlayers = MARKET_STATE.players.slice(pageStart, pageStart + MARKET_STATE.pagination.pageSize);
 
   if (!MARKET_STATE.players.length) {
     grid.innerHTML = '<div class="no-results">Nenhum jogador encontrado. Ajuste os filtros ou limpe a pesquisa.</div>';
+    renderPagination(0);
     return;
   }
 
-  MARKET_STATE.players.forEach((player) => {
+  pagePlayers.forEach((player) => {
     const playerId = String(player.id || '');
     const isOwned = MARKET_STATE.ownedPlayerIds.has(playerId);
     const isInCart = MARKET_STATE.cart.items.some((item) => String(item.id) === playerId);
@@ -382,6 +466,24 @@ function renderPlayers() {
 
     grid.appendChild(item);
   });
+
+  renderPagination(pageCount);
+}
+
+function renderPagination(pageCount) {
+  const pagination = document.getElementById('market-pagination');
+  const previous = document.getElementById('pagination-previous');
+  const next = document.getElementById('pagination-next');
+  const status = document.getElementById('pagination-status');
+  if (!pagination || !previous || !next || !status) return;
+
+  const hasResults = MARKET_STATE.players.length > 0;
+  pagination.hidden = !hasResults;
+  if (!hasResults) return;
+
+  status.textContent = `P\u00e1gina ${MARKET_STATE.pagination.page} de ${pageCount}`;
+  previous.disabled = MARKET_STATE.pagination.page <= 1;
+  next.disabled = MARKET_STATE.pagination.page >= pageCount;
 }
 
 function renderPlayerImage(player) {
@@ -397,8 +499,12 @@ function renderPlayerImage(player) {
 
 function populateNationOptions() {
   const select = document.getElementById('filter-nation');
+  if (!select) return;
+  const selectedNation = MARKET_STATE.filters.nation;
   select.innerHTML = '<option value="">Todas</option>';
-  const nations = new Set([...(MARKET_STATE.players || []).map((player) => player.nationality).filter(Boolean)]);
+  const nations = [...new Set(
+    (MARKET_STATE.catalog || []).map((player) => player.nationality).filter(Boolean),
+  )].sort((a, b) => String(a).localeCompare(String(b), 'pt-BR'));
 
   nations.forEach((nation) => {
     const option = document.createElement('option');
@@ -406,6 +512,8 @@ function populateNationOptions() {
     option.textContent = nation;
     select.appendChild(option);
   });
+
+  select.value = selectedNation;
 }
 
 function updateHeroSummary() {

@@ -21,8 +21,36 @@
       <a href="index.html" class="nav__logo" aria-label="Dream Cup — voltar para a página inicial">Dream Cup</a>
       <div id="navbar" class="nav__links" aria-hidden="false"></div>
       <div class="nav__actions" id="nav-actions">
+        <button class="nav__cart" type="button" id="btn-cart-focus" aria-controls="cart-panel" aria-expanded="false"
+          aria-label="Abrir carrinho">
+          <span class="nav__cart-icon" aria-hidden="true">🛒</span>
+          <span class="nav__cart-label">Carrinho</span>
+          <span class="nav__cart-count" id="cart-count">0</span>
+        </button>
         <div class="nav__coins" id="header-coins" aria-label="Saldo de coins">⚽ 0</div>
       </div>
+
+      <aside class="cart-panel" id="cart-panel" aria-labelledby="cart-title" aria-hidden="true">
+        <div class="cart-panel__header">
+          <div>
+            <span class="cart-panel__eyebrow">Sua seleção</span>
+            <h2 id="cart-title">Carrinho</h2>
+          </div>
+          <button class="cart-panel__close" type="button" id="btn-close-cart" aria-label="Fechar carrinho">×</button>
+        </div>
+
+        <div class="cart-panel__items" id="cart-items" aria-live="polite"></div>
+
+        <div class="cart-panel__summary">
+          <div><span>Total</span><strong id="cart-total">⚽ 0</strong></div>
+          <div><span>Seu saldo</span><strong id="cart-balance">⚽ 0</strong></div>
+        </div>
+
+        <div class="cart-panel__actions">
+          <button class="btn cart-panel__clear" type="button" id="btn-clear-cart">Limpar</button>
+          <button class="btn cart-panel__checkout" type="button" id="btn-checkout">Finalizar compra</button>
+        </div>
+      </aside>
     </div>
   </header>
 
@@ -32,12 +60,17 @@
         <div class="filter-card__header">
           <h2>Filtrar cartas</h2>
           <div class="filter-card__actions">
-            <button class="btn btn-secondary" type="button" id="btn-cart-focus">Carrinho · <span id="cart-count">0</span></button>
             <button class="btn btn-secondary" type="button" id="btn-clear-filters">Limpar filtros</button>
+            <button class="btn btn-secondary filter-card__toggle" type="button" id="btn-toggle-filters"
+              aria-controls="filter-fields" aria-expanded="true">
+              <span class="filter-card__toggle-label">Ocultar filtros</span>
+              <span class="filter-card__toggle-icon" aria-hidden="true">⌃</span>
+            </button>
           </div>
         </div>
 
-        <div class="filter-grid">
+        <div class="filter-card__body" id="filter-fields">
+          <div class="filter-grid">
           <label class="filter-field">
             <span>Buscar</span>
             <input type="search" id="filter-query" placeholder="Nome do jogador ou seleção"
@@ -90,6 +123,7 @@
               </div>
             </div>
           </div>
+          </div>
         </div>
       </div>
     </section>
@@ -97,24 +131,14 @@
     <div class="market-content">
       <section class="market-grid" id="player-grid" aria-live="polite"></section>
 
-      <aside class="cart-panel" id="cart-panel" aria-labelledby="cart-title">
-        <div class="cart-panel__header">
-          <div>
-            <span class="cart-panel__eyebrow">Sua seleção</span>
-            <h2 id="cart-title">Carrinho</h2>
-          </div>
-          <button class="cart-panel__clear" type="button" id="btn-clear-cart">Limpar</button>
-        </div>
+      <nav class="market-pagination" id="market-pagination" aria-label="Paginação do mercado" hidden>
+        <button class="btn btn-secondary market-pagination__button" type="button" id="pagination-previous"
+          aria-label="Ir para a página anterior">Anterior</button>
+        <p class="market-pagination__status" id="pagination-status" aria-live="polite">Página 1 de 1</p>
+        <button class="btn btn-secondary market-pagination__button" type="button" id="pagination-next"
+          aria-label="Ir para a próxima página">Próxima</button>
+      </nav>
 
-        <div class="cart-panel__items" id="cart-items" aria-live="polite"></div>
-
-        <div class="cart-panel__summary">
-          <div><span>Total</span><strong id="cart-total">⚽ 0</strong></div>
-          <div><span>Seu saldo</span><strong id="cart-balance">⚽ 0</strong></div>
-        </div>
-
-        <button class="btn cart-panel__checkout" type="button" id="btn-checkout">Finalizar compra</button>
-      </aside>
     </div>
   </main>
 
