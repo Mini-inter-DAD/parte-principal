@@ -53,15 +53,15 @@
       <div class="matchup-card">
         <div class="team-card team-card--user"><span class="team-card__tag">Seu elenco</span>
           <div class="team-card__crest team-card__crest--user">DC</div>
-          <h3 id="player-team-name">Dream Cup FC</h3>
-          <div class="team-card__ovr"><span id="player-team-ovr">82</span><small>OVR</small></div><span
+          <h3 id="player-team-name">Seu elenco</h3>
+          <div class="team-card__ovr"><span id="player-team-ovr">--</span><small>OVR</small></div><span
             class="team-card__meta">Formação 4-3-3</span>
         </div>
         <div class="matchup-divider" aria-hidden="true"><span>VS</span><i></i><small>AMISTOSO</small></div>
         <div class="team-card team-card--opponent"><span class="team-card__tag">Seleção adversária</span>
           <div class="team-card__crest" id="opponent-flag" aria-label="Bandeira da seleção adversária"></div>
           <h3 id="opponent-team-name">Japão</h3>
-          <div class="team-card__ovr"><span id="opponent-team-ovr">79</span><small>OVR</small></div><span
+          <div class="team-card__ovr"><span id="opponent-team-ovr">--</span><small>OVR</small></div><span
             class="team-card__meta">Seleção da Copa do Mundo</span>
         </div>
       </div>
@@ -82,7 +82,7 @@
       </div>
       <div class="live-scoreboard">
         <div class="live-team"><span class="live-team__crest live-team__crest--user">DC</span><strong
-            id="live-player-name">Dream Cup FC</strong></div>
+            id="live-player-name">Seu elenco</strong></div>
         <div class="live-score"><strong id="player-score">0</strong><span>—</span><strong id="opponent-score">0</strong>
         </div>
         <div class="live-team live-team--right"><strong id="live-opponent-name">Japão</strong><span
@@ -112,7 +112,7 @@
         <div>
           <p class="draft-eyebrow">Seu caminho</p>
           <h2 id="history-title">Histórico recente</h2>
-        </div><span class="history-count" id="history-count">3 partidas</span>
+        </div><span class="history-count" id="history-count">0 partidas</span>
       </div>
       <div class="match-history" id="match-history">
         <article class="history-row history-row--win">
@@ -143,10 +143,10 @@
   </main>
 
   <script src="js/accessibility.js"></script>
-  <script src="js/api.js"></script>
+  <script src="js/api.js?v=backend-draft-v1"></script>
   <script src="js/auth.js"></script>
   <script src="js/navbar.js"></script>
-  <script src="js/draft.js"></script>
+  <script src="js/draft.js?v=backend-draft-v1"></script>
   <script>document.addEventListener("DOMContentLoaded", () => { initDraft(); initAccessibility(); });</script>
   <script src="js/notify.js"></script>
 </body>

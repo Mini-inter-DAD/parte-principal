@@ -57,7 +57,10 @@ const api = {
   setStarter:   (id)      => apiFetch(`/squad/starter/${id}`, { method: "PATCH" }),
 
   // Draft
-  getOpponents: ()        => apiFetch("/draft/opponents"),
-  playDraft:    (body)    => apiFetch("/draft/play",    { method: "POST", body: JSON.stringify(body) }),
-  getHistory:   ()        => apiFetch("/draft/history"),
+  getOpponents:           () => apiFetch("/draft/opponents"),
+  playDraft:              (userId, opponentId) => apiFetch("/draft/play", {
+    method: "POST",
+    body: JSON.stringify({ user_id: userId, ...(opponentId ? { opponent_id: opponentId } : {}) }),
+  }),
+  getHistory:             (userId) => apiFetch(`/draft/history/${userId}`),
 };

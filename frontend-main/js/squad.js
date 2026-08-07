@@ -152,6 +152,7 @@ const SQUAD_STATE = {
 // ─── Init ─────────────────────────────────────────────────────────────────────
 function initSquad() {
   ensureAuth();
+  renderSquadName();
   // renderNavbar('squad');
   bindFormationButtons();
   bindReserveTarget();
@@ -241,6 +242,12 @@ function buildLineup() {
   SQUAD_STATE.bench = SQUAD_STATE.players.filter(
     player => !renderedPlayerIds.has(Number(player.id))
   ).sort(compareBenchPlayers);
+}
+
+function renderSquadName() {
+  const name = getSession().user?.username;
+  const element = document.getElementById('squad-name');
+  if (element && name) element.textContent = `Elenco de ${name}`;
 }
 
 // ─── Renderiza o campo ────────────────────────────────────────────────────────

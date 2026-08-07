@@ -6,6 +6,7 @@ from backend.routes.market import router as market_router
 from backend.routes.users import router as users_router
 from backend.routes.squad import router as squad_router
 from backend.routes.cart import router as cart_router
+from backend.routes.draft import router as draft_router
 
 app = FastAPI()
 
@@ -22,6 +23,7 @@ app.include_router(market_router)
 app.include_router(users_router)
 app.include_router(squad_router)
 app.include_router(cart_router)
+app.include_router(draft_router)
 
 
 @app.get("/")
