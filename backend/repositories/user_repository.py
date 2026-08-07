@@ -43,6 +43,25 @@ def get_user_by_username(db: Session, username: str):
     return result.mappings().first()
 
 
+def username_exists_anywhere(db: Session, username: str) -> bool:
+    result = db.execute(
+        text("""
+            SELECT EXISTS (
+                SELECT 1
+                FROM users
+                WHERE LOWER(username) = LOWER(:username)
+            )
+            OR EXISTS (
+                SELECT 1
+                FROM admins
+                WHERE LOWER(username) = LOWER(:username)
+            )
+        """),
+        {"username": username},
+    )
+    return bool(result.scalar_one())
+
+
 def update_coins(db: Session, user_id: int, coins: int):
     result = db.execute(
         text("""

@@ -1,8 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from backend.schemas.user_schema import AuthResponse, UserCreate, UserLogin, UserResponse
+from backend.schemas.user_schema import (
+    AuthResponse,
+    LoginRequest,
+    LoginResponse,
+    UserCreate,
+    UserResponse,
+)
 from backend.services import user_service
+from backend.services import auth_service
 from backend.services.errors import BusinessRuleError, ConflictError, NotFoundError
 from database.connection import get_db
 
@@ -42,10 +49,10 @@ def register(request: UserCreate, db: Session = Depends(get_db)):
     return {"token": f"user:{user['id']}", "user": user}
 
 
-@router.post("/auth/login", response_model=AuthResponse)
-def login(request: UserLogin, db: Session = Depends(get_db)):
+@router.post("/auth/login", response_model=LoginResponse)
+def login(request: LoginRequest, db: Session = Depends(get_db)):
     try:
-        return user_service.authenticate(
+        return auth_service.authenticate(
             db,
             username=request.username,
             password=request.password,
