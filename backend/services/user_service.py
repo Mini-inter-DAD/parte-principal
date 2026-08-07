@@ -2,9 +2,9 @@ import hashlib
 import hmac
 import secrets
 
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from backend.repositories import user_repository
+from backend.repositories import activity_repository, user_repository
 from backend.services.errors import ConflictError, NotFoundError, BusinessRuleError
 
 
@@ -42,6 +42,9 @@ def public_user(user) -> dict:
 def create_user(db, *, username: str, password: str, email: str | None = None):
     email = email or f"{username}@dreamcup.local"
     try:
+        if user_repository.username_exists_anywhere(db, username):
+            raise ConflictError("Username already exists")
+
         user = user_repository.create_user(
             db,
             username=username,
@@ -68,6 +71,17 @@ def authenticate(db, *, username: str, password: str):
     user = user_repository.get_user_by_username(db, username)
     if user is None or not verify_password(password, user["password_hash"]):
         raise BusinessRuleError("Invalid username or password")
+
+    try:
+        activity_repository.record_user_activity(
+            db,
+            user_id=user["id"],
+            event_type="login",
+        )
+        db.commit()
+    except SQLAlchemyError:
+        db.rollback()
+
     return {
         "token": f"user:{user['id']}",
         "user": public_user(user),
