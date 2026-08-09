@@ -40,7 +40,7 @@ htmlcov/
 *.sqlite3
 
 # Output gerado
-output/players copy.json
+output/
 
 # Dados temporários
 data/photos_cache.json
