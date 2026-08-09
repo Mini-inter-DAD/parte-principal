@@ -29,47 +29,85 @@
   <main class="draft-page" id="main-content">
     <section class="draft-hero" aria-labelledby="draft-title">
       <div>
-        <p class="draft-eyebrow">Modo Draft · amistoso único</p>
+        <p class="draft-eyebrow">Modos do Draft · Copa e amistoso</p>
         <h1 id="draft-title">Coloque seu elenco à prova.</h1>
-        <p class="draft-hero__copy">Enfrente uma seleção da Copa em uma partida automática. Cada vitória rende coins
-          para fortalecer sua seleção no Mercado.</p>
+        <p class="draft-hero__copy">Escolha entre a campanha da Copa do Mundo ou um amistoso único.</p>
       </div>
     </section>
 
     <div id="draft-status" class="sr-only" role="status" aria-live="polite"></div>
 
-    <section class="draft-panel draft-panel--preview" id="match-preview" aria-labelledby="preview-title">
-      <div class="panel-heading">
-        <div>
-          <p class="draft-eyebrow">Próximo confronto</p>
-          <h2 id="preview-title">Prepare-se para o apito inicial</h2>
-          <span class="match-badge">DRAFT · 90 MIN</span>
+    <section class="draft-modes" id="draft-modes" aria-label="Modos do Draft">
+      <article class="mode-card" id="mode-card-cup" data-mode-card="cup">
+        <h2 class="mode-card__title">
+          <button class="mode-card__toggle" id="mode-toggle-cup" type="button" data-mode-toggle data-mode="cup"
+            aria-controls="mode-content-cup" aria-expanded="false">
+            <span class="mode-card__copy">
+              <span class="mode-card__eyebrow">Modo principal</span>
+              <span class="mode-card__label">Copa do Mundo</span>
+              <span class="mode-card__meta" id="cup-phase-label">Fase atual: grupos · jogo 1 de 3</span>
+            </span>
+            <span class="mode-card__chevron" aria-hidden="true">⌄</span>
+          </button>
+        </h2>
+        <div class="mode-card__content" id="mode-content-cup" hidden>
+          <section class="draft-panel draft-panel--preview" id="match-preview" aria-labelledby="preview-title">
+            <div class="panel-heading">
+              <div>
+                <p class="draft-eyebrow">Próximo confronto</p>
+                <h3 id="preview-title">Prepare-se para o apito inicial</h3>
+                <span class="match-badge">COPA DO MUNDO · 90 MIN</span>
+              </div>
+              <div class="panel-heading__actions">
+                <div class="draft-reward" aria-label="Recompensa pela vitória"><span
+                    class="draft-reward__label">Recompensa
+                    pela vitória</span><strong>⚽ 250</strong></div>
+              </div>
+            </div>
+            <div class="matchup-card">
+              <div class="team-card team-card--user"><span class="team-card__tag">Seu elenco</span>
+                <div class="team-card__crest team-card__crest--user">DC</div>
+                <h3 id="player-team-name">Seu elenco</h3>
+                <div class="team-card__ovr"><span id="player-team-ovr">--</span><small>OVR</small></div><span
+                  class="team-card__meta">Formação 4-3-3</span>
+              </div>
+              <div class="matchup-divider" aria-hidden="true"><span>VS</span><i></i><small>COPA DO MUNDO</small></div>
+              <div class="team-card team-card--opponent"><span class="team-card__tag">Seleção adversária</span>
+                <div class="team-card__crest" id="opponent-flag" aria-label="Bandeira da seleção adversária"></div>
+                <h3 id="opponent-team-name">Japão</h3>
+                <div class="team-card__ovr"><span id="opponent-team-ovr">--</span><small>OVR</small></div><span
+                  class="team-card__meta">Seleção da Copa do Mundo</span>
+              </div>
+            </div>
+            <div class="preview-footer">
+              <div class="preview-footer__status">
+                <p><span class="status-dot"></span> Pronto para jogar <strong>·</strong> Resultado em tempo real!</p>
+                <p class="starter-status" id="starter-status">Monte exatamente 11 titulares válidos para liberar o
+                  início da partida.</p>
+              </div>
+              <button class="btn btn--primary draft-cta" id="btn-start-draft" type="button" disabled
+                data-starter-validation="pending" aria-disabled="true">JOGAR DRAFT <span>→</span></button>
+            </div>
+          </section>
         </div>
-        <div class="panel-heading__actions">
-          <div class="draft-reward" aria-label="Recompensa pela vitória"><span class="draft-reward__label">Recompensa
-              pela vitória</span><strong>⚽ 250</strong></div>
+      </article>
+
+      <article class="mode-card" id="mode-card-friendly" data-mode-card="friendly">
+        <h2 class="mode-card__title">
+          <button class="mode-card__toggle" id="mode-toggle-friendly" type="button" data-mode-toggle
+            data-mode="friendly" aria-controls="mode-content-friendly" aria-expanded="false">
+            <span class="mode-card__copy">
+              <span class="mode-card__eyebrow">Modo rápido</span>
+              <span class="mode-card__label">Amistoso</span>
+              <span class="mode-card__meta">Partida única para progressão mais rápida</span>
+            </span>
+            <span class="mode-card__chevron" aria-hidden="true">⌄</span>
+          </button>
+        </h2>
+        <div class="mode-card__content mode-card__content--friendly" id="mode-content-friendly" hidden>
+          <div id="friendly-preview-slot"></div>
         </div>
-      </div>
-      <div class="matchup-card">
-        <div class="team-card team-card--user"><span class="team-card__tag">Seu elenco</span>
-          <div class="team-card__crest team-card__crest--user">DC</div>
-          <h3 id="player-team-name">Seu elenco</h3>
-          <div class="team-card__ovr"><span id="player-team-ovr">--</span><small>OVR</small></div><span
-            class="team-card__meta">Formação 4-3-3</span>
-        </div>
-        <div class="matchup-divider" aria-hidden="true"><span>VS</span><i></i><small>AMISTOSO</small></div>
-        <div class="team-card team-card--opponent"><span class="team-card__tag">Seleção adversária</span>
-          <div class="team-card__crest" id="opponent-flag" aria-label="Bandeira da seleção adversária"></div>
-          <h3 id="opponent-team-name">Japão</h3>
-          <div class="team-card__ovr"><span id="opponent-team-ovr">--</span><small>OVR</small></div><span
-            class="team-card__meta">Seleção da Copa do Mundo</span>
-        </div>
-      </div>
-      <div class="preview-footer">
-        <p><span class="status-dot"></span> Pronto para jogar <strong>·</strong>Resultado em tempo real!</p>
-        <button class="btn btn--primary draft-cta" id="btn-start-draft" type="button">JOGAR DRAFT
-          <span>→</span></button>
-      </div>
+      </article>
     </section>
 
     <section class="draft-panel live-match" id="live-match" hidden aria-labelledby="live-title">
@@ -122,6 +160,10 @@
   <script src="js/api.js?v=backend-draft-v1"></script>
   <script src="js/auth.js"></script>
   <script src="js/navbar.js"></script>
+  <script src="js/draft-modes.js"></script>
+  <script src="js/draft-data.js"></script>
+  <script src="js/draft-events.js"></script>
+  <script src="js/draft-history.js"></script>
   <script src="js/draft.js?v=backend-draft-v1"></script>
   <script>document.addEventListener("DOMContentLoaded", () => { initDraft(); initAccessibility(); });</script>
   <script src="js/notify.js"></script>
