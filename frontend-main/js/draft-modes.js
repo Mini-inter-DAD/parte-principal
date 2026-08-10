@@ -49,7 +49,7 @@
     return { toggles, setExpanded };
   }
 
-  function setStartEnabled(enabled, count = 0) {
+  function setStartEnabled(enabled, count = 0, campaignEnded = false) {
     const button = getElement('btn-start-draft');
     const status = getElement('starter-status');
     const safeCount = Math.max(0, Number(count) || 0);
@@ -60,7 +60,9 @@
     }
 
     if (status) {
-      if (enabled) {
+      if (campaignEnded) {
+        status.textContent = 'Copa encerrada. Clique para recomeçar.';
+      } else if (enabled) {
         status.textContent = 'Time pronto.';
       } else if (safeCount > 11) {
         status.textContent = 'Reduza seu time para 11 titulares.';

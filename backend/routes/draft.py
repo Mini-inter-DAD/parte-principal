@@ -50,3 +50,14 @@ def get_campaign(user_id: int, db: Session = Depends(get_db)):
         return draft_service.get_campaign_state(db, user_id)
     except NotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.post("/campaign/{user_id}/restart", response_model=DraftCampaignStateResponse)
+def restart_campaign(user_id: int, db: Session = Depends(get_db)):
+    try:
+        return draft_service.restart_campaign(db, user_id)
+    except NotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except BusinessRuleError as exc:
+        db.rollback()
+        raise HTTPException(status_code=422, detail=str(exc)) from exc

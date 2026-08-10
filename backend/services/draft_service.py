@@ -349,3 +349,27 @@ def get_campaign_state(db, user_id: int):
     if campaign is None:
         return _default_campaign(user_id)
     return {"user_id": user_id, **_campaign_payload(campaign)}
+
+
+def restart_campaign(db, user_id: int):
+    if user_repository.get_user(db, user_id) is None:
+        raise NotFoundError("User not found")
+
+    try:
+        campaign = draft_repository.get_or_create_campaign(db, user_id)
+        if campaign["status"] == "ACTIVE":
+            raise BusinessRuleError("A campanha da Copa ainda está ativa")
+        campaign = draft_repository.update_campaign(
+            db,
+            campaign["id"],
+            phase_index=0,
+            group_matches=0,
+            group_points=0,
+            group_losses=0,
+            status="ACTIVE",
+        )
+        db.commit()
+        return {"user_id": user_id, **_campaign_payload(campaign)}
+    except Exception:
+        db.rollback()
+        raise

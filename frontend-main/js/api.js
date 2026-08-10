@@ -68,4 +68,5 @@ const api = {
   }),
   getHistory:             (userId) => apiFetch(`/draft/history/${userId}`),
   getCampaign:            (userId) => apiFetch(`/draft/campaign/${userId}`),
+  restartCampaign:        (userId) => apiFetch(`/draft/campaign/${userId}/restart`, { method: "POST" }),
 };
