@@ -238,8 +238,64 @@ CREATE TABLE matches (
     coins_earned    INTEGER NOT NULL DEFAULT 0
                     CHECK (coins_earned >= 0),
 
+    mode            VARCHAR(10) NOT NULL DEFAULT 'friendly'
+                    CHECK (mode IN ('cup', 'friendly')),
+
+    phase_index     SMALLINT
+                    CHECK (phase_index BETWEEN 0 AND 7),
+
     played_at       TIMESTAMP NOT NULL DEFAULT now()
 );
+
+-- ============================================================
+-- CAMPANHA DA COPA DO USUARIO
+-- ============================================================
+CREATE TABLE cup_campaigns (
+    id              SERIAL PRIMARY KEY,
+
+    user_id         INTEGER NOT NULL UNIQUE
+                    REFERENCES users(id)
+                    ON DELETE CASCADE,
+
+    phase_index     SMALLINT NOT NULL DEFAULT 0
+                    CHECK (phase_index BETWEEN 0 AND 7),
+
+    group_matches   SMALLINT NOT NULL DEFAULT 0
+                    CHECK (group_matches BETWEEN 0 AND 3),
+
+    group_points    SMALLINT NOT NULL DEFAULT 0
+                    CHECK (group_points >= 0),
+
+    status          VARCHAR(12) NOT NULL DEFAULT 'ACTIVE'
+                    CHECK (status IN ('ACTIVE', 'COMPLETED', 'ELIMINATED')),
+
+    updated_at      TIMESTAMP NOT NULL DEFAULT now()
+);
+
+-- ============================================================
+-- EVENTOS DE GOL DAS PARTIDAS
+-- ============================================================
+CREATE TABLE goal_events (
+    id              BIGSERIAL PRIMARY KEY,
+
+    match_id        INTEGER NOT NULL
+                    REFERENCES matches(id)
+                    ON DELETE CASCADE,
+
+    player_id       VARCHAR(64) NOT NULL,
+
+    player_name     VARCHAR(100) NOT NULL,
+
+    minute          SMALLINT NOT NULL
+                    CHECK (minute BETWEEN 0 AND 120),
+
+    position        VARCHAR(10),
+
+    team            VARCHAR(10) NOT NULL
+                    CHECK (team IN ('USER', 'OPPONENT'))
+);
+
+CREATE INDEX idx_goal_events_match_id ON goal_events(match_id);
 
 -- ============================================================
 -- ESCALAÇÃO DO USUÁRIO NA PARTIDA

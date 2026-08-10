@@ -58,9 +58,14 @@ const api = {
 
   // Draft
   getOpponents:           () => apiFetch("/draft/opponents"),
-  playDraft:              (userId, opponentId) => apiFetch("/draft/play", {
+  playDraft:              (userId, opponentId, mode = "cup") => apiFetch("/draft/play", {
     method: "POST",
-    body: JSON.stringify({ user_id: userId, ...(opponentId ? { opponent_id: opponentId } : {}) }),
+    body: JSON.stringify({
+      user_id: userId,
+      mode,
+      ...(opponentId ? { opponent_id: opponentId } : {}),
+    }),
   }),
   getHistory:             (userId) => apiFetch(`/draft/history/${userId}`),
+  getCampaign:            (userId) => apiFetch(`/draft/campaign/${userId}`),
 };

@@ -7,6 +7,7 @@
     match: null,
     history: [],
     squad: [],
+    campaign: null,
     mode: 'cup',
     phaseIndex: 0,
     startReady: false,
@@ -76,14 +77,25 @@
     updateStarterGate();
   }
 
+  async function loadCampaign() {
+    const userId = Number(sessionUser()?.id);
+    if (!userId || typeof api.getCampaign !== 'function') return;
+    state.campaign = await api.getCampaign(userId);
+    state.phaseIndex = Number(state.campaign?.phase_index || 0);
+  }
+
   function updateStarterGate() {
     const starters = typeof DraftData !== 'undefined'
       ? DraftData.getValidStarters(state.squad)
       : state.squad.filter((player) => player?.is_starter && player?.squad_position);
     state.startReady = starters.length === 11;
+    const campaignReady = state.mode !== 'cup' || !state.campaign || state.campaign.can_play;
     const ovr = typeof DraftData !== 'undefined' ? DraftData.calculateTeamOvr(state.squad) : null;
     setText('player-team-ovr', ovr ?? '--');
-    if (typeof DraftModes !== 'undefined') DraftModes.setStartEnabled(state.startReady, starters.length);
+    if (typeof DraftModes !== 'undefined') {
+      DraftModes.setStartEnabled(state.startReady && campaignReady, starters.length);
+      if (!campaignReady) setText('starter-status', 'Esta campanha da Copa foi encerrada.');
+    }
   }
 
   function renderCupPhase() {
@@ -126,21 +138,7 @@
       }));
     }
 
-    // Fallback visual only: scorer probability and official authorship remain backend responsibilities.
-    const events = [];
-    const addEvents = (team, total, scorer) => {
-      for (let index = 0; index < total; index += 1) {
-        events.push({
-          team,
-          minute: Math.min(89, 8 + Math.floor(Math.random() * 80)),
-          scorer,
-        });
-      }
-    };
-
-    addEvents('home', match.score.user, match.team_name);
-    addEvents('away', match.score.opponent, match.opponent.name);
-    return events.sort((left, right) => left.minute - right.minute);
+    return [];
   }
 
   function resetLive(match) {
@@ -220,7 +218,11 @@
       button.setAttribute('aria-disabled', 'true');
     }
     try {
-      state.match = await api.playDraft(userId, state.opponent?.id);
+      state.match = await api.playDraft(userId, state.opponent?.id, state.mode);
+      if (state.match.campaign) {
+        state.campaign = state.match.campaign;
+        state.phaseIndex = Number(state.match.campaign.phase_index || 0);
+      }
       setUserCoins(state.match.new_balance);
       resetLive(state.match);
       showMode('live');
@@ -292,7 +294,10 @@
     setText('result-copy', `OVR do seu elenco: ${state.match.user_ovr}.`);
     setText('result-reward', state.match.coins_earned ? `+ ⚽ ${state.match.coins_earned}` : '⚽ Nenhuma recompensa');
     setText('result-icon', state.match.result === 'W' ? '✓' : state.match.result === 'L' ? '×' : '—');
-    if (state.mode === 'cup' && state.phaseIndex < 7) state.phaseIndex += 1;
+    if (state.match.campaign) {
+      state.campaign = state.match.campaign;
+      state.phaseIndex = Number(state.match.campaign.phase_index || 0);
+    }
     renderCupPhase();
     showMode('result');
     try {
@@ -318,7 +323,7 @@
     renderCupPhase();
     setText('player-team-name', teamName());
     try {
-      await Promise.all([loadOpponents(), loadHistory(), loadSquad()]);
+      await Promise.all([loadOpponents(), loadHistory(), loadSquad(), loadCampaign()]);
       renderPreview();
     } catch (error) {
       showError(error.message || 'Não foi possível carregar o Draft.');

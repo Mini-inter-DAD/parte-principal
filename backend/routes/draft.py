@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.schemas.draft_schema import (
+    DraftCampaignStateResponse,
     DraftHistoryResponse,
     DraftOpponentResponse,
     DraftPlayRequest,
@@ -26,6 +27,7 @@ def play_draft(request: DraftPlayRequest, db: Session = Depends(get_db)):
             db,
             user_id=request.user_id,
             opponent_id=request.opponent_id,
+            mode=request.mode,
         )
     except NotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
@@ -38,5 +40,13 @@ def play_draft(request: DraftPlayRequest, db: Session = Depends(get_db)):
 def get_history(user_id: int, db: Session = Depends(get_db)):
     try:
         return draft_service.get_history(db, user_id)
+    except NotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.get("/campaign/{user_id}", response_model=DraftCampaignStateResponse)
+def get_campaign(user_id: int, db: Session = Depends(get_db)):
+    try:
+        return draft_service.get_campaign_state(db, user_id)
     except NotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc

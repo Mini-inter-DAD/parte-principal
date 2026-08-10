@@ -1,6 +1,7 @@
 from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class DraftOpponentResponse(BaseModel):
@@ -13,6 +14,26 @@ class DraftOpponentResponse(BaseModel):
 class DraftPlayRequest(BaseModel):
     user_id: int = Field(gt=0)
     opponent_id: str | None = None
+    mode: Literal["cup", "friendly"] = "cup"
+
+
+class DraftGoalEventResponse(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    player_id: str = Field(alias="playerId")
+    player_name: str = Field(alias="playerName")
+    minute: int = Field(ge=0, le=120)
+    position: str | None = None
+    team: Literal["USER", "OPPONENT"]
+
+
+class DraftCampaignResponse(BaseModel):
+    phase_index: int = Field(ge=0, le=7)
+    phase: str
+    status: Literal["ACTIVE", "COMPLETED", "ELIMINATED"]
+    group_matches: int = Field(ge=0, le=3)
+    group_points: int = Field(ge=0)
+    can_play: bool
 
 
 class DraftScoreResponse(BaseModel):
@@ -32,9 +53,15 @@ class DraftPlayResponse(BaseModel):
     coins_earned: int
     new_balance: int
     played_at: datetime
+    mode: Literal["cup", "friendly"]
+    phase_index: int | None = None
+    goal_events: list[DraftGoalEventResponse]
+    campaign: DraftCampaignResponse | None = None
 
 
 class DraftHistoryResponse(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     id: int
     user_ovr: int
     opponent_name: str
@@ -45,3 +72,10 @@ class DraftHistoryResponse(BaseModel):
     result_label: str
     coins_earned: int
     played_at: datetime
+    mode: Literal["cup", "friendly"]
+    phase_index: int | None = None
+    goal_events: list[DraftGoalEventResponse]
+
+
+class DraftCampaignStateResponse(DraftCampaignResponse):
+    user_id: int
