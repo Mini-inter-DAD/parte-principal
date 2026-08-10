@@ -1,6 +1,10 @@
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response
 from sqlalchemy.orm import Session
 
+from backend.schemas.admin_schema import (
+    AdminUserResponse,
+    UserDashboardResponse,
+)
 from backend.schemas.metrics_schema import UserMetricsResponse
 from backend.services import admin_service
 from backend.services.auth_service import current_admin_id, extract_bearer_token
@@ -32,5 +36,29 @@ def user_metrics(
 ):
     try:
         return admin_service.get_user_metrics(db, month=month)
+    except BusinessRuleError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.get("/dashboard", response_model=UserDashboardResponse)
+def user_dashboard(
+    month: str = Query(..., pattern=r"^\d{4}-(0[1-9]|1[0-2])$"),
+    _admin_id: int = Depends(current_admin_id),
+    db: Session = Depends(get_db),
+):
+    try:
+        return admin_service.get_user_dashboard(db, month=month)
+    except BusinessRuleError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.get("/users", response_model=list[AdminUserResponse])
+def users_created_in_month(
+    month: str = Query(..., pattern=r"^\d{4}-(0[1-9]|1[0-2])$"),
+    _admin_id: int = Depends(current_admin_id),
+    db: Session = Depends(get_db),
+):
+    try:
+        return admin_service.list_users(db, month=month)
     except BusinessRuleError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc

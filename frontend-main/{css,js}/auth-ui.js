@@ -118,12 +118,16 @@ document.addEventListener('DOMContentLoaded', () => {
     setLoading(btn, true);
     try {
       const data = await loginWithFormError({ username, password });
-      saveSession({ token: data.token, user: data.user });
+      const account = data.account_type === 'admin'
+        ? { ...data.admin, role: 'admin' }
+        : data.user;
+      saveSession({ token: data.token, user: account });
       
       // Substituição: sucesso após login
       notify.success('Conta criada! Redirecionando...');
       
-      window.location.href = `market.html${window.location.search}`;
+      const destination = data.account_type === 'admin' ? 'admin.html' : 'market.html';
+      window.location.href = `${destination}${window.location.search}`;
     } catch (err) {
       // Substituição: notificação de erro no login
       setError('login-form-error', err.message || 'Usuário ou senha incorretos.');
