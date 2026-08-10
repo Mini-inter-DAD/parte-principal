@@ -1,0 +1,206 @@
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+
+def list_user_overalls(db: Session, user_id: int):
+    result = db.execute(
+        text("""
+            SELECT p.overall
+            FROM user_players up
+            JOIN players p ON p.id = up.player_id
+            WHERE up.user_id = :user_id
+            ORDER BY up.is_starter DESC, p.overall DESC, p.name ASC
+            LIMIT 11
+        """),
+        {"user_id": user_id},
+    )
+    return [row["overall"] for row in result.mappings().all()]
+
+
+def count_valid_starters(db: Session, user_id: int) -> int:
+    result = db.execute(
+        text("""
+            SELECT COUNT(*)
+            FROM user_players
+            WHERE user_id = :user_id
+              AND is_starter = TRUE
+              AND squad_position IS NOT NULL
+        """),
+        {"user_id": user_id},
+    )
+    return int(result.scalar_one())
+
+
+def list_user_starters(db: Session, user_id: int):
+    result = db.execute(
+        text("""
+            SELECT p.id, p.name, p.position, p.overall
+            FROM user_players up
+            JOIN players p ON p.id = up.player_id
+            WHERE up.user_id = :user_id
+              AND up.is_starter = TRUE
+              AND up.squad_position IS NOT NULL
+            ORDER BY up.squad_position, p.name
+            LIMIT 11
+        """),
+        {"user_id": user_id},
+    )
+    return result.mappings().all()
+
+
+def get_or_create_campaign(db: Session, user_id: int):
+    db.execute(
+        text("""
+            INSERT INTO cup_campaigns (user_id)
+            VALUES (:user_id)
+            ON CONFLICT (user_id) DO NOTHING
+        """),
+        {"user_id": user_id},
+    )
+    result = db.execute(
+        text("""
+            SELECT id, user_id, phase_index, group_matches, group_points,
+                   group_losses, status, updated_at
+            FROM cup_campaigns
+            WHERE user_id = :user_id
+            FOR UPDATE
+        """),
+        {"user_id": user_id},
+    )
+    return result.mappings().one()
+
+
+def get_campaign(db: Session, user_id: int):
+    result = db.execute(
+        text("""
+            SELECT id, user_id, phase_index, group_matches, group_points,
+                   group_losses, status, updated_at
+            FROM cup_campaigns
+            WHERE user_id = :user_id
+        """),
+        {"user_id": user_id},
+    )
+    return result.mappings().first()
+
+
+def update_campaign(
+    db: Session,
+    campaign_id: int,
+    *,
+    phase_index: int,
+    group_matches: int,
+    group_points: int,
+    group_losses: int,
+    status: str,
+):
+    result = db.execute(
+        text("""
+            UPDATE cup_campaigns
+            SET phase_index = :phase_index,
+                group_matches = :group_matches,
+                group_points = :group_points,
+                group_losses = :group_losses,
+                status = :status,
+                updated_at = now()
+            WHERE id = :campaign_id
+            RETURNING id, user_id, phase_index, group_matches,
+                      group_points, group_losses, status, updated_at
+        """),
+        {
+            "campaign_id": campaign_id,
+            "phase_index": phase_index,
+            "group_matches": group_matches,
+            "group_points": group_points,
+            "group_losses": group_losses,
+            "status": status,
+        },
+    )
+    return result.mappings().one()
+
+
+def create_goal_events(db: Session, match_id: int, events: list[dict]):
+    for event in events:
+        db.execute(
+            text("""
+                INSERT INTO goal_events (
+                    match_id, player_id, player_name, minute, position, team
+                )
+                VALUES (
+                    :match_id, :player_id, :player_name, :minute, :position, :team
+                )
+            """),
+            {"match_id": match_id, **event},
+        )
+
+
+def list_goal_events(db: Session, match_id: int):
+    result = db.execute(
+        text("""
+            SELECT player_id, player_name, minute, position, team
+            FROM goal_events
+            WHERE match_id = :match_id
+            ORDER BY minute ASC, id ASC
+        """),
+        {"match_id": match_id},
+    )
+    return result.mappings().all()
+
+
+def create_match(
+    db: Session,
+    *,
+    user_id: int,
+    user_ovr: int,
+    opponent_name: str,
+    opponent_ovr: int,
+    user_score: int,
+    opponent_score: int,
+    result: str,
+    coins_earned: int,
+    mode: str,
+    phase_index: int | None,
+):
+    created = db.execute(
+        text("""
+            INSERT INTO matches (
+                user_id, user_ovr, opponent_name, opponent_ovr,
+                user_score, opponent_score, result, coins_earned, mode, phase_index
+            )
+            VALUES (
+                :user_id, :user_ovr, :opponent_name, :opponent_ovr,
+                :user_score, :opponent_score, :result, :coins_earned, :mode, :phase_index
+            )
+            RETURNING id, user_id, user_ovr, opponent_name, opponent_ovr,
+                      user_score, opponent_score, result, coins_earned, played_at,
+                      mode, phase_index
+        """),
+        {
+            "user_id": user_id,
+            "user_ovr": user_ovr,
+            "opponent_name": opponent_name,
+            "opponent_ovr": opponent_ovr,
+            "user_score": user_score,
+            "opponent_score": opponent_score,
+            "result": result,
+            "coins_earned": coins_earned,
+            "mode": mode,
+            "phase_index": phase_index,
+        },
+    )
+    return created.mappings().one()
+
+
+def list_history(db: Session, user_id: int, limit: int = 20):
+    result = db.execute(
+        text("""
+            SELECT id, user_ovr, opponent_name, opponent_ovr,
+                   user_score, opponent_score, result, coins_earned, played_at,
+                   mode, phase_index
+            FROM matches
+            WHERE user_id = :user_id
+            ORDER BY played_at DESC, id DESC
+            LIMIT :limit
+        """),
+        {"user_id": user_id, "limit": limit},
+    )
+    return result.mappings().all()
