@@ -102,13 +102,14 @@ def _last_complete_month() -> str:
 
 def get_user_dashboard(db, *, month: str):
     # Valida o mês selecionado antes de montar o histórico.
-    month_bounds(month)
-    history = []
-
-    for offset in range(-7, 1):
-        history_month = _shift_month(month, offset)
-        metrics = get_user_metrics(db, month=history_month)
-        history.append(metrics)
+    selected_month_start, next_month_start = month_bounds(month)
+    first_month_start = datetime.strptime(_shift_month(month, -7), "%Y-%m")
+    history = metrics_repository.get_monthly_user_metrics(
+        db,
+        first_month_start=first_month_start,
+        last_month_start=selected_month_start,
+        next_month_start=next_month_start,
+    )
 
     selected = history[-1]
     last_complete = _last_complete_month()

@@ -98,7 +98,7 @@ async function loadAdminData() {
   setAdminLoading(true);
   const params = { month: ADMIN_STATE.selectedMonth };
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 4000);
+  const timeout = window.setTimeout(() => controller.abort(), 15000);
 
   const [dashboardResult, usersResult] = await Promise.allSettled([
     api.getAdminDashboard(params, { signal: controller.signal, skipAuthRedirect: true }),
