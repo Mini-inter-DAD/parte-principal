@@ -83,6 +83,12 @@ SET group_losses = results.losses,
 FROM group_results results
 WHERE campaign.user_id = results.user_id;
 
+UPDATE cup_campaigns
+SET phase_index = group_matches
+WHERE status = 'ACTIVE'
+  AND group_matches BETWEEN 1 AND 2
+  AND phase_index < 3;
+
 CREATE TABLE IF NOT EXISTS goal_events (
     id              BIGSERIAL PRIMARY KEY,
     match_id        INTEGER NOT NULL REFERENCES matches(id) ON DELETE CASCADE,

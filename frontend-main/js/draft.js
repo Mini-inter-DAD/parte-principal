@@ -263,6 +263,13 @@
     return new Date(value).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
   }
 
+  function setResultActionLabel(label) {
+    const button = $('btn-play-again');
+    if (!button) return;
+    const textNode = Array.from(button.childNodes).find((node) => node.nodeType === Node.TEXT_NODE);
+    if (textNode) textNode.nodeValue = `${label} `;
+  }
+
   function renderHistory() {
     const container = $('match-history');
     if (!container) return;
@@ -301,6 +308,15 @@
     if (state.match.campaign) {
       state.campaign = state.match.campaign;
       state.phaseIndex = Number(state.match.campaign.phase_index || 0);
+      setResultActionLabel(
+        state.match.campaign.status === 'ACTIVE'
+          ? 'PRÓXIMA PARTIDA'
+          : state.match.campaign.status === 'COMPLETED'
+            ? 'NOVA COPA'
+            : 'RECOMEÇAR COPA',
+      );
+    } else {
+      setResultActionLabel('JOGAR NOVAMENTE');
     }
     renderCupPhase();
     showMode('result');

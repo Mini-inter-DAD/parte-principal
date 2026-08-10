@@ -220,6 +220,8 @@ def _advance_campaign(campaign, result: str):
             status = "ELIMINATED"
         elif group_matches >= 3:
             phase_index = 3
+        else:
+            phase_index = group_matches
     elif result == "W":
         if phase_index == len(CUP_PHASES) - 1:
             status = "COMPLETED"
