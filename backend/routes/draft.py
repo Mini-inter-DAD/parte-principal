@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from backend.schemas.draft_schema import (
@@ -37,9 +37,14 @@ def play_draft(request: DraftPlayRequest, db: Session = Depends(get_db)):
 
 
 @router.get("/history/{user_id}", response_model=list[DraftHistoryResponse])
-def get_history(user_id: int, db: Session = Depends(get_db)):
+def get_history(
+    user_id: int,
+    limit: int = Query(default=20, ge=1, le=50),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
     try:
-        return draft_service.get_history(db, user_id)
+        return draft_service.get_history(db, user_id, limit=limit, offset=offset)
     except NotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 

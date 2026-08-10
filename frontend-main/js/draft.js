@@ -10,6 +10,7 @@
     campaign: null,
     mode: 'cup',
     phaseIndex: 0,
+    historyPage: 1,
     startReady: false,
     minute: 0,
     events: [],
@@ -62,7 +63,17 @@
   async function loadHistory() {
     const userId = Number(sessionUser()?.id);
     if (!userId) return;
-    state.history = await api.getHistory(userId);
+    const pageSize = 50;
+    const history = [];
+    let offset = 0;
+    let page;
+    do {
+      page = await api.getHistory(userId, { limit: pageSize, offset });
+      history.push(...page);
+      offset += page.length;
+    } while (page.length === pageSize);
+    state.history = history;
+    state.historyPage = 1;
     renderHistory();
   }
 
@@ -226,6 +237,7 @@
       if (state.match.campaign) {
         state.campaign = state.match.campaign;
         state.phaseIndex = Number(state.match.campaign.phase_index || 0);
+        renderCupPhase();
       }
       setUserCoins(state.match.new_balance);
       resetLive(state.match);
@@ -263,23 +275,39 @@
     return new Date(value).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
   }
 
+  function setResultActionLabel(label) {
+    const button = $('btn-play-again');
+    if (!button) return;
+    const textNode = Array.from(button.childNodes).find((node) => node.nodeType === Node.TEXT_NODE);
+    if (textNode) textNode.nodeValue = `${label} `;
+  }
+
   function renderHistory() {
     const container = $('match-history');
+    const pagination = $('history-pagination');
     if (!container) return;
     container.innerHTML = '';
     setText('history-count', `${state.history.length} partidas`);
 
     if (!state.history.length) {
       container.innerHTML = '<p class="history-empty">Nenhuma partida disputada ainda.</p>';
+      if (pagination) pagination.hidden = true;
       return;
     }
+
+    const pageSize = 5;
+    const totalPages = Math.max(1, Math.ceil(state.history.length / pageSize));
+    state.historyPage = Math.min(Math.max(state.historyPage, 1), totalPages);
+    const start = (state.historyPage - 1) * pageSize;
+    const visibleHistory = state.history.slice(start, start + pageSize);
 
     if (typeof DraftHistory !== 'undefined') {
-      DraftHistory.render(container, state.history, { teamName: teamName() });
+      DraftHistory.render(container, visibleHistory, { teamName: teamName() });
+      renderHistoryPagination(totalPages);
       return;
     }
 
-    state.history.forEach((match) => {
+    visibleHistory.forEach((match) => {
       const opponent = state.opponents.find((item) => item.name === match.opponent_name);
       const code = opponent?.code || 'un';
       const row = document.createElement('article');
@@ -287,6 +315,43 @@
       row.innerHTML = `<div class="history-row__phase">DRAFT<strong>FINALIZADO</strong></div><div class="history-row__opponent"><span class="flag-icon"><img class="flag-image" src="https://flagcdn.com/w80/${code}.png" alt="Bandeira de ${escapeHtml(match.opponent_name)}" width="80" height="53" loading="lazy"></span><strong>${escapeHtml(match.opponent_name)}</strong><small>${formatPlayedAt(match.played_at)}</small></div><div class="history-row__score"><strong>${match.user_score}</strong><span>—</span><strong>${match.opponent_score}</strong></div><div class="history-row__reward">${match.coins_earned ? `+${match.coins_earned} ⚽` : '—'} </div><span class="history-row__status">${escapeHtml(match.result_label)}</span>`;
       container.appendChild(row);
     });
+    renderHistoryPagination(totalPages);
+  }
+
+  function renderHistoryPagination(totalPages) {
+    const container = $('history-pagination');
+    if (!container) return;
+    container.innerHTML = '';
+    container.hidden = totalPages <= 1;
+    if (totalPages <= 1) return;
+
+    const previous = document.createElement('button');
+    previous.type = 'button';
+    previous.className = 'history-pagination__button';
+    previous.textContent = '\u2190 Anterior';
+    previous.disabled = state.historyPage === 1;
+    previous.addEventListener('click', () => {
+      state.historyPage -= 1;
+      renderHistory();
+    });
+
+    const indicator = document.createElement('span');
+    indicator.className = 'history-pagination__page';
+    indicator.textContent = `P\u00e1gina ${state.historyPage} de ${totalPages}`;
+
+    const next = document.createElement('button');
+    next.type = 'button';
+    next.className = 'history-pagination__button';
+    next.textContent = 'Pr\u00f3xima \u2192';
+    next.disabled = state.historyPage === totalPages;
+    next.addEventListener('click', () => {
+      state.historyPage += 1;
+      renderHistory();
+    });
+
+    container.appendChild(previous);
+    container.appendChild(indicator);
+    container.appendChild(next);
   }
 
   async function showResult() {
@@ -301,6 +366,15 @@
     if (state.match.campaign) {
       state.campaign = state.match.campaign;
       state.phaseIndex = Number(state.match.campaign.phase_index || 0);
+      setResultActionLabel(
+        state.match.campaign.status === 'ACTIVE'
+          ? 'PRÓXIMA PARTIDA'
+          : state.match.campaign.status === 'COMPLETED'
+            ? 'NOVA COPA'
+            : 'RECOMEÇAR COPA',
+      );
+    } else {
+      setResultActionLabel('JOGAR NOVAMENTE');
     }
     renderCupPhase();
     showMode('result');
@@ -334,10 +408,25 @@
     }
     $('btn-start-draft').addEventListener('click', startDraftMatch);
     $('btn-next-result').addEventListener('click', showResult);
-    $('btn-play-again').addEventListener('click', () => {
+    $('btn-play-again').addEventListener('click', async () => {
+      const userId = Number(sessionUser()?.id);
+      if (state.mode === 'cup' && state.campaign && !state.campaign.can_play) {
+        try {
+          state.campaign = await api.restartCampaign(userId);
+          state.phaseIndex = Number(state.campaign.phase_index || 0);
+        } catch (error) {
+          showError(error.message || 'Não foi possível reiniciar a Copa.');
+          return;
+        }
+      }
+
       $('match-result').classList.remove('result-panel--loss');
+      state.match = null;
+      state.events = [];
+      state.minute = 0;
       showMode('preview');
       state.opponent = state.opponents[Math.floor(Math.random() * state.opponents.length)] || null;
+      renderCupPhase();
       renderPreview();
     });
   }

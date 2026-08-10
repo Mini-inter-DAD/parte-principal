@@ -11,7 +11,7 @@
     rel="stylesheet" />
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/accessibility.css" />
-  <link rel="stylesheet" href="css/draft.css" />
+  <link rel="stylesheet" href="css/draft.css?v=history-spacing-v1" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -152,19 +152,20 @@
         </div><span class="history-count" id="history-count">0 partidas</span>
       </div>
       <div class="match-history" id="match-history"></div>
+      <nav class="history-pagination" id="history-pagination" aria-label="Paginação do histórico" hidden></nav>
     </section>
   </main>
 
   <script src="js/accessibility.js"></script>
   <script src="js/admin-access.js"></script>
-  <script src="js/api.js?v=backend-draft-v4"></script>
+  <script src="js/api.js?v=backend-history-v1"></script>
   <script src="js/auth.js"></script>
   <script src="js/navbar.js"></script>
   <script src="js/draft-modes.js?v=backend-draft-v4"></script>
-  <script src="js/draft-data.js"></script>
+  <script src="js/draft-data.js?v=backend-draft-v6"></script>
   <script src="js/draft-events.js"></script>
-  <script src="js/draft-history.js"></script>
-  <script src="js/draft.js?v=backend-draft-v4"></script>
+  <script src="js/draft-history.js?v=backend-history-v1"></script>
+  <script src="js/draft.js?v=backend-history-v1"></script>
   <script>document.addEventListener("DOMContentLoaded", () => { initDraft(); initAccessibility(); });</script>
   <script src="js/notify.js"></script>
 </body>

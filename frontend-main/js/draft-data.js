@@ -20,6 +20,11 @@
     'Final',
   ]);
 
+  const DRAFT_STARTER_SLOTS = Object.freeze([
+    'GK', 'LB', 'CB1', 'CB2', 'RB',
+    'CM1', 'CM2', 'CM3', 'LW', 'ST', 'RW',
+  ]);
+
   function isNonEmptyString(value) {
     return typeof value === 'string' && value.trim() !== '';
   }
@@ -41,7 +46,20 @@
       return [];
     }
 
-    return players.filter((player) => player?.is_starter === true && isNonEmptyString(player?.squad_position));
+    const usedSlots = new Set();
+    return players.filter((player) => {
+      if (player?.is_starter !== true || !isNonEmptyString(player?.squad_position)) {
+        return false;
+      }
+
+      const slot = player.squad_position.trim().toUpperCase();
+      if (!DRAFT_STARTER_SLOTS.includes(slot) || usedSlots.has(slot)) {
+        return false;
+      }
+
+      usedSlots.add(slot);
+      return true;
+    });
   }
 
   function calculateTeamOvr(players) {
@@ -87,6 +105,7 @@
 
   return Object.freeze({
     CUP_PHASES,
+    DRAFT_STARTER_SLOTS,
     getValidStarters,
     calculateTeamOvr,
     getPhase,

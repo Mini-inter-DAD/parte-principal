@@ -21,11 +21,14 @@ def list_user_players(db: Session, user_id: int):
 def count_valid_starters(db: Session, user_id: int) -> int:
     result = db.execute(
         text("""
-            SELECT COUNT(*)
+            SELECT COUNT(DISTINCT UPPER(TRIM(squad_position)))
             FROM user_players
             WHERE user_id = :user_id
               AND is_starter = TRUE
-              AND squad_position IS NOT NULL
+              AND UPPER(TRIM(squad_position)) IN (
+                  'GK', 'LB', 'CB1', 'CB2', 'RB',
+                  'CM1', 'CM2', 'CM3', 'LW', 'ST', 'RW'
+              )
         """),
         {"user_id": user_id},
     )
