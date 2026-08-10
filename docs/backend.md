@@ -209,12 +209,45 @@ Resposta `DraftPlayResponse`:
 |---|---|---|
 | POST | `/admin/auth/logout` | Encerra a sessão do admin (204) |
 | GET | `/admin/metrics/users?month=YYYY-MM` | Métricas de usuários do mês |
+| GET | `/admin/users` | Lista usuários — sem `month`, todos paginados; com `month`, criados no mês |
+| DELETE | `/admin/users/{user_id}` | Bane (exclui) um usuário (204) |
 
 `UserMetricsResponse`: `{ "month": "2026-06", "new_users": 5, "mau": 3 }`.
 
 - `new_users`: usuários criados no mês.
 - `mau` (Monthly Active Users): usuários distintos com eventos de atividade (`login`) no mês.
 - `month` deve seguir o formato `^\d{4}-(0[1-9]|1[0-2])$`.
+
+### `GET /admin/users` — listar usuários
+
+Query params:
+
+| Parâmetro | Tipo | Padrão | Descrição |
+|---|---|---|---|
+| `month` | string (opcional) | — | Formato `^\d{4}-(0[1-9]|1[0-2])$`. Quando informado, filtra usuários criados no mês |
+| `limit` | int | `50` | Tamanho da página (1–100) |
+| `offset` | int | `0` | Deslocamento da página (≥ 0) |
+
+- **Sem `month`** → `PaginatedUsersResponse`, todos os usuários ordenados por `created_at DESC`:
+
+```json
+{
+  "users": [{ "id": 1, "username": "jose", "email": "jose@x.com", "coins": 15000, "created_at": "..." }],
+  "total": 12,
+  "limit": 50,
+  "offset": 0
+}
+```
+
+- **Com `month`** → `list[AdminUserResponse]` (`id`, `username`, `email`, `coins`, `created_at`) — mesmo contrato usado pelo dashboard.
+- `month`, `limit` ou `offset` inválidos → `422`.
+
+### `DELETE /admin/users/{user_id}` — banir usuário
+
+- Exige sessão de admin válida (mesmo `current_admin_id` dos demais endpoints administrativos).
+- `204 No Content` em sucesso; `404` se o usuário não existe (ou já foi banido).
+- Exclusão **física** (hard delete): cascata em `user_players`, `cart_items`, `transactions`, `matches` (e eventos/linhações), `user_activity_events` e `cup_campaigns`.
+- Após o ban: o login falha e os endpoints do usuário retornam `404`; o username fica livre para novo cadastro.
 
 ## Códigos de erro
 
