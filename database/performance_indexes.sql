@@ -2,8 +2,10 @@
 -- Seguro para reaplicação em ambientes existentes.
 
 -- Painel administrativo: usuários criados por período.
-CREATE INDEX IF NOT EXISTS idx_users_created_at
-    ON users (created_at);
+DROP INDEX IF EXISTS idx_users_created_at;
+
+CREATE INDEX IF NOT EXISTS idx_users_created_at_id
+    ON users (created_at DESC, id DESC);
 
 -- Draft: histórico do usuário ordenado do mais recente para o mais antigo.
 CREATE INDEX IF NOT EXISTS idx_matches_user_played_at_id
@@ -20,3 +22,17 @@ CREATE INDEX IF NOT EXISTS idx_user_players_user_starter
 -- Cadastro: seleção de jogadores dentro da faixa de overall.
 CREATE INDEX IF NOT EXISTS idx_players_overall
     ON players (overall);
+
+CREATE INDEX IF NOT EXISTS idx_players_market_order
+    ON players (
+        (CASE WHEN ea_id IS NOT NULL THEN 0 ELSE 1 END),
+        overall DESC,
+        price DESC,
+        name ASC,
+        id ASC
+    );
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+CREATE INDEX IF NOT EXISTS idx_players_name_trgm
+    ON players USING gin (name gin_trgm_ops);
