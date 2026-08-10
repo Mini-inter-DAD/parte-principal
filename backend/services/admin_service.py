@@ -138,7 +138,16 @@ def get_user_dashboard(db, *, month: str):
     }
 
 
-def list_users(db, *, month: str):
+def list_users(db, *, month: str | None = None, limit: int = 50, offset: int = 0):
+    if month is None:
+        users = admin_repository.list_users_paginated(db, limit=limit, offset=offset)
+        return {
+            "users": users,
+            "total": admin_repository.count_users(db),
+            "limit": limit,
+            "offset": offset,
+        }
+
     month_start, next_month_start = month_bounds(month)
     return admin_repository.list_users_by_month(
         db,

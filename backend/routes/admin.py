@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from backend.schemas.admin_schema import (
     AdminUserResponse,
+    PaginatedUsersResponse,
     UserDashboardResponse,
 )
 from backend.schemas.metrics_schema import UserMetricsResponse
@@ -52,13 +53,15 @@ def user_dashboard(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
-@router.get("/users", response_model=list[AdminUserResponse])
+@router.get("/users", response_model=list[AdminUserResponse] | PaginatedUsersResponse)
 def users_created_in_month(
-    month: str = Query(..., pattern=r"^\d{4}-(0[1-9]|1[0-2])$"),
+    month: str | None = Query(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$"),
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
     _admin_id: int = Depends(current_admin_id),
     db: Session = Depends(get_db),
 ):
     try:
-        return admin_service.list_users(db, month=month)
+        return admin_service.list_users(db, month=month, limit=limit, offset=offset)
     except BusinessRuleError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc

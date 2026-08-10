@@ -16,6 +16,13 @@ class AdminUserResponse(BaseModel):
     created_at: datetime
 
 
+class PaginatedUsersResponse(BaseModel):
+    users: list[AdminUserResponse]
+    total: int
+    limit: int
+    offset: int
+
+
 class UserMetricPoint(BaseModel):
     label: str
     value: int
