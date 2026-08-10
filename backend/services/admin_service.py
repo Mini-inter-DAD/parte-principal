@@ -101,6 +101,7 @@ def _last_complete_month() -> str:
 
 
 def get_user_dashboard(db, *, month: str):
+    # Valida o mês selecionado antes de montar o histórico.
     month_bounds(month)
     history = []
 

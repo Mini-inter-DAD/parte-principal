@@ -48,6 +48,30 @@ ALTER TABLE matches
 ALTER TABLE matches
     ADD COLUMN IF NOT EXISTS phase_index SMALLINT;
 
+-- Preserve the World Cup roster mapping from the generated player data.
+ALTER TABLE players
+    ADD COLUMN IF NOT EXISTS national_team VARCHAR(60);
+
+UPDATE players
+SET national_team = country
+WHERE national_team IS NULL;
+
+CREATE TABLE IF NOT EXISTS national_team_rosters (
+    national_team   VARCHAR(60) NOT NULL,
+    player_id       INTEGER NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+    roster_position VARCHAR(5),
+    PRIMARY KEY (national_team, player_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_national_team_rosters_team
+    ON national_team_rosters(national_team);
+
+INSERT INTO national_team_rosters (national_team, player_id)
+SELECT national_team, id
+FROM players
+WHERE national_team IS NOT NULL
+ON CONFLICT (national_team, player_id) DO NOTHING;
+
 CREATE TABLE IF NOT EXISTS cup_campaigns (
     id              SERIAL PRIMARY KEY,
     user_id         INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,

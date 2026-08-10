@@ -51,3 +51,5 @@ docker-data/
 # Arquivos locais
 *.bak
 *.tmp
+dreamcup_dump.sql
+*.dump

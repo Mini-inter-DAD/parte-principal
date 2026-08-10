@@ -4,11 +4,21 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 
+class DraftOpponentPlayerResponse(BaseModel):
+    id: int
+    name: str
+    position: str
+    overall: int
+    club: str | None = None
+    photo_url: str | None = None
+
+
 class DraftOpponentResponse(BaseModel):
     id: str
     name: str
     code: str
     overall: int
+    players: list[DraftOpponentPlayerResponse] = Field(default_factory=list)
 
 
 class DraftPlayRequest(BaseModel):

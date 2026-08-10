@@ -28,6 +28,14 @@ const MARKET_STATE = {
 };
 
 const FALLBACK_SECTIONS = ['Estrelas', 'Destaques da Copa', 'Veteranos'];
+const POSITION_FILTER_CODES = Object.freeze({
+  goleiro: ['GK', 'GOL', 'GOLEIRO'],
+  zagueiro: ['CB', 'ZAG', 'DF', 'ZAGUEIRO'],
+  lateral: ['LB', 'LE', 'RB', 'LD', 'LWB', 'AE', 'ADE', 'RWB', 'AD', 'ADD', 'LATERAL'],
+  meia: ['CDM', 'VOL', 'CM', 'MC', 'MF', 'CAM', 'MEI', 'LM', 'ME', 'RM', 'MD', 'MEIA'],
+  atacante: ['LW', 'PE', 'RW', 'PD', 'CF', 'SA', 'ST', 'CA', 'FW', 'ATACANTE'],
+});
+
 const FALLBACK_PLAYERS = [
   {
     id: '1',
@@ -402,7 +410,7 @@ function filterPlayer(player) {
     return false;
   }
 
-  if (filters.position && (player.position || '').toLowerCase() !== filters.position.toLowerCase()) {
+  if (filters.position && !matchesPositionFilter(player.position, filters.position)) {
     return false;
   }
 
@@ -419,6 +427,18 @@ function filterPlayer(player) {
   }
 
   return true;
+}
+
+function matchesPositionFilter(playerPosition, selectedPosition) {
+  const selected = String(selectedPosition || '').trim().toLowerCase();
+  const player = String(playerPosition || '').trim().toUpperCase();
+  const allowedPositions = POSITION_FILTER_CODES[selected];
+
+  if (!allowedPositions) {
+    return player === String(selectedPosition || '').trim().toUpperCase();
+  }
+
+  return allowedPositions.includes(player);
 }
 
 function renderPlayers() {
