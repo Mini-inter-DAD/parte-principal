@@ -11,15 +11,16 @@ function getToken() {
 }
 
 async function apiFetch(path, options = {}) {
+  const { skipAuthRedirect = false, ...fetchOptions } = options;
   const headers = {
     "Content-Type": "application/json",
     ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
-    ...options.headers,
+    ...fetchOptions.headers,
   };
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+  const res = await fetch(`${BASE_URL}${path}`, { ...fetchOptions, headers });
 
-  if (res.status === 401) {
+  if (res.status === 401 && !skipAuthRedirect) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     window.location.href = "/auth.html";
@@ -27,7 +28,11 @@ async function apiFetch(path, options = {}) {
   }
 
   const data = await res.json();
-  if (!res.ok) throw new Error(data.detail || "Erro desconhecido");
+  if (!res.ok) {
+    const error = new Error(data.detail || "Erro desconhecido");
+    error.status = res.status;
+    throw error;
+  }
   return data;
 }
 
@@ -69,4 +74,8 @@ const api = {
   getHistory:             (userId) => apiFetch(`/draft/history/${userId}`),
   getCampaign:            (userId) => apiFetch(`/draft/campaign/${userId}`),
   restartCampaign:        (userId) => apiFetch(`/draft/campaign/${userId}/restart`, { method: "POST" }),
+
+  // Admin
+  getAdminDashboard: (params, options = {}) => apiFetch(`/admin/dashboard?${new URLSearchParams(params)}`, options),
+  getAdminUsers:     (params, options = {}) => apiFetch(`/admin/users?${new URLSearchParams(params)}`, options),
 };

@@ -85,3 +85,57 @@ def get_user_metrics(db, *, month: str):
             next_month_start=next_month_start,
         ),
     }
+
+
+def _shift_month(month: str, offset: int) -> str:
+    parsed = datetime.strptime(month, "%Y-%m")
+    absolute_month = (parsed.year * 12) + parsed.month - 1 + offset
+    year, month_index = divmod(absolute_month, 12)
+    return f"{year:04d}-{month_index + 1:02d}"
+
+
+def _last_complete_month() -> str:
+    now = datetime.now(timezone.utc)
+    current = f"{now.year:04d}-{now.month:02d}"
+    return _shift_month(current, -1)
+
+
+def get_user_dashboard(db, *, month: str):
+    # Valida o mês selecionado antes de montar o histórico.
+    month_bounds(month)
+    history = []
+
+    for offset in range(-7, 1):
+        history_month = _shift_month(month, offset)
+        metrics = get_user_metrics(db, month=history_month)
+        history.append(metrics)
+
+    selected = history[-1]
+    last_complete = _last_complete_month()
+    available_months = [
+        _shift_month(last_complete, offset)
+        for offset in range(-11, 1)
+    ]
+
+    return {
+        "monthlyActiveUsers": [
+            {"label": item["month"], "value": item["mau"]}
+            for item in history
+        ],
+        "usersCreated": [
+            {"label": item["month"], "value": item["new_users"]}
+            for item in history
+        ],
+        "activeUsersTotal": selected["mau"],
+        "createdUsersTotal": selected["new_users"],
+        "availableMonths": available_months,
+    }
+
+
+def list_users(db, *, month: str):
+    month_start, next_month_start = month_bounds(month)
+    return admin_repository.list_users_by_month(
+        db,
+        month_start=month_start,
+        next_month_start=next_month_start,
+    )
