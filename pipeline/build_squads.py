@@ -1,4 +1,3 @@
-# build_squads.py
 import json
 import requests
 import unicodedata
@@ -71,6 +70,8 @@ def find_player_match(wc_name: str, nation: str, wc_position: str, ea_index):
 
     wc_group = position_group(wc_position)
     ranked = []
+    # Pontua os candidatos para desempatar nomes repetidos:
+    # nacionalidade, grupo de posição e nome exato.
     for player in candidates.values():
         score = 0
         if normalize(player.nationality) == normalize(nation):

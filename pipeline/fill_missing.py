@@ -1,4 +1,3 @@
-# fill_missing.py
 import os
 import json
 import re
@@ -104,6 +103,7 @@ def main():
                 })
         except Exception as e:
             print(f"  ERRO no batch {i}: {e}")
+            # Fallback: usa o overall padrão 70 para não interromper o pipeline.
             for player in batch:
                 generated.append({
                     "nation": player["nation"],

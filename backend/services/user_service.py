@@ -11,6 +11,7 @@ from backend.services.errors import ConflictError, NotFoundError, BusinessRuleEr
 def hash_password(password: str) -> str:
     salt = secrets.token_bytes(16)
     digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 120_000)
+    # Formato armazenado: pbkdf2_sha256$<iterações>$<salt>$<digest>
     return f"pbkdf2_sha256$120000${salt.hex()}${digest.hex()}"
 
 
@@ -51,6 +52,7 @@ def create_user(db, *, username: str, password: str, email: str | None = None):
             email=email,
             password_hash=hash_password(password),
         )
+        # Novo usuário ganha 12 jogadores aleatórios (OVR 60–70): 11 titulares e 1 reserva.
         starter_player_ids = user_repository.list_random_starter_player_ids(db)
         if len(starter_player_ids) < 12:
             raise BusinessRuleError(

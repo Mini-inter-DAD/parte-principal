@@ -2,8 +2,8 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 
-# The Draft preview and match use the default 4-3-3 field. A player only
-# counts as a starter when the saved squad position maps to one of these slots.
+# A prévia e a partida do Draft usam o campo padrão 4-3-3. Um jogador só
+# conta como titular quando a posição salva no elenco corresponde a uma destas vagas.
 DRAFT_STARTER_SLOTS = (
     "GK", "LB", "CB1", "CB2", "RB",
     "CM1", "CM2", "CM3", "LW", "ST", "RW",

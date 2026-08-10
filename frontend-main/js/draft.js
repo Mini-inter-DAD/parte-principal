@@ -169,6 +169,7 @@
   }
 
   function renderSecondHalfDivider(hasSecondHalfEvent = false) {
+    // Insere o divisor "2º Tempo" na timeline de eventos.
     const container = $('match-events');
     if (!container) return;
 
@@ -255,6 +256,7 @@
       button.setAttribute('aria-disabled', 'true');
     }
     try {
+      // Campanha encerrada: reinicia a Copa antes de jogar a próxima partida.
       if (state.mode === 'cup' && state.campaign && !state.campaign.can_play) {
         state.campaign = await api.restartCampaign(userId);
         state.phaseIndex = Number(state.campaign.phase_index || 0);
