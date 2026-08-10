@@ -16,7 +16,10 @@ function renderNavbar(activePage) {
 
   // update header coins if present (keeps coin position in header)
   const headerCoins = document.getElementById('header-coins');
-  if (headerCoins) headerCoins.textContent = `⚽ ${coins}`;
+  const formattedCoins = typeof formatCoins === 'function'
+    ? formatCoins(coins)
+    : Number(coins || 0).toLocaleString('pt-BR');
+  if (headerCoins) headerCoins.textContent = `⚽ ${formattedCoins}`;
 
   // place logout button into the right-side actions area if available
   const actions = document.getElementById('nav-actions');

@@ -669,10 +669,6 @@ function buyPlayer(playerId) {
   return addPlayerToCart(playerId);
 }
 
-function formatCoins(number) {
-  return Number(number).toLocaleString('pt-BR');
-}
-
 function formatPlayerName(name) {
   return String(name)
     .trim()

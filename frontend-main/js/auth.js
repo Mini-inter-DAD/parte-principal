@@ -72,7 +72,10 @@ function setUserCoins(coins) {
   session.user.coins = coins;
   localStorage.setItem('user', JSON.stringify(session.user));
   const headerCoins = document.getElementById('header-coins');
-  if (headerCoins) headerCoins.textContent = `⚽ ${coins}`;
+  const formattedCoins = typeof formatCoins === 'function'
+    ? formatCoins(coins)
+    : Number(coins || 0).toLocaleString('pt-BR');
+  if (headerCoins) headerCoins.textContent = `⚽ ${formattedCoins}`;
 }
 
 window.getSession = getSession;

@@ -168,6 +168,27 @@
     $('btn-next-result').hidden = true;
   }
 
+  function renderSecondHalfDivider(hasSecondHalfEvent = false) {
+    const container = $('match-events');
+    if (!container) return;
+
+    const divider = container.querySelector('.match-half-divider') || document.createElement('div');
+    if (!divider.parentNode) {
+      divider.className = 'match-half-divider';
+      divider.textContent = '2º Tempo';
+    }
+
+    if (!hasSecondHalfEvent) {
+      container.appendChild(divider);
+      return;
+    }
+
+    const firstHalfEvent = Array.from(container.querySelectorAll('.match-event'))
+      .find((event) => Number(event.dataset.minute) <= 45);
+    if (firstHalfEvent) container.insertBefore(divider, firstHalfEvent);
+    else container.appendChild(divider);
+  }
+
   function addGoal(event) {
     const scoreId = event.team === 'home' ? 'player-score' : 'opponent-score';
     const score = Number($(scoreId).textContent || 0) + 1;
@@ -184,14 +205,19 @@
         opponentName: state.match.opponent.name,
       });
       const rendered = container.lastElementChild;
-      if (rendered) container.prepend(rendered);
+      if (rendered) {
+        container.prepend(rendered);
+        if (Number(event.minute) > 45) renderSecondHalfDivider(true);
+      }
       setText('draft-status', `Gol aos ${event.minute} minutos: ${event.scorer}.`);
       return;
     }
     const row = document.createElement('div');
     row.className = 'match-event';
+    if (event.minute !== null && event.minute !== undefined) row.dataset.minute = String(event.minute);
     row.innerHTML = `<span class="match-event__minute">${String(event.minute).padStart(2, '0')}'</span><span class="match-event__icon">⚽</span><span class="match-event__text"><strong>Gol de ${escapeHtml(event.scorer)}</strong><small>${event.team === 'home' ? 'Que jogada do seu elenco!' : 'O adversário aproveita.'}</small></span><span class="match-event__team">${escapeHtml(team)}</span>`;
     $('match-events').prepend(row);
+    if (Number(event.minute) > 45) renderSecondHalfDivider(true);
     setText('draft-status', `Gol aos ${event.minute} minutos: ${event.scorer}.`);
   }
 
@@ -205,6 +231,7 @@
         event.seen = true;
         addGoal(event);
       });
+    if (state.minute === 46) renderSecondHalfDivider();
     if (state.minute >= 90) finishDraftMatch();
   }
 
@@ -312,7 +339,7 @@
       const code = opponent?.code || 'un';
       const row = document.createElement('article');
       row.className = `history-row history-row--${resultClass(match.result)}`;
-      row.innerHTML = `<div class="history-row__phase">DRAFT<strong>FINALIZADO</strong></div><div class="history-row__opponent"><span class="flag-icon"><img class="flag-image" src="https://flagcdn.com/w80/${code}.png" alt="Bandeira de ${escapeHtml(match.opponent_name)}" width="80" height="53" loading="lazy"></span><strong>${escapeHtml(match.opponent_name)}</strong><small>${formatPlayedAt(match.played_at)}</small></div><div class="history-row__score"><strong>${match.user_score}</strong><span>—</span><strong>${match.opponent_score}</strong></div><div class="history-row__reward">${match.coins_earned ? `+${match.coins_earned} ⚽` : '—'} </div><span class="history-row__status">${escapeHtml(match.result_label)}</span>`;
+      row.innerHTML = `<div class="history-row__phase">DRAFT<strong>FINALIZADO</strong></div><div class="history-row__opponent"><span class="flag-icon"><img class="flag-image" src="https://flagcdn.com/w80/${code}.png" alt="Bandeira de ${escapeHtml(match.opponent_name)}" width="80" height="53" loading="lazy"></span><strong>${escapeHtml(match.opponent_name)}</strong><small>${formatPlayedAt(match.played_at)}</small></div><div class="history-row__score"><strong>${match.user_score}</strong><span>—</span><strong>${match.opponent_score}</strong></div><div class="history-row__reward">${match.coins_earned ? `+${formatCoins(match.coins_earned)} ⚽` : '—'} </div><span class="history-row__status">${escapeHtml(match.result_label)}</span>`;
       container.appendChild(row);
     });
     renderHistoryPagination(totalPages);
@@ -361,7 +388,8 @@
     setText('result-player-score', state.match.score.user);
     setText('result-opponent-score', state.match.score.opponent);
     setText('result-copy', `OVR do seu elenco: ${state.match.user_ovr}.`);
-    setText('result-reward', state.match.coins_earned ? `+ ⚽ ${state.match.coins_earned}` : '⚽ Nenhuma recompensa');
+    const reward = Number(state.match.coins_earned || 0);
+    setText('result-reward', reward > 0 ? `+ ⚽ ${formatCoins(reward)}` : '⚽ 0 coins');
     setText('result-icon', state.match.result === 'W' ? '✓' : state.match.result === 'L' ? '×' : '—');
     if (state.match.campaign) {
       state.campaign = state.match.campaign;

@@ -20,6 +20,37 @@ ARTIFACT_FILE = PROJECT_ROOT / "artifacts" / "players.json"
 PLAYERS_FILE = OUTPUT_FILE if OUTPUT_FILE.exists() else ARTIFACT_FILE
 EA_PLAYERS_FILE = PROJECT_ROOT / "data" / "ea_fc26_players.csv"
 
+PLAYER_EA_ID_OVERRIDES = {
+    ("brazil", "alisson", "GK"): 212831,
+}
+
+
+def normalize_match_value(value: object) -> str:
+    return " ".join(str(value or "").strip().casefold().split())
+
+
+def format_player_name(value: object) -> str | None:
+    raw_name = " ".join(str(value or "").strip().split())
+    if not raw_name:
+        return None
+    if any(character.isupper() for character in raw_name):
+        return raw_name
+    return " ".join(
+        part[:1].upper() + part[1:].lower()
+        for part in raw_name.split()
+    )
+
+
+def corrected_ea_id(player: dict) -> int | None:
+    raw_ea_id = player.get("ea_id")
+    source_ea_id = int(raw_ea_id) if raw_ea_id is not None else None
+    key = (
+        normalize_match_value(player.get("nationality") or player.get("nation")),
+        normalize_match_value(player.get("wc_name") or player.get("name")),
+        str(player.get("position") or "").strip().upper(),
+    )
+    return PLAYER_EA_ID_OVERRIDES.get(key, source_ea_id)
+
 
 def calculate_price(overall: int) -> int:
     return calculate_player_price(overall)
@@ -50,14 +81,33 @@ def seed_players():
     with engine.begin() as conn:
 
         for player in players:
+            raw_source_ea_id = player.get("ea_id")
+            source_ea_id = int(raw_source_ea_id) if raw_source_ea_id is not None else None
+            corrected_id = corrected_ea_id(player)
+            national_team = player.get("nation") or player.get("nationality")
+
+            if source_ea_id is not None and corrected_id != source_ea_id:
+                conn.execute(
+                    text("""
+                        DELETE FROM national_team_rosters
+                        WHERE national_team = :national_team
+                          AND player_id IN (
+                              SELECT id FROM players WHERE ea_id = :source_ea_id
+                          )
+                    """),
+                    {
+                        "national_team": national_team,
+                        "source_ea_id": source_ea_id,
+                    },
+                )
 
             player_data = {
-                "ea_id": player.get("ea_id"),
-                "name": player.get("name"),
+                "ea_id": corrected_id,
+                "name": format_player_name(player.get("wc_name") or player.get("name")),
                 "country": player.get("nationality") or player.get("nation"),
-                "national_team": player.get("nation") or player.get("nationality"),
+                "national_team": national_team,
                 "position": ea_positions.get(
-                    player.get("ea_id"),
+                    corrected_id,
                     player.get("position"),
                 ),
                 "overall": player.get("overall"),
@@ -72,7 +122,7 @@ def seed_players():
                         SELECT id
                         FROM players
                         WHERE ea_id IS NULL
-                          AND name = :name
+                          AND LOWER(name) = LOWER(:name)
                           AND country = :country
                           AND national_team = :national_team
                           AND position = :position
@@ -87,13 +137,15 @@ def seed_players():
                     conn.execute(
                         text("""
                             UPDATE players
-                            SET country = :country,
+                            SET name = :name,
+                                country = :country,
                                 national_team = :national_team,
                                 price = :price
                             WHERE id = :id
                         """),
                         {
                             "id": existing_id,
+                            "name": player_data["name"],
                             "country": player_data["country"],
                             "national_team": player_data["national_team"],
                             "price": player_data["price"],
@@ -143,8 +195,12 @@ def seed_players():
                     )
                     ON CONFLICT (ea_id) DO UPDATE
                     SET position = EXCLUDED.position,
+                        name = EXCLUDED.name,
                         country = EXCLUDED.country,
                         national_team = EXCLUDED.national_team,
+                        overall = EXCLUDED.overall,
+                        club = EXCLUDED.club,
+                        photo_url = EXCLUDED.photo_url,
                         price = EXCLUDED.price
                     RETURNING id
                 """),

@@ -26,6 +26,63 @@ def name_variants(name: str) -> set[str]:
         variants.add(f"{parts[0]} {parts[1]}")    
     return variants
 
+
+POSITION_GROUPS = {
+    "GK": {"GK"},
+    "DF": {"DF", "CB", "LB", "RB", "LWB", "RWB"},
+    "MF": {"MF", "CDM", "CM", "CAM", "LM", "RM"},
+    "FW": {"FW", "LW", "RW", "CF", "ST"},
+}
+
+
+def position_group(position: str | None) -> str | None:
+    normalized = str(position or "").strip().upper()
+    return next(
+        (group for group, positions in POSITION_GROUPS.items() if normalized in positions),
+        None,
+    )
+
+
+def build_ea_index(ea_players) -> dict[str, list[object]]:
+    index: dict[str, list[object]] = {}
+    for player in ea_players:
+        variants = name_variants(player.raw_name)
+        if player.common_name:
+            variants.update(name_variants(player.common_name))
+        for variant in variants:
+            index.setdefault(variant, []).append(player)
+    return index
+
+
+def find_player_match(wc_name: str, nation: str, wc_position: str, ea_index):
+    normalized_wc_name = normalize(wc_name)
+    candidates = {
+        player.ea_id: player
+        for variant in name_variants(wc_name)
+        for player in ea_index.get(variant, [])
+    }
+    if not candidates:
+        return None
+
+    wc_group = position_group(wc_position)
+    ranked = []
+    for player in candidates.values():
+        score = 0
+        if normalize(player.nationality) == normalize(nation):
+            score += 100
+        if wc_group and position_group(player.position) == wc_group:
+            score += 80
+        if normalize(player.raw_name) == normalized_wc_name:
+            score += 60
+        if player.common_name and normalize(player.common_name) == normalized_wc_name:
+            score += 50
+        ranked.append((score, player))
+
+    ranked.sort(key=lambda item: (-item[0], item[1].ea_id))
+    if len(ranked) > 1 and ranked[0][0] == ranked[1][0]:
+        return None
+    return ranked[0][1]
+
 def main():
     print("Baixando elencos do openfootball...")
     squads = requests.get(SQUADS_URL).json()
@@ -34,14 +91,8 @@ def main():
     print("Carregando CSV EA FC...")
     ea_players = get_players()
 
-    # índice: nome normalizado -> player
-    ea_index: dict[str, object] = {}
-    for p in ea_players:
-        for v in name_variants(p.raw_name):
-            ea_index[v] = p
-        if p.common_name:
-            for v in name_variants(p.common_name):
-                ea_index[v] = p
+    # Índice com todos os candidatos; nomes comuns podem pertencer a mais de um jogador.
+    ea_index = build_ea_index(ea_players)
 
     api = FootballApiService()
     result = []
@@ -51,18 +102,14 @@ def main():
         nation = team["name"]
         for player in team["players"]:
             wc_name = player["name"]
-            found = None
-            for v in name_variants(wc_name):
-                if v in ea_index:
-                    found = ea_index[v]
-                    break
+            found = find_player_match(wc_name, nation, player["pos"], ea_index)
 
             if found:
                 result.append({
                     "nation": nation,
                     "wc_name": wc_name,
                     "ea_id": found.ea_id,
-                    "name": found.name,
+                    "name": found.raw_name,
                     "common_name": found.common_name,
                     "overall": found.overall,
                     "position": player["pos"],

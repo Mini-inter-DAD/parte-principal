@@ -1,3 +1,8 @@
+function formatCoins(value) {
+  const number = Number(value);
+  return (Number.isFinite(number) ? number : 0).toLocaleString('pt-BR');
+}
+
 const POSITION_LABELS = Object.freeze({
   GK: 'GOL',
   GOL: 'GOL',

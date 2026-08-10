@@ -35,6 +35,7 @@
     row.className = 'match-event';
     row.setAttribute('role', 'article');
     row.setAttribute('data-team', normalized.team);
+    if (normalized.minute !== null) row.dataset.minute = String(normalized.minute);
 
     const minute = normalized.minute === null ? '—' : `${String(normalized.minute).padStart(2, '0')}'`;
     const teamName = normalized.team === 'USER' ? context.teamName : context.opponentName;

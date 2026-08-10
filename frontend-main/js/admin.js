@@ -286,7 +286,7 @@ function renderUsers() {
         </div>
       </td>
       <td class="users-table__muted">${escapeAdminHtml(user.id ?? user.userId ?? user.user_id ?? '—')}</td>
-      <td class="users-table__coins">⚽ ${formatNumber(coins)}</td>
+      <td class="users-table__coins">⚽ ${formatCoins(coins)}</td>
       <td>${createdAt ? formatDate(createdAt) : '<span class="users-table__muted">—</span>'}</td>
     `;
 

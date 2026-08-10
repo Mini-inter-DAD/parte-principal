@@ -637,6 +637,26 @@
     text-transform: uppercase
 }
 
+.match-half-divider {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin: .7rem 0;
+    color: var(--color-text-muted);
+    font-size: .64rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.match-half-divider::before,
+.match-half-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, .12);
+}
+
 .live-hint {
     text-align: center;
     color: var(--color-text-muted);
