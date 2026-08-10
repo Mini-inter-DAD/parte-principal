@@ -339,9 +339,9 @@ async function loadSections() {
 
 function renderSectionTabs() {
   const container = document.getElementById('section-tabs');
-  if (!container) return; // section chips removed by layout — nothing to render
+  if (!container) return; // chips de seção removidos no layout — nada a renderizar
   container.innerHTML = '';
-  // if container exists, render only custom sections (exclude the default unwanted sections)
+  // Se o container existe, renderiza só as seções customizadas (exclui as padrão)
   const tabs = MARKET_STATE.sections.filter(s => !['Estrelas', 'Destaques da Copa', 'Veteranos', 'Todos'].includes(s));
   tabs.forEach((section) => {
     const button = document.createElement('button');

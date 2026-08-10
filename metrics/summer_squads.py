@@ -1,4 +1,3 @@
-# summary_squads.py
 import json
 
 
@@ -6,7 +5,6 @@ def main():
     with open("output/players.json", encoding="utf-8") as f:
         players = json.load(f)
 
-    # agrupa por nação
     by_nation = {}
     for p in players:
         nation = p["nation"]
