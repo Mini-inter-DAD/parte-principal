@@ -1,3 +1,36 @@
+# Dream Cup — Ultimate Team da Copa do Mundo
+
+Jogo web de fantasia de futebol baseado na Copa do Mundo de 2026: o usuário cria uma conta, monta seu elenco no mercado, escala um time titular, disputa partidas (draft) e acumula moedas. Projeto desenvolvido como trabalho da disciplina de DAD, com foco em **acessibilidade digital**.
+
+> O restante deste arquivo contém a pesquisa acadêmica sobre acessibilidade digital em empresas reais e a lista de responsáveis. Documentação técnica completa do projeto fica em [`docs/`](docs/).
+
+## Início rápido
+
+```bash
+# 1. Subir o banco (PostgreSQL 17)
+docker compose up -d
+
+# 2. Criar .env a partir do exemplo
+cp .env.example .env
+
+# 3. Rodar backend (FastAPI)
+uvicorn backend.app:app --reload
+```
+
+Frontend: veja [`docs/frontend.md`](docs/frontend.md). Pipeline de dados: [`docs/pipeline.md`](docs/pipeline.md).
+
+## Documentação
+
+- [`docs/setup.md`](docs/setup.md) — Requisitos, variáveis de ambiente, instalação e execução
+- [`docs/arquitetura.md`](docs/arquitetura.md) — Visão geral da arquitetura e estrutura do repositório
+- [`docs/backend.md`](docs/backend.md) — Referência da API (endpoints, autenticação, regras de negócio)
+- [`docs/banco-de-dados.md`](docs/banco-de-dados.md) — Modelagem do banco de dados
+- [`docs/frontend.md`](docs/frontend.md) — Interface web, fluxo de navegação e acessibilidade
+- [`docs/pipeline.md`](docs/pipeline.md) — Pipeline de dados (elencos, IA e métricas)
+- [`docs/evidencias.md`](docs/evidencias.md) — Ferramenta de auditoria de acessibilidade
+
+---
+
 # Stack
 
 ## Banco De Dados
