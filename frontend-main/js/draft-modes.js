@@ -60,9 +60,13 @@
     }
 
     if (status) {
-      status.textContent = enabled
-        ? `${safeCount}/11 titulares prontos para jogar.`
-        : `Complete seu time antes de jogar. ${safeCount}/11 titulares escalados.`;
+      if (enabled) {
+        status.textContent = `${safeCount}/11 titulares prontos para jogar.`;
+      } else if (safeCount > 11) {
+        status.textContent = `Reduza seu time para exatamente 11 titulares. ${safeCount} titulares escalados.`;
+      } else {
+        status.textContent = `Complete seu time antes de jogar. ${safeCount}/11 titulares escalados.`;
+      }
       status.classList.toggle('starter-status--ready', enabled);
     }
   }
