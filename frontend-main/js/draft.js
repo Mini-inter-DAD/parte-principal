@@ -351,10 +351,25 @@
     }
     $('btn-start-draft').addEventListener('click', startDraftMatch);
     $('btn-next-result').addEventListener('click', showResult);
-    $('btn-play-again').addEventListener('click', () => {
+    $('btn-play-again').addEventListener('click', async () => {
+      const userId = Number(sessionUser()?.id);
+      if (state.mode === 'cup' && state.campaign && !state.campaign.can_play) {
+        try {
+          state.campaign = await api.restartCampaign(userId);
+          state.phaseIndex = Number(state.campaign.phase_index || 0);
+        } catch (error) {
+          showError(error.message || 'Não foi possível reiniciar a Copa.');
+          return;
+        }
+      }
+
       $('match-result').classList.remove('result-panel--loss');
+      state.match = null;
+      state.events = [];
+      state.minute = 0;
       showMode('preview');
       state.opponent = state.opponents[Math.floor(Math.random() * state.opponents.length)] || null;
+      renderCupPhase();
       renderPreview();
     });
   }
