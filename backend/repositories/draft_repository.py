@@ -217,7 +217,7 @@ def create_match(
     return created.mappings().one()
 
 
-def list_history(db: Session, user_id: int, limit: int = 20):
+def list_history(db: Session, user_id: int, limit: int = 20, offset: int = 0):
     result = db.execute(
         text("""
             SELECT id, user_ovr, opponent_name, opponent_ovr,
@@ -227,7 +227,8 @@ def list_history(db: Session, user_id: int, limit: int = 20):
             WHERE user_id = :user_id
             ORDER BY played_at DESC, id DESC
             LIMIT :limit
+            OFFSET :offset
         """),
-        {"user_id": user_id, "limit": limit},
+        {"user_id": user_id, "limit": limit, "offset": offset},
     )
     return result.mappings().all()

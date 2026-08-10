@@ -326,12 +326,12 @@ def play_draft(db, *, user_id: int, opponent_id: str | None = None, mode: str = 
         raise
 
 
-def get_history(db, user_id: int):
+def get_history(db, user_id: int, *, limit: int = 20, offset: int = 0):
     if user_repository.get_user(db, user_id) is None:
         raise NotFoundError("User not found")
 
     history = []
-    for row in draft_repository.list_history(db, user_id):
+    for row in draft_repository.list_history(db, user_id, limit=limit, offset=offset):
         history.append(
             {
                 **dict(row),

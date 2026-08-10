@@ -66,7 +66,7 @@ const api = {
       ...(opponentId ? { opponent_id: opponentId } : {}),
     }),
   }),
-  getHistory:             (userId) => apiFetch(`/draft/history/${userId}`),
+  getHistory:             (userId, { limit = 20, offset = 0 } = {}) => apiFetch(`/draft/history/${userId}?limit=${limit}&offset=${offset}`),
   getCampaign:            (userId) => apiFetch(`/draft/campaign/${userId}`),
   restartCampaign:        (userId) => apiFetch(`/draft/campaign/${userId}/restart`, { method: "POST" }),
 };
