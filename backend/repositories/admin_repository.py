@@ -76,6 +76,30 @@ def list_users_by_month(
     return list(result.mappings().all())
 
 
+def count_users(db: Session) -> int:
+    result = db.execute(
+        text("""
+            SELECT COUNT(*)
+            FROM users
+        """)
+    )
+    return int(result.scalar_one())
+
+
+def list_users_paginated(db: Session, *, limit: int, offset: int):
+    result = db.execute(
+        text("""
+            SELECT id, username, email, coins, created_at
+            FROM users
+            ORDER BY created_at DESC, id DESC
+            LIMIT :limit
+            OFFSET :offset
+        """),
+        {"limit": limit, "offset": offset},
+    )
+    return list(result.mappings().all())
+
+
 def revoke_session(db: Session, token_hash: str):
     db.execute(
         text("""
