@@ -121,7 +121,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const account = data.account_type === 'admin'
         ? { ...data.admin, role: 'admin' }
         : data.user;
+
       saveSession({ token: data.token, user: account });
+      if (data.account_type === 'admin') {
+        localStorage.setItem('adminToken', data.token);
+        localStorage.setItem('admin', JSON.stringify(data.admin));
+      }
       
       // Substituição: sucesso após login
       notify.success('Conta criada! Redirecionando...');
