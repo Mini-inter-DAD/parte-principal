@@ -18,6 +18,20 @@ def list_user_players(db: Session, user_id: int):
     return result.mappings().all()
 
 
+def count_valid_starters(db: Session, user_id: int) -> int:
+    result = db.execute(
+        text("""
+            SELECT COUNT(*)
+            FROM user_players
+            WHERE user_id = :user_id
+              AND is_starter = TRUE
+              AND squad_position IS NOT NULL
+        """),
+        {"user_id": user_id},
+    )
+    return int(result.scalar_one())
+
+
 def update_starter(
     db: Session,
     user_id: int,

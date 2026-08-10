@@ -107,7 +107,7 @@ def set_starter(request: StarterUpdate, db: Session = Depends(get_db)):
             is_starter=request.is_starter,
             squad_position=request.squad_position,
         )
-    except (NotFoundError, BusinessRuleError) as exc:
+    except (NotFoundError, ConflictError, BusinessRuleError) as exc:
         raise _service_error(exc) from exc
 
 
@@ -124,5 +124,5 @@ def set_current_user_starter(
             player_id=player_id,
             is_starter=True,
         )
-    except NotFoundError as exc:
+    except (NotFoundError, ConflictError, BusinessRuleError) as exc:
         raise _service_error(exc) from exc

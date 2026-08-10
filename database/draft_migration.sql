@@ -70,3 +70,75 @@ CREATE TABLE IF NOT EXISTS goal_events (
 );
 
 CREATE INDEX IF NOT EXISTS idx_goal_events_match_id ON goal_events(match_id);
+
+-- Repair old data created before the backend enforced one player per slot.
+WITH starter_rows AS (
+    SELECT
+        up.id,
+        up.user_id,
+        UPPER(up.squad_position) AS slot,
+        p.overall,
+        ROW_NUMBER() OVER (
+            PARTITION BY up.user_id, UPPER(up.squad_position)
+            ORDER BY p.overall DESC, up.acquired_at ASC, up.id ASC
+        ) AS slot_rank
+    FROM user_players up
+    JOIN players p ON p.id = up.player_id
+    WHERE up.is_starter = TRUE
+      AND up.squad_position IS NOT NULL
+), unique_slots AS (
+    SELECT id, user_id, slot, overall
+    FROM starter_rows
+    WHERE slot_rank = 1
+), ordered_slots AS (
+    SELECT
+        id,
+        ROW_NUMBER() OVER (
+            PARTITION BY user_id
+            ORDER BY
+                CASE slot
+                    WHEN 'GK' THEN 1
+                    WHEN 'LB' THEN 2
+                    WHEN 'CB1' THEN 3
+                    WHEN 'CB2' THEN 4
+                    WHEN 'RB' THEN 5
+                    WHEN 'CM1' THEN 6
+                    WHEN 'CM2' THEN 7
+                    WHEN 'CM3' THEN 8
+                    WHEN 'LW' THEN 9
+                    WHEN 'RW' THEN 10
+                    WHEN 'ST' THEN 11
+                    WHEN 'LWB' THEN 12
+                    WHEN 'RWB' THEN 13
+                    WHEN 'CB3' THEN 14
+                    WHEN 'CDM1' THEN 15
+                    WHEN 'CDM2' THEN 16
+                    WHEN 'CAM' THEN 17
+                    WHEN 'LM' THEN 18
+                    WHEN 'RM' THEN 19
+                    WHEN 'ST1' THEN 20
+                    WHEN 'ST2' THEN 21
+                    ELSE 99
+                END,
+                overall DESC,
+                id ASC
+        ) AS roster_rank
+    FROM unique_slots
+), keepers AS (
+    SELECT id
+    FROM ordered_slots
+    WHERE roster_rank <= 11
+)
+UPDATE user_players up
+SET is_starter = FALSE,
+    squad_position = NULL
+WHERE up.is_starter = TRUE
+  AND NOT EXISTS (
+      SELECT 1
+      FROM keepers
+      WHERE keepers.id = up.id
+  );
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_user_players_starter_slot
+    ON user_players(user_id, UPPER(squad_position))
+    WHERE is_starter = TRUE AND squad_position IS NOT NULL;

@@ -2,6 +2,44 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 
+INITIAL_STARTER_SLOTS = (
+    "GK", "LB", "CB1", "CB2", "RB", "CM1", "CM2", "CM3", "LW", "RW", "ST"
+)
+
+INITIAL_SLOT_CANDIDATES = {
+    "GK": ("GK",),
+    "LB": ("LB", "LWB"),
+    "LWB": ("LWB", "LB"),
+    "CB": ("CB1", "CB2", "CB3"),
+    "DF": ("CB1", "CB2", "CB3"),
+    "RB": ("RB", "RWB"),
+    "RWB": ("RWB", "RB"),
+    "CDM": ("CM1", "CM2", "CM3", "CDM1", "CDM2"),
+    "CM": ("CM1", "CM2", "CM3", "CAM", "CDM1", "CDM2"),
+    "MC": ("CM1", "CM2", "CM3"),
+    "MF": ("CM1", "CM2", "CM3", "CAM"),
+    "CAM": ("CAM", "CM1", "CM2", "CM3"),
+    "LM": ("LM", "LW"),
+    "LW": ("LW", "LM"),
+    "RM": ("RM", "RW"),
+    "RW": ("RW", "RM"),
+    "ST": ("ST", "ST1", "ST2"),
+    "CF": ("ST", "ST1", "ST2"),
+    "FW": ("ST", "ST1", "ST2"),
+}
+
+
+def _initial_squad_position(position: str, used_slots: set[str]) -> str:
+    normalized_position = str(position or "").strip().upper()
+    for slot in INITIAL_SLOT_CANDIDATES.get(normalized_position, ()):
+        if slot not in used_slots:
+            return slot
+    for slot in INITIAL_STARTER_SLOTS:
+        if slot not in used_slots:
+            return slot
+    return ""
+
+
 def create_user(db: Session, *, username: str, email: str, password_hash: str):
     result = db.execute(
         text("""
@@ -90,11 +128,18 @@ def list_random_starter_player_ids(db: Session, limit: int = 12) -> list[int]:
 
 
 def add_players_to_user(db: Session, user_id: int, player_ids: list[int]):
+    used_slots: set[str] = set()
     for index, player_id in enumerate(player_ids):
         position = db.execute(
             text("SELECT position FROM players WHERE id = :player_id"),
             {"player_id": player_id},
         ).scalar_one()
+        is_starter = index < 11
+        squad_position = _initial_squad_position(position, used_slots) if is_starter else None
+        if is_starter and not squad_position:
+            raise ValueError("Could not assign a unique initial squad position")
+        if squad_position:
+            used_slots.add(squad_position)
         db.execute(
             text("""
                 INSERT INTO user_players (
@@ -107,7 +152,7 @@ def add_players_to_user(db: Session, user_id: int, player_ids: list[int]):
             {
                 "user_id": user_id,
                 "player_id": player_id,
-                "is_starter": index < 11,
-                "squad_position": position if index < 11 else None,
+                "is_starter": is_starter,
+                "squad_position": squad_position,
             },
         )

@@ -170,6 +170,10 @@ CREATE TABLE user_players (
     UNIQUE(user_id, player_id)
 );
 
+CREATE UNIQUE INDEX uq_user_players_starter_slot
+    ON user_players(user_id, UPPER(squad_position))
+    WHERE is_starter = TRUE AND squad_position IS NOT NULL;
+
 -- ============================================================
 -- CART ITEMS
 -- Jogadores separados para compra pelo usuario

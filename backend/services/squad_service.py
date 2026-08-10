@@ -1,4 +1,4 @@
-from backend.repositories import player_repository, squad_repository, user_repository
+from backend.repositories import squad_repository, user_repository
 from backend.services.errors import BusinessRuleError, ConflictError, NotFoundError
 from backend.services.position_rules import (
     can_play_in_slot,
@@ -103,6 +103,11 @@ def assign_position(
         and current["is_starter"]
         and same_slot(current["squad_position"], target_slot)
     ]
+    starter_count = squad_repository.count_valid_starters(db, user_id)
+    if not player["is_starter"] and not replaced_player_ids and starter_count >= 11:
+        raise BusinessRuleError(
+            "O elenco já possui 11 titulares. Substitua um titular ou envie um deles para a reserva."
+        )
     if player["is_starter"] and same_slot(player["squad_position"], target_slot):
         return {
             "message": "O jogador já está nesta posição",
@@ -165,23 +170,14 @@ def move_to_bench(db, *, user_id: int, player_id: int):
 
 
 def set_starter(db, *, user_id: int, player_id: int, is_starter: bool, squad_position=None):
-    if user_repository.get_user(db, user_id) is None:
-        raise NotFoundError("User not found")
-    if player_repository.get_player(db, player_id) is None:
-        raise NotFoundError("Player not found")
-    if is_starter and squad_position and not can_play_in_slot(
-        player_repository.get_player(db, player_id)["position"],
-        squad_position,
-    ):
-        raise BusinessRuleError("The player is not compatible with this position")
-    updated = squad_repository.update_starter(
-        db,
-        user_id,
-        player_id,
-        is_starter,
-        squad_position,
-    )
-    if updated is None:
-        raise NotFoundError("Player is not in the user's squad")
-    db.commit()
-    return dict(updated)
+    if is_starter:
+        if not squad_position:
+            raise BusinessRuleError("Informe uma posição válida para o titular")
+        return assign_position(
+            db,
+            user_id=user_id,
+            player_id=player_id,
+            target_slot=squad_position,
+        )
+
+    return move_to_bench(db, user_id=user_id, player_id=player_id)
