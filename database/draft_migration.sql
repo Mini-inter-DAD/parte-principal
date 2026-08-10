@@ -54,10 +54,34 @@ CREATE TABLE IF NOT EXISTS cup_campaigns (
     phase_index     SMALLINT NOT NULL DEFAULT 0 CHECK (phase_index BETWEEN 0 AND 7),
     group_matches   SMALLINT NOT NULL DEFAULT 0 CHECK (group_matches BETWEEN 0 AND 3),
     group_points    SMALLINT NOT NULL DEFAULT 0 CHECK (group_points >= 0),
+    group_losses    SMALLINT NOT NULL DEFAULT 0 CHECK (group_losses BETWEEN 0 AND 3),
     status          VARCHAR(12) NOT NULL DEFAULT 'ACTIVE'
                     CHECK (status IN ('ACTIVE', 'COMPLETED', 'ELIMINATED')),
     updated_at      TIMESTAMP NOT NULL DEFAULT now()
 );
+
+ALTER TABLE cup_campaigns
+    ADD COLUMN IF NOT EXISTS group_losses SMALLINT NOT NULL DEFAULT 0;
+
+-- Backfill defeats from group matches already stored before this column existed.
+WITH group_results AS (
+    SELECT
+        user_id,
+        COUNT(*) FILTER (WHERE result = 'L') AS losses
+    FROM matches
+    WHERE mode = 'cup'
+      AND phase_index BETWEEN 0 AND 2
+    GROUP BY user_id
+)
+UPDATE cup_campaigns campaign
+SET group_losses = results.losses,
+    status = CASE
+        WHEN campaign.phase_index < 3 AND results.losses >= 2 THEN 'ELIMINATED'
+        ELSE campaign.status
+    END,
+    updated_at = now()
+FROM group_results results
+WHERE campaign.user_id = results.user_id;
 
 CREATE TABLE IF NOT EXISTS goal_events (
     id              BIGSERIAL PRIMARY KEY,

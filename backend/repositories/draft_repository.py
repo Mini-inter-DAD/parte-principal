@@ -60,7 +60,7 @@ def get_or_create_campaign(db: Session, user_id: int):
     result = db.execute(
         text("""
             SELECT id, user_id, phase_index, group_matches, group_points,
-                   status, updated_at
+                   group_losses, status, updated_at
             FROM cup_campaigns
             WHERE user_id = :user_id
             FOR UPDATE
@@ -74,7 +74,7 @@ def get_campaign(db: Session, user_id: int):
     result = db.execute(
         text("""
             SELECT id, user_id, phase_index, group_matches, group_points,
-                   status, updated_at
+                   group_losses, status, updated_at
             FROM cup_campaigns
             WHERE user_id = :user_id
         """),
@@ -90,6 +90,7 @@ def update_campaign(
     phase_index: int,
     group_matches: int,
     group_points: int,
+    group_losses: int,
     status: str,
 ):
     result = db.execute(
@@ -98,17 +99,19 @@ def update_campaign(
             SET phase_index = :phase_index,
                 group_matches = :group_matches,
                 group_points = :group_points,
+                group_losses = :group_losses,
                 status = :status,
                 updated_at = now()
             WHERE id = :campaign_id
             RETURNING id, user_id, phase_index, group_matches,
-                      group_points, status, updated_at
+                      group_points, group_losses, status, updated_at
         """),
         {
             "campaign_id": campaign_id,
             "phase_index": phase_index,
             "group_matches": group_matches,
             "group_points": group_points,
+            "group_losses": group_losses,
             "status": status,
         },
     )

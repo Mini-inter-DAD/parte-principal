@@ -33,6 +33,7 @@ class DraftCampaignResponse(BaseModel):
     status: Literal["ACTIVE", "COMPLETED", "ELIMINATED"]
     group_matches: int = Field(ge=0, le=3)
     group_points: int = Field(ge=0)
+    group_losses: int = Field(ge=0, le=3)
     can_play: bool
 
 

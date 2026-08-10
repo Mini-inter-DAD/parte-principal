@@ -270,6 +270,9 @@ CREATE TABLE cup_campaigns (
     group_points    SMALLINT NOT NULL DEFAULT 0
                     CHECK (group_points >= 0),
 
+    group_losses    SMALLINT NOT NULL DEFAULT 0
+                    CHECK (group_losses BETWEEN 0 AND 3),
+
     status          VARCHAR(12) NOT NULL DEFAULT 'ACTIVE'
                     CHECK (status IN ('ACTIVE', 'COMPLETED', 'ELIMINATED')),
 

@@ -137,6 +137,7 @@ def _campaign_payload(campaign):
         "status": campaign["status"],
         "group_matches": int(campaign["group_matches"]),
         "group_points": int(campaign["group_points"]),
+        "group_losses": int(campaign["group_losses"]),
         "can_play": campaign["status"] == "ACTIVE",
     }
 
@@ -149,6 +150,7 @@ def _default_campaign(user_id: int):
         "status": "ACTIVE",
         "group_matches": 0,
         "group_points": 0,
+        "group_losses": 0,
         "can_play": True,
     }
 
@@ -207,16 +209,17 @@ def _advance_campaign(campaign, result: str):
     phase_index = int(campaign["phase_index"])
     group_matches = int(campaign["group_matches"])
     group_points = int(campaign["group_points"])
+    group_losses = int(campaign["group_losses"])
     status = campaign["status"]
 
     if phase_index < 3:
         group_matches += 1
         group_points += {"W": 3, "D": 1, "L": 0}[result]
-        if group_matches >= 3:
-            if group_points >= 4:
-                phase_index = 3
-            else:
-                status = "ELIMINATED"
+        group_losses += int(result == "L")
+        if group_losses >= 2:
+            status = "ELIMINATED"
+        elif group_matches >= 3:
+            phase_index = 3
     elif result == "W":
         if phase_index == len(CUP_PHASES) - 1:
             status = "COMPLETED"
@@ -225,7 +228,7 @@ def _advance_campaign(campaign, result: str):
     elif result == "L":
         status = "ELIMINATED"
 
-    return phase_index, group_matches, group_points, status
+    return phase_index, group_matches, group_points, group_losses, status
 
 
 def play_draft(db, *, user_id: int, opponent_id: str | None = None, mode: str = "cup"):
@@ -274,7 +277,7 @@ def play_draft(db, *, user_id: int, opponent_id: str | None = None, mode: str = 
 
         campaign_payload = None
         if campaign is not None:
-            next_phase, group_matches, group_points, status = _advance_campaign(
+            next_phase, group_matches, group_points, group_losses, status = _advance_campaign(
                 campaign,
                 result,
             )
@@ -284,6 +287,7 @@ def play_draft(db, *, user_id: int, opponent_id: str | None = None, mode: str = 
                 phase_index=next_phase,
                 group_matches=group_matches,
                 group_points=group_points,
+                group_losses=group_losses,
                 status=status,
             )
             campaign_payload = _campaign_payload(campaign)
