@@ -55,7 +55,7 @@ function bindAdminEvents() {
   });
 }
 
-/* O mês atual não aparece porque seus dados ainda estão incompletos. */
+/* O mês atual fica disponível para acompanhar métricas em tempo real. */
 function populateMonthFilter(availableMonths = []) {
   const select = document.getElementById('month-filter');
   const completeMonths = getCompleteMonths(12);
@@ -80,7 +80,7 @@ function getCompleteMonths(amount) {
   currentMonth.setDate(1);
 
   return Array.from({ length: amount }, (_, index) => {
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - index - 1, 1);
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - index, 1);
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
   });
 }
@@ -91,7 +91,7 @@ function isCompleteMonth(month) {
   const candidate = new Date(year, monthNumber - 1, 1);
   const current = new Date();
   const currentMonth = new Date(current.getFullYear(), current.getMonth(), 1);
-  return candidate < currentMonth;
+  return candidate <= currentMonth;
 }
 
 async function loadAdminData() {

@@ -100,6 +100,11 @@ def _last_complete_month() -> str:
     return _shift_month(current, -1)
 
 
+def _current_month() -> str:
+    now = datetime.now(timezone.utc)
+    return f"{now.year:04d}-{now.month:02d}"
+
+
 def get_user_dashboard(db, *, month: str):
     # Valida o mês selecionado antes de montar o histórico.
     selected_month_start, next_month_start = month_bounds(month)
@@ -112,9 +117,9 @@ def get_user_dashboard(db, *, month: str):
     )
 
     selected = history[-1]
-    last_complete = _last_complete_month()
+    current_month = _current_month()
     available_months = [
-        _shift_month(last_complete, offset)
+        _shift_month(current_month, offset)
         for offset in range(-11, 1)
     ]
 
