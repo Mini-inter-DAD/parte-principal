@@ -293,16 +293,6 @@ body {
   font-size: 1.15rem;
 }
 
-.filter-card__header h2::after {
-  display: block;
-  width: 2.5rem;
-  height: 3px;
-  margin-top: 0.55rem;
-  border-radius: 999px;
-  background: var(--color-accent);
-  content: '';
-}
-
 .filter-card__actions {
   display: flex;
   flex-wrap: wrap;

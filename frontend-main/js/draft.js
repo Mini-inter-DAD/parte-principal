@@ -6,6 +6,10 @@
     opponent: null,
     match: null,
     history: [],
+    squad: [],
+    mode: 'cup',
+    phaseIndex: 0,
+    startReady: false,
     minute: 0,
     events: [],
     timer: null,
@@ -61,9 +65,37 @@
     renderHistory();
   }
 
+  async function loadSquad() {
+    const userId = Number(sessionUser()?.id);
+    if (!userId || typeof api.getSquad !== 'function') {
+      state.squad = [];
+      updateStarterGate();
+      return;
+    }
+    state.squad = await api.getSquad(userId);
+    updateStarterGate();
+  }
+
+  function updateStarterGate() {
+    const starters = typeof DraftData !== 'undefined'
+      ? DraftData.getValidStarters(state.squad)
+      : state.squad.filter((player) => player?.is_starter && player?.squad_position);
+    state.startReady = starters.length === 11;
+    const ovr = typeof DraftData !== 'undefined' ? DraftData.calculateTeamOvr(state.squad) : null;
+    setText('player-team-ovr', ovr ?? '--');
+    if (typeof DraftModes !== 'undefined') DraftModes.setStartEnabled(state.startReady, starters.length);
+  }
+
+  function renderCupPhase() {
+    if (typeof DraftData === 'undefined') return;
+    const phase = DraftData.getPhase(state.phaseIndex);
+    setText('cup-phase-label', phase ? `Fase atual: ${phase}` : 'Copa do Mundo');
+  }
+
   function renderPreview() {
     setText('player-team-name', teamName());
-    setText('player-team-ovr', '--');
+    updateStarterGate();
+    renderCupPhase();
 
     if (!state.opponent) {
       setText('opponent-team-name', 'Nenhum adversário');
@@ -84,6 +116,17 @@
   }
 
   function createEvents(match) {
+    const apiEvents = Array.isArray(match.goal_events) ? match.goal_events : [];
+    if (apiEvents.length && typeof DraftData !== 'undefined') {
+      return DraftData.normalizeGoals(apiEvents).map((event) => ({
+        team: event.team === 'USER' ? 'home' : 'away',
+        minute: event.minute,
+        scorer: event.playerName,
+        playerName: event.playerName,
+      }));
+    }
+
+    // Fallback visual only: scorer probability and official authorship remain backend responsibilities.
     const events = [];
     const addEvents = (team, total, scorer) => {
       for (let index = 0; index < total; index += 1) {
@@ -122,6 +165,21 @@
     const score = Number($(scoreId).textContent || 0) + 1;
     setText(scoreId, score);
     const team = event.team === 'home' ? state.match.team_name : state.match.opponent.name;
+    if (typeof DraftEvents !== 'undefined') {
+      const container = $('match-events');
+      DraftEvents.renderGoalEvent(container, {
+        minute: event.minute,
+        playerName: event.playerName || event.scorer,
+        team: event.team === 'home' ? 'USER' : 'OPPONENT',
+      }, {
+        teamName: state.match.team_name,
+        opponentName: state.match.opponent.name,
+      });
+      const rendered = container.lastElementChild;
+      if (rendered) container.prepend(rendered);
+      setText('draft-status', `Gol aos ${event.minute} minutos: ${event.scorer}.`);
+      return;
+    }
     const row = document.createElement('div');
     row.className = 'match-event';
     row.innerHTML = `<span class="match-event__minute">${String(event.minute).padStart(2, '0')}'</span><span class="match-event__icon">⚽</span><span class="match-event__text"><strong>Gol de ${escapeHtml(event.scorer)}</strong><small>${event.team === 'home' ? 'Que jogada do seu elenco!' : 'O adversário aproveita.'}</small></span><span class="match-event__team">${escapeHtml(team)}</span>`;
@@ -134,7 +192,7 @@
     setText('match-minute', String(state.minute).padStart(2, '0'));
     $('match-progress-bar').style.width = `${(state.minute / 90) * 100}%`;
     state.events
-      .filter((event) => !event.seen && event.minute <= state.minute)
+      .filter((event) => !event.seen && (event.minute === null || event.minute <= state.minute))
       .forEach((event) => {
         event.seen = true;
         addGoal(event);
@@ -150,8 +208,17 @@
       return;
     }
 
+    updateStarterGate();
+    if (!state.startReady) {
+      showError('Complete seu time antes de jogar. É necessário escalar 11 titulares.');
+      return;
+    }
+
     const button = $('btn-start-draft');
-    if (button) button.disabled = true;
+    if (button) {
+      button.disabled = true;
+      button.setAttribute('aria-disabled', 'true');
+    }
     try {
       state.match = await api.playDraft(userId, state.opponent?.id);
       setUserCoins(state.match.new_balance);
@@ -161,7 +228,11 @@
     } catch (error) {
       showError(error.message || 'Não foi possível iniciar o Draft.');
     } finally {
-      if (button) button.disabled = false;
+      if (button) {
+        button.disabled = false;
+        button.setAttribute('aria-disabled', 'false');
+      }
+      updateStarterGate();
     }
   }
 
@@ -197,6 +268,11 @@
       return;
     }
 
+    if (typeof DraftHistory !== 'undefined') {
+      DraftHistory.render(container, state.history, { teamName: teamName() });
+      return;
+    }
+
     state.history.forEach((match) => {
       const opponent = state.opponents.find((item) => item.name === match.opponent_name);
       const code = opponent?.code || 'un';
@@ -216,6 +292,8 @@
     setText('result-copy', `OVR do seu elenco: ${state.match.user_ovr}.`);
     setText('result-reward', state.match.coins_earned ? `+ ⚽ ${state.match.coins_earned}` : '⚽ Nenhuma recompensa');
     setText('result-icon', state.match.result === 'W' ? '✓' : state.match.result === 'L' ? '×' : '—');
+    if (state.mode === 'cup' && state.phaseIndex < 7) state.phaseIndex += 1;
+    renderCupPhase();
     showMode('result');
     try {
       await loadHistory();
@@ -228,9 +306,19 @@
     if (!$('match-preview')) return;
     if (typeof requireAuth === 'function') requireAuth();
     if (typeof renderNavbar === 'function') renderNavbar('draft');
+    if (typeof DraftModes !== 'undefined') {
+      DraftModes.bind({
+        onModeChange: (mode, expanded) => {
+          if (expanded) state.mode = mode;
+          renderCupPhase();
+          renderPreview();
+        },
+      });
+    }
+    renderCupPhase();
     setText('player-team-name', teamName());
     try {
-      await Promise.all([loadOpponents(), loadHistory()]);
+      await Promise.all([loadOpponents(), loadHistory(), loadSquad()]);
       renderPreview();
     } catch (error) {
       showError(error.message || 'Não foi possível carregar o Draft.');

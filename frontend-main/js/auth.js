@@ -71,6 +71,8 @@ function setUserCoins(coins) {
   if (!session.user) return;
   session.user.coins = coins;
   localStorage.setItem('user', JSON.stringify(session.user));
+  const headerCoins = document.getElementById('header-coins');
+  if (headerCoins) headerCoins.textContent = `⚽ ${coins}`;
 }
 
 window.getSession = getSession;
