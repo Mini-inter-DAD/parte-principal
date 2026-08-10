@@ -2,6 +2,14 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 
+# The Draft preview and match use the default 4-3-3 field. A player only
+# counts as a starter when the saved squad position maps to one of these slots.
+DRAFT_STARTER_SLOTS = (
+    "GK", "LB", "CB1", "CB2", "RB",
+    "CM1", "CM2", "CM3", "LW", "ST", "RW",
+)
+
+
 def list_user_overalls(db: Session, user_id: int):
     result = db.execute(
         text("""
@@ -20,11 +28,14 @@ def list_user_overalls(db: Session, user_id: int):
 def count_valid_starters(db: Session, user_id: int) -> int:
     result = db.execute(
         text("""
-            SELECT COUNT(*)
+            SELECT COUNT(DISTINCT UPPER(TRIM(squad_position)))
             FROM user_players
             WHERE user_id = :user_id
               AND is_starter = TRUE
-              AND squad_position IS NOT NULL
+              AND UPPER(TRIM(squad_position)) IN (
+                  'GK', 'LB', 'CB1', 'CB2', 'RB',
+                  'CM1', 'CM2', 'CM3', 'LW', 'ST', 'RW'
+              )
         """),
         {"user_id": user_id},
     )
@@ -34,13 +45,29 @@ def count_valid_starters(db: Session, user_id: int) -> int:
 def list_user_starters(db: Session, user_id: int):
     result = db.execute(
         text("""
-            SELECT p.id, p.name, p.position, p.overall
+            SELECT p.id, p.name, p.position, p.overall, up.squad_position
             FROM user_players up
             JOIN players p ON p.id = up.player_id
             WHERE up.user_id = :user_id
               AND up.is_starter = TRUE
-              AND up.squad_position IS NOT NULL
-            ORDER BY up.squad_position, p.name
+              AND UPPER(TRIM(up.squad_position)) IN (
+                  'GK', 'LB', 'CB1', 'CB2', 'RB',
+                  'CM1', 'CM2', 'CM3', 'LW', 'ST', 'RW'
+              )
+            ORDER BY CASE UPPER(TRIM(up.squad_position))
+                WHEN 'GK' THEN 1
+                WHEN 'LB' THEN 2
+                WHEN 'CB1' THEN 3
+                WHEN 'CB2' THEN 4
+                WHEN 'RB' THEN 5
+                WHEN 'CM1' THEN 6
+                WHEN 'CM2' THEN 7
+                WHEN 'CM3' THEN 8
+                WHEN 'LW' THEN 9
+                WHEN 'ST' THEN 10
+                WHEN 'RW' THEN 11
+            END,
+            p.name
             LIMIT 11
         """),
         {"user_id": user_id},
