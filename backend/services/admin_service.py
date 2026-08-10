@@ -5,7 +5,7 @@ import secrets
 from sqlalchemy.exc import SQLAlchemyError
 
 from backend.repositories import admin_repository, metrics_repository
-from backend.services.errors import BusinessRuleError
+from backend.services.errors import BusinessRuleError, NotFoundError
 from backend.services.metrics_service import month_bounds
 from backend.services.user_service import verify_password
 
@@ -64,6 +64,16 @@ def authenticate_admin(db, *, username: str, password: str):
 def logout_admin(db, *, token: str):
     try:
         admin_repository.revoke_session(db, hash_session_token(token))
+        db.commit()
+    except SQLAlchemyError:
+        db.rollback()
+        raise
+
+
+def ban_user(db, *, user_id: int):
+    if not admin_repository.delete_user(db, user_id):
+        raise NotFoundError("User not found")
+    try:
         db.commit()
     except SQLAlchemyError:
         db.rollback()

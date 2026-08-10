@@ -109,3 +109,15 @@ def revoke_session(db: Session, token_hash: str):
         """),
         {"token_hash": token_hash},
     )
+
+
+def delete_user(db: Session, user_id: int) -> bool:
+    result = db.execute(
+        text("""
+            DELETE FROM users
+            WHERE id = :user_id
+            RETURNING id
+        """),
+        {"user_id": user_id},
+    )
+    return result.mappings().first() is not None

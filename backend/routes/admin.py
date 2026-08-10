@@ -9,7 +9,7 @@ from backend.schemas.admin_schema import (
 from backend.schemas.metrics_schema import UserMetricsResponse
 from backend.services import admin_service
 from backend.services.auth_service import current_admin_id, extract_bearer_token
-from backend.services.errors import BusinessRuleError
+from backend.services.errors import BusinessRuleError, NotFoundError
 from database.connection import get_db
 
 
@@ -65,3 +65,16 @@ def users_created_in_month(
         return admin_service.list_users(db, month=month, limit=limit, offset=offset)
     except BusinessRuleError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.delete("/users/{user_id}", status_code=204)
+def ban_user(
+    user_id: int,
+    _admin_id: int = Depends(current_admin_id),
+    db: Session = Depends(get_db),
+):
+    try:
+        admin_service.ban_user(db, user_id=user_id)
+    except NotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return Response(status_code=204)
