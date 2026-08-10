@@ -3,11 +3,16 @@ import json
 import requests
 import unicodedata
 import re
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from pipeline.cache import get_cache, set_cache, file_hash, text_hash
 from pipeline.source.fifa_source import get_players
 from pipeline.source.photo_source import FootballApiService
 
 SQUADS_URL = "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.squads.json"
+
+EA_CSV = Path("data/ea_fc26_players.csv")
+MATCH_VERSION = "1"
 
 def normalize(name: str) -> str:
     name = name.lower().strip()
@@ -88,6 +93,23 @@ def main():
     squads = requests.get(SQUADS_URL).json()
     print(f"{len(squads)} seleções carregadas")
 
+    fingerprint = text_hash(
+        json.dumps(squads, ensure_ascii=False, sort_keys=True)
+        + file_hash(EA_CSV)
+        + MATCH_VERSION
+    )
+
+    result = get_cache("build_squads", fingerprint)
+    if result is not None:
+        print(f"✅ {len(result)} jogadores recuperados do cache")
+        output_dir = Path(__file__).parent.parent / "output"
+        output_file = output_dir / "players.json"
+        output_file.write_text(
+            json.dumps(result, ensure_ascii=True, indent=4),
+            encoding="utf-8",
+        )
+        return
+
     print("Carregando CSV EA FC...")
     ea_players = get_players()
 
@@ -140,8 +162,15 @@ def main():
             if done % 50 == 0:
                 print(f"  {done}/{len(result)} fotos...")
 
-    with open("output/players.json", "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=4)
+    set_cache("build_squads", fingerprint, result)
+
+    output_dir = Path(__file__).parent.parent / "output"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_file = output_dir / "players.json"
+    output_file.write_text(
+        json.dumps(result, ensure_ascii=True, indent=4),
+        encoding="utf-8",
+    )
 
     print("Feito!")
 

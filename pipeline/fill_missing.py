@@ -4,17 +4,32 @@ import json
 import re
 import time
 from groq import Groq
+from pathlib import Path
 
 from dotenv import load_dotenv
+
+from pipeline.cache import get_cache, set_cache, file_hash, text_hash
 
 load_dotenv()
 
 
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
-with open('data/missing.json', 'r', encoding='utf-8') as arquivo:
-    MISSING = json.load(arquivo)
+ROOT = Path(__file__).resolve().parent.parent
+missing_json = ROOT / "data" / "missing.json"
+players_json = ROOT / "output" / "players.json"
 
+MISSING = json.loads(missing_json.read_text(encoding="utf-8"))
+
+MODEL = "llama-3.3-70b-versatile"
+TEMPERATURE = 0.1
+
+SYSTEM_PROMPT = (
+    "You are a football analyst. For each player, estimate their EA FC 26 overall rating "
+    "as an integer between 55 and 91. Base it on real-world reputation, league level, and performance. "
+    "Respond ONLY with a JSON array of integers in the same order as the input. "
+    "Example: [72, 68, 81, 75]. No explanation, no text, just the array."
+)
 
 
 def estimate_batch(batch: list) -> list:
@@ -24,16 +39,11 @@ def estimate_batch(batch: list) -> list:
     )
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model=MODEL,
         messages=[
             {
                 "role": "system",
-                "content": (
-                    "You are a football analyst. For each player, estimate their EA FC 26 overall rating "
-                    "as an integer between 55 and 91. Base it on real-world reputation, league level, and performance. "
-                    "Respond ONLY with a JSON array of integers in the same order as the input. "
-                    "Example: [72, 68, 81, 75]. No explanation, no text, just the array."
-                )
+                "content": SYSTEM_PROMPT
             },
             {
                 "role": "user",
@@ -41,7 +51,7 @@ def estimate_batch(batch: list) -> list:
             }
         ],
         max_tokens=200,
-        temperature=0.1,
+        temperature=TEMPERATURE,
     )
 
     raw = response.choices[0].message.content.strip()
@@ -50,13 +60,30 @@ def estimate_batch(batch: list) -> list:
 
 
 def main():
-    with open("output/players.json", encoding="utf-8") as f:
-        players = json.load(f)
+    players = json.loads(players_json.read_text(encoding="utf-8"))
 
+    fingerprint = text_hash(
+        file_hash(missing_json)
+        + json.dumps(players, ensure_ascii=False, sort_keys=True)
+        + text_hash(SYSTEM_PROMPT)
+        + MODEL
+        + str(TEMPERATURE)
+    )
 
-    BATCH_SIZE = 10
+    generated = get_cache("fill_missing", fingerprint)
+    if generated is not None:
+        print(f"[cache] {len(generated)} overalls recuperados do cache")
+        all_players = players + generated
+        players_json.write_text(
+            json.dumps(all_players, ensure_ascii=False, indent=4),
+            encoding="utf-8",
+        )
+        print(f"Total: {len(all_players)} jogadores")
+        return
+
     generated = []
 
+    BATCH_SIZE = 10
     for i in range(0, len(MISSING), BATCH_SIZE):
         batch = MISSING[i:i + BATCH_SIZE]
         print(f"Estimando overalls {i+1}-{i+len(batch)}...")
@@ -93,12 +120,17 @@ def main():
         time.sleep(0.5)
 
     print(f"\n{len(generated)} overalls estimados")
+
+    set_cache("fill_missing", fingerprint, generated)
+
     print("Salvando JSON final...")
 
     all_players = players + generated
 
-    with open("output/players.json", "w", encoding="utf-8") as f:
-        json.dump(all_players, f, ensure_ascii=False, indent=4)
+    players_json.write_text(
+        json.dumps(all_players, ensure_ascii=False, indent=4),
+        encoding="utf-8",
+    )
 
     print(f"Total: {len(all_players)} jogadores")
 
