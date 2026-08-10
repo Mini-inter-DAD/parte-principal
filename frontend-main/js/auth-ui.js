@@ -128,13 +128,11 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('admin', JSON.stringify(data.admin));
       }
       
-      // Substituição: sucesso após login
       notify.success('Conta criada! Redirecionando...');
       
       const destination = data.account_type === 'admin' ? 'admin.html' : 'market.html';
       window.location.href = `${destination}${window.location.search}`;
     } catch (err) {
-      // Substituição: notificação de erro no login
       setError('login-form-error', err.message || 'Usuário ou senha incorretos.');
     } finally {
       setLoading(btn, false);
@@ -151,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirm  = document.getElementById('register-confirm').value;
     const btn      = document.getElementById('btn-register');
 
-    // Validação inline antiga (visual nos campos, caso ainda utilize)
+    // Validação dos campos antes do envio
     let valid = true;
     if (!username) { setError('register-username-error', 'Escolha um nome de usuário.'); valid = false; }
     if (username.length < 3) { setError('register-username-error', 'Mínimo de 3 caracteres.'); valid = false; }
@@ -159,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (password.length < 6) { setError('register-password-error', 'A senha precisa ter 6+ caracteres.'); valid = false; }
     if (password !== confirm) { setError('register-confirm-error', 'As senhas não coincidem.'); valid = false; }
 
-    // Substituição: cadastro com múltiplos erros usando o componente notify
+    // Exibe todos os erros de validação de uma vez
     if (!valid) {
       notify.errors('Dados inválidos', {
         username: !username ? 'Escolha um nome de usuário.' : (username.length < 3 ? 'Mínimo de 3 caracteres.' : ''),
@@ -174,7 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await api.register({ username, password });
       saveSession({ token: data.token, user: data.user });
       
-      // Substituição: sucesso após cadastro
       notify.success('Conta criada! Redirecionando...');
       
       window.location.href = `market.html${window.location.search}`;

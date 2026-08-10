@@ -70,6 +70,8 @@ def clear_cart(db, user_id: int):
 
 def checkout(db, user_id: int):
     try:
+        # Compra é tudo ou nada: bloqueia o usuário e os itens do carrinho
+        # com FOR UPDATE para manter moedas e posse consistentes sob concorrência.
         user = user_repository.get_user(db, user_id, for_update=True)
         if user is None:
             raise NotFoundError("Usuário não encontrado")

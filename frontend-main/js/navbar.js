@@ -14,17 +14,17 @@ function renderNavbar(activePage) {
     <a href="/draft.html"  class="${activePage === 'draft'  ? 'active' : ''}">Jogar</a>
   `;
 
-  // update header coins if present (keeps coin position in header)
+  // Atualiza as moedas no header, mantendo a posição do saldo
   const headerCoins = document.getElementById('header-coins');
   const formattedCoins = typeof formatCoins === 'function'
     ? formatCoins(coins)
     : Number(coins || 0).toLocaleString('pt-BR');
   if (headerCoins) headerCoins.textContent = `⚽ ${formattedCoins}`;
 
-  // place logout button into the right-side actions area if available
+  // Coloca o botão de sair na área de ações à direita, se existir
   const actions = document.getElementById('nav-actions');
   if (actions) {
-    // remove any previously rendered logout buttons to avoid duplicates
+    // Remove botões de sair já renderizados para evitar duplicatas
     const existing = actions.querySelectorAll('.btn-logout');
     existing.forEach(n => n.remove());
 
@@ -35,7 +35,7 @@ function renderNavbar(activePage) {
     btn.addEventListener('click', logout);
     actions.appendChild(btn);
   } else {
-    // fallback: append a styled logout button to nav
+    // Fallback: adiciona o botão de sair diretamente na nav
     const fallback = document.createElement('button');
     fallback.type = 'button';
     fallback.className = 'btn btn-logout';

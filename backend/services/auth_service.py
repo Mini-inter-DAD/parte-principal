@@ -14,6 +14,8 @@ def current_user_id(authorization: str | None = Header(default=None)) -> int:
     token = authorization.removeprefix("Bearer ")
     if not token.startswith("user:"):
         raise HTTPException(status_code=401, detail="Invalid token")
+    # Token de usuário é stateless: apenas "user:<id>" (sem expiração),
+    # então o id é extraído direto do token.
     try:
         user_id = int(token.removeprefix("user:"))
     except ValueError as exc:

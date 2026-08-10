@@ -153,7 +153,6 @@ const SQUAD_STATE = {
 function initSquad() {
   ensureAuth();
   renderSquadName();
-  // renderNavbar('squad');
   bindFormationButtons();
   bindReserveTarget();
   loadSquad();
@@ -250,7 +249,6 @@ function renderSquadName() {
   if (element && name) element.textContent = `Elenco de ${name}`;
 }
 
-// ─── Renderiza o campo ────────────────────────────────────────────────────────
 // ─── Renderiza o campo ────────────────────────────────────────────────────────
 function renderField() {
   buildLineup();

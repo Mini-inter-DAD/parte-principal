@@ -151,6 +151,8 @@ def calculate_team_ovr(overalls: list[int]) -> int:
 
 
 def simulate_match(user_ovr: int, opponent_ovr: int) -> str:
+    # Probabilidades derivadas da diferença de overall:
+    # favoritismo ajusta a chance de vitória, e o empate cai quanto maior a diferença.
     difference = user_ovr - opponent_ovr
     win_chance = clamp(0.50 + (difference * 0.03), 0.15, 0.85)
     draw_chance = clamp(0.22 - (abs(difference) * 0.01), 0.08, 0.25)
