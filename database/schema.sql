@@ -129,6 +129,8 @@ CREATE TABLE players (
 
     country        VARCHAR(60) NOT NULL,
 
+    national_team  VARCHAR(60),
+
     position       VARCHAR(5) NOT NULL,
 
     overall        SMALLINT NOT NULL
@@ -145,6 +147,16 @@ CREATE TABLE players (
     price          INTEGER NOT NULL
                    CHECK (price >= 0)
 );
+
+CREATE TABLE national_team_rosters (
+    national_team  VARCHAR(60) NOT NULL,
+    player_id      INTEGER NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+    roster_position VARCHAR(5),
+    PRIMARY KEY (national_team, player_id)
+);
+
+CREATE INDEX idx_national_team_rosters_team
+    ON national_team_rosters(national_team);
 
 -- ============================================================
 -- USER PLAYERS

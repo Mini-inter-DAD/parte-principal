@@ -10,6 +10,20 @@ DRAFT_STARTER_SLOTS = (
 )
 
 
+def list_national_team_players(db: Session):
+    result = db.execute(
+        text("""
+            SELECT p.id, p.name, p.position, p.overall, p.club, p.photo_url,
+                   roster.national_team
+            FROM national_team_rosters roster
+            JOIN players p ON p.id = roster.player_id
+            WHERE TRIM(roster.national_team) <> ''
+            ORDER BY roster.national_team ASC, p.overall DESC, p.name ASC, p.id ASC
+        """)
+    )
+    return result.mappings().all()
+
+
 def list_user_overalls(db: Session, user_id: int):
     result = db.execute(
         text("""

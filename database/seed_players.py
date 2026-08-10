@@ -54,7 +54,8 @@ def seed_players():
             player_data = {
                 "ea_id": player.get("ea_id"),
                 "name": player.get("name"),
-                "country": player.get("nationality"),
+                "country": player.get("nationality") or player.get("nation"),
+                "national_team": player.get("nation") or player.get("nationality"),
                 "position": ea_positions.get(
                     player.get("ea_id"),
                     player.get("position"),
@@ -73,6 +74,7 @@ def seed_players():
                         WHERE ea_id IS NULL
                           AND name = :name
                           AND country = :country
+                          AND national_team = :national_team
                           AND position = :position
                           AND overall = :overall
                           AND club IS NOT DISTINCT FROM :club
@@ -83,18 +85,45 @@ def seed_players():
                 ).scalar()
                 if existing_id is not None:
                     conn.execute(
-                        text("UPDATE players SET price = :price WHERE id = :id"),
-                        {"id": existing_id, "price": player_data["price"]},
+                        text("""
+                            UPDATE players
+                            SET country = :country,
+                                national_team = :national_team,
+                                price = :price
+                            WHERE id = :id
+                        """),
+                        {
+                            "id": existing_id,
+                            "country": player_data["country"],
+                            "national_team": player_data["national_team"],
+                            "price": player_data["price"],
+                        },
+                    )
+                    conn.execute(
+                        text("""
+                            INSERT INTO national_team_rosters (
+                                national_team, player_id, roster_position
+                            )
+                            VALUES (:national_team, :player_id, :roster_position)
+                            ON CONFLICT (national_team, player_id) DO UPDATE
+                            SET roster_position = EXCLUDED.roster_position
+                        """),
+                        {
+                            "national_team": player_data["national_team"],
+                            "player_id": existing_id,
+                            "roster_position": player_data["position"],
+                        },
                     )
                     inserted += 1
                     continue
 
-            conn.execute(
+            result = conn.execute(
                 text("""
                     INSERT INTO players (
                         ea_id,
                         name,
                         country,
+                        national_team,
                         position,
                         overall,
                         club,
@@ -105,6 +134,7 @@ def seed_players():
                         :ea_id,
                         :name,
                         :country,
+                        :national_team,
                         :position,
                         :overall,
                         :club,
@@ -113,9 +143,28 @@ def seed_players():
                     )
                     ON CONFLICT (ea_id) DO UPDATE
                     SET position = EXCLUDED.position,
+                        country = EXCLUDED.country,
+                        national_team = EXCLUDED.national_team,
                         price = EXCLUDED.price
+                    RETURNING id
                 """),
                 player_data
+            )
+            player_id = result.scalar_one()
+            conn.execute(
+                text("""
+                    INSERT INTO national_team_rosters (
+                        national_team, player_id, roster_position
+                    )
+                    VALUES (:national_team, :player_id, :roster_position)
+                    ON CONFLICT (national_team, player_id) DO UPDATE
+                    SET roster_position = EXCLUDED.roster_position
+                """),
+                {
+                    "national_team": player_data["national_team"],
+                    "player_id": player_id,
+                    "roster_position": player_data["position"],
+                },
             )
 
             inserted += 1

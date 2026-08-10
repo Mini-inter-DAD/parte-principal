@@ -16,8 +16,8 @@ router = APIRouter(prefix="/draft", tags=["draft"])
 
 
 @router.get("/opponents", response_model=list[DraftOpponentResponse])
-def get_opponents():
-    return draft_service.list_opponents()
+def get_opponents(db: Session = Depends(get_db)):
+    return draft_service.list_opponents(db)
 
 
 @router.post("/play", response_model=DraftPlayResponse)

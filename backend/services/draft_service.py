@@ -1,4 +1,5 @@
 import random
+import unicodedata
 
 from backend.repositories import draft_repository, user_repository
 from backend.services.errors import BusinessRuleError, NotFoundError
@@ -17,64 +18,126 @@ CUP_PHASES = (
 )
 
 
-OPPONENTS = (
-    {
-        "id": "japan",
-        "name": "Japão",
-        "code": "jp",
-        "overall": 74,
-        "scorers": (
-            {"playerId": "japan-1", "playerName": "Kubo", "position": "RW"},
-            {"playerId": "japan-2", "playerName": "Ueda", "position": "ST"},
-        ),
-    },
-    {
-        "id": "usa",
-        "name": "Estados Unidos",
-        "code": "us",
-        "overall": 78,
-        "scorers": (
-            {"playerId": "usa-1", "playerName": "Pulisic", "position": "LW"},
-            {"playerId": "usa-2", "playerName": "Balogun", "position": "ST"},
-        ),
-    },
-    {
-        "id": "mexico",
-        "name": "México",
-        "code": "mx",
-        "overall": 80,
-        "scorers": (
-            {"playerId": "mexico-1", "playerName": "Lozano", "position": "LW"},
-            {"playerId": "mexico-2", "playerName": "Gimenez", "position": "ST"},
-        ),
-    },
-    {
-        "id": "morocco",
-        "name": "Marrocos",
-        "code": "ma",
-        "overall": 82,
-        "scorers": (
-            {"playerId": "morocco-1", "playerName": "Hakimi", "position": "RB"},
-            {"playerId": "morocco-2", "playerName": "En-Nesyri", "position": "ST"},
-        ),
-    },
-    {
-        "id": "france",
-        "name": "França",
-        "code": "fr",
-        "overall": 89,
-        "scorers": (
-            {"playerId": "france-1", "playerName": "Mbappe", "position": "ST"},
-            {"playerId": "france-2", "playerName": "Griezmann", "position": "CAM"},
-        ),
-    },
-)
-
 RESULT_LABELS = {"W": "Vitória", "D": "Empate", "L": "Derrota"}
 
 
-def list_opponents():
-    return list(OPPONENTS)
+NATIONAL_TEAM_ROSTER_SIZE = 26
+
+NATIONAL_TEAM_CODES = {
+    "algeria": "dz",
+    "argentina": "ar",
+    "australia": "au",
+    "austria": "at",
+    "belgium": "be",
+    "bosnia and herzegovina": "ba",
+    "brazil": "br",
+    "canada": "ca",
+    "cape verde": "cv",
+    "colombia": "co",
+    "croatia": "hr",
+    "czech republic": "cz",
+    "dr congo": "cd",
+    "ecuador": "ec",
+    "egypt": "eg",
+    "england": "gb-eng",
+    "france": "fr",
+    "germany": "de",
+    "ghana": "gh",
+    "haiti": "ht",
+    "iran": "ir",
+    "iraq": "iq",
+    "ivory coast": "ci",
+    "japan": "jp",
+    "jordan": "jo",
+    "mexico": "mx",
+    "morocco": "ma",
+    "netherlands": "nl",
+    "new zealand": "nz",
+    "norway": "no",
+    "panama": "pa",
+    "paraguay": "py",
+    "portugal": "pt",
+    "qatar": "qa",
+    "saudi arabia": "sa",
+    "scotland": "gb-sct",
+    "senegal": "sn",
+    "south africa": "za",
+    "south korea": "kr",
+    "spain": "es",
+    "sweden": "se",
+    "switzerland": "ch",
+    "tunisia": "tn",
+    "turkey": "tr",
+    "united states": "us",
+    "uruguay": "uy",
+    "uzbekistan": "uz",
+    "curacao": "cw",
+    "curaaao": "cw",
+}
+
+
+def _team_key(name: str) -> str:
+    normalized = unicodedata.normalize("NFKD", str(name).strip())
+    return " ".join(normalized.encode("ascii", "ignore").decode().casefold().split())
+
+
+def _team_id(name: str) -> str:
+    return _team_key(name).replace(" ", "-")
+
+
+def _serialize_team_player(player) -> dict:
+    return {
+        "id": int(player["id"]),
+        "name": format_player_name(player["name"]),
+        "position": player["position"],
+        "overall": int(player["overall"]),
+        "club": player["club"],
+        "photo_url": player["photo_url"],
+    }
+
+
+def _build_opponent(team_name: str, roster: list[dict]) -> dict | None:
+    if len(roster) < NATIONAL_TEAM_ROSTER_SIZE:
+        return None
+
+    roster = roster[:NATIONAL_TEAM_ROSTER_SIZE]
+    players = [_serialize_team_player(player) for player in roster]
+    scorers = [
+        {
+            "playerId": str(player["id"]),
+            "playerName": format_player_name(player["name"]),
+            "position": player["position"],
+        }
+        for player in roster
+    ]
+
+    return {
+        "id": _team_id(team_name),
+        "name": team_name,
+        "code": NATIONAL_TEAM_CODES.get(_team_key(team_name), "un"),
+        "overall": calculate_team_ovr([int(player["overall"]) for player in roster]),
+        "players": players,
+        "scorers": scorers,
+    }
+
+
+def list_opponents(db):
+    teams = {}
+    for player in draft_repository.list_national_team_players(db):
+        team_name = str(player["national_team"]).strip()
+        teams.setdefault(team_name, []).append(player)
+
+    opponents = []
+    for team_name in sorted(teams, key=_team_key):
+        opponent = _build_opponent(team_name, teams[team_name])
+        if opponent is not None:
+            opponents.append(opponent)
+
+    if not opponents:
+        raise BusinessRuleError(
+            "Nenhuma selecao com 26 jogadores foi encontrada na base de dados"
+        )
+    return opponents
 
 
 def clamp(value: float, minimum: float, maximum: float) -> float:
@@ -120,10 +183,10 @@ def calculate_reward(result: str, user_ovr: int, opponent_ovr: int) -> int:
     return round((base_reward + opponent_bonus + difficulty_bonus) / 50) * 50
 
 
-def _get_opponent(opponent_id: str | None):
+def _get_opponent(opponents: list[dict], opponent_id: str | None):
     if opponent_id is None:
-        return random.choice(OPPONENTS)
-    opponent = next((item for item in OPPONENTS if item["id"] == opponent_id), None)
+        return random.choice(opponents)
+    opponent = next((item for item in opponents if item["id"] == opponent_id), None)
     if opponent is None:
         raise BusinessRuleError("Adversário inválido")
     return opponent
@@ -247,7 +310,8 @@ def play_draft(db, *, user_id: int, opponent_id: str | None = None, mode: str = 
 
         starters = draft_repository.list_user_starters(db, user_id)
         user_ovr = calculate_team_ovr([int(row["overall"]) for row in starters])
-        opponent = _get_opponent(opponent_id)
+        opponents = list_opponents(db)
+        opponent = _get_opponent(opponents, opponent_id)
         campaign = None
         phase_index = None
 
