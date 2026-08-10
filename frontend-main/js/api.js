@@ -27,9 +27,17 @@ async function apiFetch(path, options = {}) {
     return;
   }
 
-  const data = await res.json();
+  const text = await res.text();
+  let data = null;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = text;
+    }
+  }
   if (!res.ok) {
-    const error = new Error(data.detail || "Erro desconhecido");
+    const error = new Error((data && data.detail) || "Erro desconhecido");
     error.status = res.status;
     throw error;
   }
@@ -77,5 +85,10 @@ const api = {
 
   // Admin
   getAdminDashboard: (params, options = {}) => apiFetch(`/admin/dashboard?${new URLSearchParams(params)}`, options),
+  // Lista usuários. Com { month } retorna os criados no mês (dashboard). Sem month: todos.
   getAdminUsers:     (params, options = {}) => apiFetch(`/admin/users?${new URLSearchParams(params)}`, options),
+  // Lista todos os usuários, paginado no servidor: { limit, offset } -> { users, total, limit, offset }
+  listAllUsers:      ({ limit = 50, offset = 0 } = {}, options = {}) => apiFetch(`/admin/users?limit=${limit}&offset=${offset}`, options),
+  // Bane (exclui) um usuário: 204 em sucesso (resolve para null), 404 se não existir
+  banAdminUser:      (userId, options = {}) => apiFetch(`/admin/users/${userId}`, { method: "DELETE", ...options }),
 };
