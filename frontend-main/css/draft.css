@@ -880,6 +880,7 @@
     grid-column: 1 / -1;
     display: grid;
     grid-template-columns: minmax(150px, 1fr) auto minmax(170px, 1fr) auto 1rem;
+    gap: 1rem;
     align-items: center;
     width: 100%;
     padding: .7rem .85rem;
