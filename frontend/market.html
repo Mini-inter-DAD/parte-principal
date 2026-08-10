@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mercado da Bola | Dream Cup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/global.css?v=20260808-admin" />
+  <link rel="stylesheet" href="css/accessibility.css" />
+  <link rel="stylesheet" href="css/market.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+  <header class="nav" role="banner">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo" aria-label="Dream Cup — voltar para a página inicial">Dream Cup</a>
+      <div id="navbar" class="nav__links" aria-hidden="false"></div>
+      <div class="nav__actions" id="nav-actions">
+        <div class="nav__coins" id="header-coins" aria-label="Saldo de coins">⚽ 0</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="market-page" id="market-root">
+    <section class="market-toolbar">
+      <div class="filter-card" aria-label="Painel de filtros do Mercado da Bola">
+        <div class="filter-card__header">
+          <h2>Filtrar cartas</h2>
+          <button class="btn btn-secondary" type="button" id="btn-clear-filters">Limpar filtros</button>
+        </div>
+
+        <div class="filter-grid">
+          <label class="filter-field">
+            <span>Buscar</span>
+            <input type="search" id="filter-query" placeholder="Nome do jogador ou seleção"
+              aria-label="Pesquisar jogador ou seleção" />
+          </label>
+
+          <label class="filter-field">
+            <span>Seleção</span>
+            <select id="filter-nation" aria-label="Filtrar por seleção">
+              <option value="">Todas</option>
+            </select>
+          </label>
+
+          <label class="filter-field">
+            <span>Posição</span>
+            <select id="filter-position" aria-label="Filtrar por posição">
+              <option value="">Todas</option>
+              <option value="Goleiro">Goleiro</option>
+              <option value="Zagueiro">Zagueiro</option>
+              <option value="Lateral">Lateral</option>
+              <option value="Meia">Meia</option>
+              <option value="Atacante">Atacante</option>
+            </select>
+          </label>
+
+          <div class="filter-field filter-range">
+            <span>OVR</span>
+            <div class="range-row">
+              <div>
+                <label for="filter-ovr-min">Mín.</label>
+                <input type="number" id="filter-ovr-min" min="60" max="99" value="70" aria-label="Pontuação mínima" />
+              </div>
+              <div>
+                <label for="filter-ovr-max">Máx.</label>
+                <input type="number" id="filter-ovr-max" min="60" max="99" value="99" aria-label="Pontuação máxima" />
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-field filter-range">
+            <span>Valor de Mercado</span>
+            <div class="range-row">
+              <div>
+                <label for="filter-price-min">Mín.</label>
+                <input type="number" id="filter-price-min" min="0" value="0" aria-label="Valor mínimo" />
+              </div>
+              <div>
+                <label for="filter-price-max">Máx.</label>
+                <input type="number" id="filter-price-max" min="0" value="999999" aria-label="Valor máximo" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="market-grid" id="player-grid" aria-live="polite"></section>
+  </main>
+
+  <script src="js/accessibility.js"></script>
+  <script src="js/admin-access.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/market.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", () => { initMarket(); initAccessibility(); });</script>
+  <script src="js/notify.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dados dos usuários | Dream Cup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/global.css?v=20260808-admin" />
+  <link rel="stylesheet" href="css/accessibility.css" />
+  <link rel="stylesheet" href="css/admin.css?v=20260810-pagination" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+  <header class="admin-header" role="banner">
+    <a href="index.html" class="admin-header__logo" aria-label="Dream Cup — voltar para a página inicial">Dream Cup</a>
+    <div class="admin-profile admin-profile--card" aria-label="Perfil do administrador">
+      <img id="admin-avatar" src="assets/Neymar Jr.png" alt="Avatar do administrador" />
+    </div>
+  </header>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar" aria-label="Menu administrativo">
+      <div class="admin-sidebar__spacer" aria-hidden="true"></div>
+      <button class="admin-logout" id="admin-logout" type="button">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M10 17L15 12L10 7M15 12H3M14 4H20C20.5523 4 21 4.44772 21 5V19C21 19.5523 20.5523 20 20 20H14"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Logout
+      </button>
+    </aside>
+
+    <main class="admin-page" id="main-content">
+      <header class="admin-page__heading">
+        <div>
+          <p class="admin-eyebrow">Painel administrativo</p>
+          <h1>Dados dos usuários</h1>
+        </div>
+
+        <label class="month-filter" for="month-filter">
+          <span class="sr-only">Filtrar dados por mês</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+          <select id="month-filter" aria-label="Filtrar dados por mês"></select>
+        </label>
+      </header>
+
+      <p class="admin-status" id="admin-status" role="status" aria-live="polite">Carregando dados...</p>
+
+      <section class="dashboard-grid" aria-label="Indicadores de usuários">
+        <article class="dashboard-chart" aria-labelledby="active-users-title">
+          <header class="dashboard-chart__header">
+            <div>
+              <h2 id="active-users-title">Monthly Active Users</h2>
+              <p>Usuários únicos ativos no período</p>
+            </div>
+            <strong id="active-users-total">—</strong>
+          </header>
+          <div class="chart-container" id="active-users-chart" aria-label="Gráfico de usuários ativos"></div>
+        </article>
+
+        <article class="dashboard-chart" aria-labelledby="created-users-title">
+          <header class="dashboard-chart__header">
+            <div>
+              <h2 id="created-users-title">Usuários Criados</h2>
+              <p>Novas contas criadas no período</p>
+            </div>
+            <strong id="created-users-total">—</strong>
+          </header>
+          <div class="chart-container" id="created-users-chart" aria-label="Gráfico de usuários criados"></div>
+        </article>
+      </section>
+
+      <section class="users-section" aria-labelledby="users-heading">
+        <div class="users-section__header">
+          <div>
+            <h2 id="users-heading">Usuários criados</h2>
+            <p id="users-summary">Carregando usuários...</p>
+          </div>
+          <span class="data-source-badge" id="data-source-badge" hidden>Dados de demonstração</span>
+        </div>
+
+        <div class="users-table-wrap">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th scope="col">Usuário</th>
+                <th scope="col">ID</th>
+                <th scope="col">Saldo</th>
+                <th scope="col">Data de cadastro</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body"></tbody>
+          </table>
+          <div class="users-empty" id="users-empty" hidden>
+            Nenhum usuário foi criado no mês selecionado.
+          </div>
+        </div>
+
+        <nav class="users-pagination" id="users-pagination" aria-label="Paginação da lista de usuários" hidden></nav>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/accessibility.js"></script>
+  <script src="js/notify.js"></script>
+  <script src="js/admin.js?v=20260810-pagination"></script>
+  <script>document.addEventListener('DOMContentLoaded', () => { initAdmin(); initAccessibility(); });</script>
+</body>
+
+</html>

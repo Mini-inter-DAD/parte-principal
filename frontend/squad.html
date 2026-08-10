@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu Elenco | Dream Cup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/global.css?v=20260808-admin" />
+  <link rel="stylesheet" href="css/accessibility.css" />
+  <link rel="stylesheet" href="css/squad.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+  <header class="nav" role="banner">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo" aria-label="Dream Cup — voltar para a página inicial">Dream Cup</a>
+      <div id="navbar" class="nav__links" aria-hidden="false"></div>
+      <div class="nav__actions" id="nav-actions">
+        <div class="nav__coins" id="header-coins" aria-label="Saldo de coins">⚽ 0</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="squad-page" id="main-content">
+
+    <!-- ═══ COLUNA ESQUERDA — Formações ═══ -->
+    <aside class="squad-sidebar" aria-label="Configurações do elenco">
+
+      <section class="sidebar-section" aria-labelledby="formation-heading">
+        <h2 class="sidebar-title" id="formation-heading">Formação</h2>
+        <div class="formation-grid" role="group" aria-label="Escolha a formação">
+          <button class="formation-btn formation-btn--active" data-formation="4-3-3" aria-pressed="true">4-3-3</button>
+          <button class="formation-btn" data-formation="4-4-2" aria-pressed="false">4-4-2</button>
+          <button class="formation-btn" data-formation="4-2-3-1" aria-pressed="false">4-2-3-1</button>
+          <button class="formation-btn" data-formation="4-2-4" aria-pressed="false">4-2-4</button>
+          <button class="formation-btn" data-formation="3-5-2" aria-pressed="false">3-5-2</button>
+          <button class="formation-btn" data-formation="5-3-2" aria-pressed="false">5-3-2</button>
+          <button class="formation-btn" data-formation="4-5-1" aria-pressed="false">4-5-1</button>
+          <button class="formation-btn" data-formation="3-4-3" aria-pressed="false">3-4-3</button>
+        </div>
+      </section>
+
+      <!-- OVR do elenco -->
+      <section class="sidebar-section sidebar-section--ovr" aria-labelledby="ovr-heading">
+        <h2 class="sidebar-title" id="ovr-heading">Pontuação Geral</h2>
+        <div class="squad-ovr-display">
+          <div class="ovr-big" id="squad-ovr-value" aria-live="polite">--</div>
+          <div class="ovr-label">OVR</div>
+        </div>
+        <div class="ovr-breakdown">
+          <div class="ovr-breakdown__item">
+            <span class="ovr-breakdown__label">⚔️ Ataque</span>
+            <span class="ovr-breakdown__value" id="ovr-attack">--</span>
+          </div>
+          <div class="ovr-breakdown__item">
+            <span class="ovr-breakdown__label">🛡️ Defesa</span>
+            <span class="ovr-breakdown__value" id="ovr-defense">--</span>
+          </div>
+        </div>
+      </section>
+
+    </aside>
+
+    <!-- ═══ COLUNA CENTRAL — Campo ═══ -->
+    <section class="squad-field-wrapper" aria-label="Campo de futebol com escalação">
+      <div class="field" id="field" role="img" aria-label="Escalação atual no campo">
+
+        <!-- Linhas do campo -->
+        <div class="field__lines" aria-hidden="true">
+          <div class="field__line field__line--top-box"></div>
+          <div class="field__line field__line--mid"></div>
+          <div class="field__circle"></div>
+          <div class="field__line field__line--bot-box"></div>
+        </div>
+
+        <!-- Slots dos jogadores — preenchidos pelo JS -->
+        <div class="field__players" id="field-players" aria-label="Jogadores em campo"></div>
+
+      </div>
+    </section>
+
+    <!-- ═══ COLUNA DIREITA — Boxscore / Meu Elenco (lista) ═══ -->
+    <aside class="squad-boxscore" aria-label="Boxscore e lista do elenco">
+      <div class="boxscore-header">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="boxscore-title" style="font-weight:700; margin-bottom: 1rem;">Meu Elenco</div>
+          </div>
+        </div>
+
+        <div class="squad-group-section">
+          <div class="squad-group-title">Titulares</div>
+          <ul class="boxscore-list" id="titulares-list"></ul>
+        </div>
+
+        <div class="squad-group-section" style="margin-top: 1.25rem;">
+          <div class="squad-group-title">Reservas</div>
+          <ul class="boxscore-list" id="reservas-list"></ul>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/accessibility.js"></script>
+  <script src="js/admin-access.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", initAccessibility);</script>
+  <script src="js/squad.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", initSquad);</script>
+</body>
+
+</html>
