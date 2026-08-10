@@ -226,6 +226,7 @@
       if (state.match.campaign) {
         state.campaign = state.match.campaign;
         state.phaseIndex = Number(state.match.campaign.phase_index || 0);
+        renderCupPhase();
       }
       setUserCoins(state.match.new_balance);
       resetLive(state.match);
