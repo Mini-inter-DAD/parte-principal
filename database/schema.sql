@@ -339,6 +339,8 @@ CREATE TABLE penalty_shootouts (
                                 CHECK (current_turn IN ('user_shoot', 'user_save')),
     current_shooter_name        VARCHAR(100) NOT NULL,
     available_shoot_zones       JSONB NOT NULL DEFAULT '[]'::jsonb,
+    opponent_available_shoot_zones JSONB NOT NULL
+                                DEFAULT '["top_left", "top_center", "top_right", "bottom_left", "bottom_right"]'::jsonb,
     user_goalkeeper_name        VARCHAR(100) NOT NULL,
     user_goalkeeper_overall     SMALLINT NOT NULL,
     opponent_goalkeeper_name    VARCHAR(100) NOT NULL,

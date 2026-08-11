@@ -240,6 +240,7 @@ def create_penalty_shootout(
     user_id: int,
     current_shooter_name: str,
     available_shoot_zones: list[str],
+    opponent_available_shoot_zones: list[str],
     user_goalkeeper_name: str,
     user_goalkeeper_overall: int,
     opponent_goalkeeper_name: str,
@@ -249,12 +250,14 @@ def create_penalty_shootout(
         text("""
             INSERT INTO penalty_shootouts (
                 match_id, user_id, current_shooter_name, available_shoot_zones,
+                opponent_available_shoot_zones,
                 user_goalkeeper_name, user_goalkeeper_overall,
                 opponent_goalkeeper_name, opponent_goalkeeper_overall
             )
             VALUES (
                 :match_id, :user_id, :current_shooter_name,
                 CAST(:available_shoot_zones AS JSONB),
+                CAST(:opponent_available_shoot_zones AS JSONB),
                 :user_goalkeeper_name, :user_goalkeeper_overall,
                 :opponent_goalkeeper_name, :opponent_goalkeeper_overall
             )
@@ -265,6 +268,9 @@ def create_penalty_shootout(
             "user_id": user_id,
             "current_shooter_name": current_shooter_name,
             "available_shoot_zones": json.dumps(available_shoot_zones),
+            "opponent_available_shoot_zones": json.dumps(
+                opponent_available_shoot_zones
+            ),
             "user_goalkeeper_name": user_goalkeeper_name,
             "user_goalkeeper_overall": user_goalkeeper_overall,
             "opponent_goalkeeper_name": opponent_goalkeeper_name,
@@ -288,6 +294,7 @@ def get_active_penalty_shootout(db: Session, user_id: int):
                 shootout.current_turn,
                 shootout.current_shooter_name,
                 shootout.available_shoot_zones,
+                shootout.opponent_available_shoot_zones,
                 shootout.user_goalkeeper_name,
                 shootout.user_goalkeeper_overall,
                 shootout.opponent_goalkeeper_name,
@@ -330,6 +337,7 @@ def get_penalty_shootout_for_update(db: Session, user_id: int, match_id: int):
                 shootout.current_turn,
                 shootout.current_shooter_name,
                 shootout.available_shoot_zones,
+                shootout.opponent_available_shoot_zones,
                 shootout.user_goalkeeper_name,
                 shootout.user_goalkeeper_overall,
                 shootout.opponent_goalkeeper_name,

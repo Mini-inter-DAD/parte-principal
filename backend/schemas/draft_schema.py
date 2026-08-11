@@ -71,6 +71,7 @@ class DraftPenaltyStateResponse(BaseModel):
     user_attempts: int = Field(ge=0)
     opponent_attempts: int = Field(ge=0)
     available_zones: list[PenaltyZone]
+    blocked_zones: list[PenaltyZone]
     decision_time_seconds: int = Field(ge=3, le=8)
     is_finished: bool
     winner: Literal["USER", "OPPONENT"] | None = None
