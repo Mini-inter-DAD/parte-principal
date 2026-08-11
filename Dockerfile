@@ -7,6 +7,9 @@ VOLUME /app/output
 
 WORKDIR /app
 
+# Garante logs sem buffer no deploy
+ENV PYTHONUNBUFFERED=1
+
 # Instalando dependências
 COPY requirements.txt .
 RUN pip install -r requirements.txt

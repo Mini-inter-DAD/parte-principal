@@ -2,7 +2,7 @@
 set -euo pipefail
 
 echo "Executando pipeline..."
-python run.py
+python -u run.py
 
 echo "Iniciando app em foreground..."
 python -m uvicorn backend.app:app --host 0.0.0.0 --port 8000
