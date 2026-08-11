@@ -34,6 +34,34 @@ test('handles empty values and already abbreviated names', () => {
   assert.equal(browser.formatPlayerName('K. Mbappe'), 'K. Mbappe');
 });
 
+test('uses familiar aliases for famous players', () => {
+  assert.equal(browser.formatPlayerName('Vinícius Júnior'), 'Vini Jr.');
+  assert.equal(
+    browser.formatPlayerName('vinicius jose de oliveira junior'),
+    'Vini Jr.',
+  );
+  assert.equal(browser.formatPlayerName('Raphael Dias Belloli'), 'Raphinha');
+  assert.equal(browser.formatPlayerName('Virgil van Dijk'), 'Van Dijk');
+  assert.equal(
+    browser.formatPlayerName('Rúben Santos Gato Alves Dias'),
+    'Rúben Dias',
+  );
+});
+
+test('normalizes case, accents, punctuation, and spaces for alias lookup', () => {
+  assert.equal(browser.formatPlayerName('  VINICIUS   JUNIOR  '), 'Vini Jr.');
+  assert.equal(browser.formatPlayerName('C. Ronaldo dos Santos Aveiro'), 'Cristiano Ronaldo');
+  assert.equal(browser.formatPlayerName('Rodrigo Hernández Cascante'), 'Rodri');
+});
+
+test('keeps the generic abbreviation for names without a curated alias', () => {
+  assert.equal(
+    browser.formatPlayerName('Lamine Yamal Nasraoui Ebana'),
+    'L. Yamal',
+  );
+  assert.equal(browser.formatPlayerName('Kyllian Mbappe'), 'K. Mbappe');
+});
+
 test('market delegates visible names to the shared formatter', () => {
   const market = fs.readFileSync(
     path.join(__dirname, 'market.js'),
