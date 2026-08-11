@@ -46,7 +46,7 @@ draft.html (Jogar — partidas)
 
 ## Comunicação com o backend
 
-- **URL da API**: `http://localhost:8000` por padrão; sobrescrita pelo parâmetro `?api=<url>` em qualquer página. Todos os endpoints ficam sob o prefixo `/api` (ex.: `?api=http://localhost:8000` → `http://localhost:8000/api/...`).
+- **URL da API**: o frontend é servido pelo próprio backend, então todas as chamadas usam caminhos relativos ao mesmo host sob o prefixo `/api` (ex.: `/api/market/players`).
 - **Autenticação**: token e usuário no `localStorage`. Toda chamada via `apiFetch` envia `Authorization: Bearer <token>`.
 - **401**: `apiFetch` limpa a sessão e redireciona para `auth.html`.
 - **Modo demo**: quando o token não começa com `user:` (ex.: `demo-token`), as chamadas de carrinho/compra são desativadas e o saldo é mantido localmente.

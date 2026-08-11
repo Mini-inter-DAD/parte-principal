@@ -78,21 +78,15 @@ Veja [`backend.md`](backend.md) para a referência completa da API.
 
 ## 3. Frontend
 
-O frontend é HTML/CSS/JS puro servido por Nginx (Docker):
+O frontend é HTML/CSS/JS puro servido pelo próprio backend (Docker):
 
 ```bash
-cd frontend-main
-docker build -t frontend .
-docker run -p 3000:80 frontend
+docker compose up --build
 ```
 
-Acesse `http://localhost:3000`.
+Acesse `http://localhost:8000`.
 
-Para rodar em desenvolvimento sem Docker, sirva a pasta `frontend-main` estaticamente (ex.: `python -m http.server 3000` dentro da pasta) e informe a URL do backend via parâmetro `?api=`:
-
-```
-http://localhost:3000/market.html?api=http://localhost:8000
-```
+Em desenvolvimento sem Docker, o backend com `--reload` já entrega o frontend junto da API em `http://localhost:8000`. Não há servidor estático separado: as chamadas do frontend usam caminhos relativos (`/api/...`) no mesmo host.
 
 ## 4. Pipeline de dados
 

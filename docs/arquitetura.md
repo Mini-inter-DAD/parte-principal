@@ -60,7 +60,7 @@ HTTP → routes/ → services/ (valida regras) → repositories/ (SQL) → Postg
 
 ## Frontend
 
-Frontend vanilla em `frontend-main/`, servido por Nginx no Docker. A comunicação com o backend é centralizada em `js/api.js` (`fetch`), com token lido do `localStorage`. O endereço do backend é `http://localhost:8000` por padrão e pode ser sobrescrito com o parâmetro `?api=`. Detalhes em [`frontend.md`](frontend.md).
+Frontend vanilla em `frontend-main/`, servido pelo próprio backend. A comunicação com a API é centralizada em `js/api.js` (`fetch`), com token lido do `localStorage`. Como frontend e API ficam no mesmo host, todas as chamadas usam caminhos relativos sob o prefixo `/api`. Detalhes em [`frontend.md`](frontend.md).
 
 ## Pipeline de dados
 
