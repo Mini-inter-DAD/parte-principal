@@ -19,6 +19,7 @@
     penaltyTimer: null,
     isPenaltyAnimating: false,
     isLoading: true,
+    pendingBalance: null,
   };
 
   const PENALTY_ZONES = [
@@ -117,7 +118,53 @@
     return 'final';
   }
 
-  function selectOpponentForCurrentStage() {
+  function opponentStorageKey(mode = state.mode) {
+    const userId = Number(sessionUser()?.id);
+    return userId ? `draft_next_opponent_${userId}_${mode}` : null;
+  }
+
+  function clearSavedOpponent(mode = state.mode) {
+    const key = opponentStorageKey(mode);
+    if (key) localStorage.removeItem(key);
+  }
+
+  function restoreSavedOpponent() {
+    const key = opponentStorageKey();
+    if (!key) return false;
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(key) || 'null');
+      if (!saved || saved.stage !== currentOpponentStage()) {
+        clearSavedOpponent();
+        return false;
+      }
+
+      const opponent = state.opponents.find((item) => String(item.id) === String(saved.id));
+      if (!opponent) {
+        clearSavedOpponent();
+        return false;
+      }
+
+      state.opponent = opponent;
+      return true;
+    } catch {
+      clearSavedOpponent();
+      return false;
+    }
+  }
+
+  function saveCurrentOpponent() {
+    const key = opponentStorageKey();
+    if (!key || !state.opponent) return;
+    localStorage.setItem(key, JSON.stringify({
+      id: state.opponent.id,
+      stage: currentOpponentStage(),
+    }));
+  }
+
+  function selectOpponentForCurrentStage({ forceNew = false } = {}) {
+    if (!forceNew && restoreSavedOpponent()) return;
+
     const ranges = {
       group_stage: [65, 75],
       round_of_16: [70, 80],
@@ -140,6 +187,23 @@
         );
       });
     state.opponent = available[Math.floor(Math.random() * available.length)] || null;
+    saveCurrentOpponent();
+  }
+
+  function queueBalance(balance) {
+    const parsedBalance = Number(balance);
+    state.pendingBalance = Number.isFinite(parsedBalance) ? parsedBalance : null;
+  }
+
+  function applyPendingBalance() {
+    if (state.pendingBalance === null) return;
+    setUserCoins(state.pendingBalance);
+    state.pendingBalance = null;
+  }
+
+  function completeDisplayedMatch() {
+    applyPendingBalance();
+    clearSavedOpponent();
   }
 
   async function loadHistory() {
@@ -387,7 +451,8 @@
           state.campaign = attempt.campaign;
           state.phaseIndex = Number(attempt.campaign.phase_index || 0);
         }
-        setUserCoins(attempt.new_balance);
+        queueBalance(attempt.new_balance);
+        completeDisplayedMatch();
         state.isPenaltyAnimating = false;
         clearPenaltyTimer();
         await showResult();
@@ -530,12 +595,18 @@
       if (state.mode === 'cup' && state.campaign && !state.campaign.can_play) {
         state.campaign = await api.restartCampaign(userId);
         state.phaseIndex = Number(state.campaign.phase_index || 0);
+        clearSavedOpponent();
+        selectOpponentForCurrentStage({ forceNew: true });
         renderCupPhase();
+      }
+      if (!state.opponent) {
+        throw new Error('Nenhum adversário disponível para esta fase.');
       }
       state.match = await api.playDraft(
         userId,
-        state.opponent?.id || null,
+        state.opponent.id,
         state.mode,
+        currentOpponentStage(),
       );
       // A resposta do backend define o confronto efetivamente jogado.
       state.opponent = state.match.opponent || state.opponent;
@@ -547,7 +618,7 @@
       if (state.mode === 'cup' && state.match.stage_label) {
         setText('cup-phase-label', 'Fase atual: ' + state.match.stage_label);
       }
-      setUserCoins(state.match.new_balance);
+      queueBalance(state.match.new_balance);
       resetLive(state.match);
       showMode('live');
       state.timer = setInterval(tick, 100);
@@ -577,6 +648,8 @@
     );
     if (state.match.requires_penalties) {
       $('btn-next-result').innerHTML = 'DISPUTAR PÊNALTIS <span>→</span>';
+    } else {
+      completeDisplayedMatch();
     }
     $('btn-next-result').hidden = false;
     setText(
@@ -696,6 +769,7 @@
       return;
     }
 
+    completeDisplayedMatch();
     clearPenaltyTimer();
     $('btn-next-result').hidden = true;
     $('match-result').classList.toggle('result-panel--loss', state.match.result !== 'W');
@@ -794,7 +868,7 @@
         try {
           state.campaign = await api.restartCampaign(userId);
           state.phaseIndex = Number(state.campaign.phase_index || 0);
-          selectOpponentForCurrentStage();
+          clearSavedOpponent();
         } catch (error) {
           showError(error.message || 'Não foi possível reiniciar a Copa.');
           return;
@@ -804,10 +878,11 @@
       $('match-result').classList.remove('result-panel--loss');
       state.match = null;
       state.penalty = null;
+      state.pendingBalance = null;
       state.events = [];
       state.minute = 0;
       showMode('preview');
-      selectOpponentForCurrentStage();
+      selectOpponentForCurrentStage({ forceNew: true });
       renderCupPhase();
       renderPreview();
     });
