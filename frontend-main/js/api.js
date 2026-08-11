@@ -4,7 +4,7 @@
    ============================================= */
 
 const API_URL_OVERRIDE = new URLSearchParams(window.location.search).get("api");
-const BASE_URL = (API_URL_OVERRIDE || "http://localhost:8000") + "/api";
+const BASE_URL = (API_URL_OVERRIDE || "") + "/api";
 
 function getToken() {
   return localStorage.getItem("token");
