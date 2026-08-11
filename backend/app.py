@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -12,11 +13,18 @@ from backend.routes.squad import router as squad_router
 from backend.routes.cart import router as cart_router
 from backend.routes.draft import router as draft_router
 from backend.routes.admin import router as admin_router
+from database.run_migrations import main as run_migrations
 
 ROOT = Path(__file__).resolve().parent.parent
 FRONTEND = ROOT / "frontend-main"
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    run_migrations()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

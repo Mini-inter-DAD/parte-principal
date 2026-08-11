@@ -1,9 +1,6 @@
 #! /bin/bash
 set -euo pipefail
 
-echo "Aplicando migrações do banco..."
-python -u -m database.run_migrations
-
 echo "Executando pipeline..."
 python -u run.py
 
