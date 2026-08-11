@@ -85,7 +85,7 @@ def main():
     BATCH_SIZE = 10
     for i in range(0, len(MISSING), BATCH_SIZE):
         batch = MISSING[i:i + BATCH_SIZE]
-        print(f"Estimando overalls {i+1}-{i+len(batch)}...")
+        print(f"Estimando overalls {i+1}-{i+len(batch)}...", flush=True)
         try:
             overalls = estimate_batch(batch)
             for player, overall in zip(batch, overalls):
