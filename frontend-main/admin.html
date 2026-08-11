@@ -11,7 +11,7 @@
     rel="stylesheet" />
   <link rel="stylesheet" href="css/global.css?v=20260808-admin" />
   <link rel="stylesheet" href="css/accessibility.css" />
-  <link rel="stylesheet" href="css/admin.css?v=20260810-pagination" />
+  <link rel="stylesheet" href="css/admin.css?v=20260811-custom-month-dropdown" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -42,14 +42,20 @@
           <h1>Dados dos usuários</h1>
         </div>
 
-        <label class="month-filter" for="month-filter">
-          <span class="sr-only">Filtrar dados por mês</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" />
-          </svg>
-          <select id="month-filter" aria-label="Filtrar dados por mês"></select>
-        </label>
+        <div class="month-filter" id="month-filter-control">
+          <span class="sr-only" id="month-filter-label">Filtrar dados por mês</span>
+          <select class="sr-only" id="month-filter" tabindex="-1" aria-hidden="true"></select>
+          <button class="month-filter__trigger" id="month-filter-trigger" type="button" aria-haspopup="listbox"
+            aria-expanded="false" aria-labelledby="month-filter-label month-filter-value">
+            <span id="month-filter-value"></span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+          <div class="month-filter__options" id="month-filter-options" role="listbox"
+            aria-labelledby="month-filter-label" hidden></div>
+        </div>
       </header>
 
       <p class="admin-status" id="admin-status" role="status" aria-live="polite">Carregando dados...</p>
@@ -95,6 +101,7 @@
                 <th scope="col">ID</th>
                 <th scope="col">Saldo</th>
                 <th scope="col">Data de cadastro</th>
+                <th scope="col" class="users-table__actions-heading"><span class="sr-only">Ações</span></th>
               </tr>
             </thead>
             <tbody id="users-table-body"></tbody>
@@ -114,7 +121,7 @@
   <script src="js/auth.js"></script>
   <script src="js/accessibility.js"></script>
   <script src="js/notify.js"></script>
-  <script src="js/admin.js?v=admin-dashboard-v4"></script>
+  <script src="js/admin.js?v=admin-dashboard-v8"></script>
   <script>document.addEventListener('DOMContentLoaded', () => { initAdmin(); initAccessibility(); });</script>
 </body>
 
