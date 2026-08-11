@@ -90,14 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function loginWithFormError(body) {
-    const apiUrl = new URLSearchParams(window.location.search).get('api') || 'http://localhost:8000';
-    const response = await fetch(`${apiUrl}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.detail || 'Usuário ou senha incorretos.');
+    const data = await api.login(body);
     return data;
   }
 

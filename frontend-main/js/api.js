@@ -3,8 +3,7 @@
    Todas as chamadas fetch() passam por aqui.
    ============================================= */
 
-const API_URL_OVERRIDE = new URLSearchParams(window.location.search).get("api");
-const BASE_URL = (API_URL_OVERRIDE || "") + "/api";
+const BASE_URL = "/api";
 
 function getToken() {
   return localStorage.getItem("token");
