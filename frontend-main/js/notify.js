@@ -29,8 +29,6 @@ const THEME = {
 const BASE_STYLES = {
   background:         'var(--color-surface, #1c2b3a)',
   color:              'var(--color-text, #e8e8e8)',
-  borderRadius:       '12px',
-  fontFamily:         'Inter, sans-serif',
   confirmButtonText:  'OK',
   customClass: {
     popup:            'swal-popup',
