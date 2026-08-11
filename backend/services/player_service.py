@@ -12,7 +12,7 @@ from backend.services.search_utils import compact_search
 
 def serialize_player(player) -> dict:
     data = dict(player)
-    data["name"] = format_player_name(data["name"])
+    data["name"] = format_player_name(data["name"], ea_id=data.get("ea_id"))
     data["nationality_pt"] = translate_nationality(data["country"])
     data["nationality"] = data["nationality_pt"]
     data["country_code"] = country_code(data["country"])

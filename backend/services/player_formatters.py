@@ -1,3 +1,11 @@
+import csv
+from functools import lru_cache
+from pathlib import Path
+
+
+EA_PLAYERS_FILE = Path(__file__).resolve().parents[2] / "data" / "ea_fc26_players.csv"
+
+
 NATIONALITY_TRANSLATIONS = {
     "brazil": "Brasil",
     "argentina": "Argentina",
@@ -67,8 +75,34 @@ NATIONALITY_CODES = {
 }
 
 
-def format_player_name(name: str) -> str:
-    return " ".join(str(name).strip().split()).title()
+def normalize_o_slash(name: str) -> str:
+    return str(name).replace("Ø", "O").replace("ø", "o")
+
+
+@lru_cache(maxsize=1)
+def _source_names_with_o_slash() -> dict[int, str]:
+    if not EA_PLAYERS_FILE.exists():
+        return {}
+
+    with EA_PLAYERS_FILE.open(encoding="utf-8-sig", newline="") as csv_file:
+        source_names = {}
+        for row in csv.DictReader(csv_file):
+            source_name = f"{row.get('firstName', '')} {row.get('lastName', '')}".strip()
+            if row.get("id") and ("Ø" in source_name or "ø" in source_name):
+                source_names[int(row["id"])] = source_name
+        return source_names
+
+
+def _recover_legacy_name(name: str, ea_id: int | None) -> str:
+    if "?" not in name or ea_id is None:
+        return name
+    return _source_names_with_o_slash().get(int(ea_id), name)
+
+
+def format_player_name(name: str, *, ea_id: int | None = None) -> str:
+    normalized = " ".join(str(name).strip().split())
+    normalized = _recover_legacy_name(normalized, ea_id)
+    return normalize_o_slash(normalized).title()
 
 
 def translate_nationality(nationality: str) -> str:

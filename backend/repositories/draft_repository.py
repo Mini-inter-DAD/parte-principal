@@ -15,7 +15,7 @@ DRAFT_STARTER_SLOTS = (
 def list_national_team_players(db: Session):
     result = db.execute(
         text("""
-            SELECT p.id, p.name, p.position, p.overall, p.club, p.photo_url,
+            SELECT p.id, p.ea_id, p.name, p.position, p.overall, p.club, p.photo_url,
                    roster.national_team
             FROM national_team_rosters roster
             JOIN players p ON p.id = roster.player_id
@@ -61,7 +61,7 @@ def count_valid_starters(db: Session, user_id: int) -> int:
 def list_user_starters(db: Session, user_id: int):
     result = db.execute(
         text("""
-            SELECT p.id, p.name, p.position, p.overall, up.squad_position
+            SELECT p.id, p.ea_id, p.name, p.position, p.overall, up.squad_position
             FROM user_players up
             JOIN players p ON p.id = up.player_id
             WHERE up.user_id = :user_id
