@@ -3,7 +3,7 @@ from models.player import Player
 from pipeline.utils import normalizar_nome_acento
 
 def get_players():
-    df = pd.read_csv("data/ea_fc26_players.csv")
+    df = pd.read_csv("data/ea_fc26_players.csv", encoding="utf-8")
 
     players = []
 
