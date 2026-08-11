@@ -3,12 +3,65 @@ function formatCoins(value) {
   return (Number.isFinite(number) ? number : 0).toLocaleString('pt-BR');
 }
 
-function formatPlayerName(name) {
-  const terms = String(name ?? '')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
+const PLAYER_DISPLAY_ALIASES = Object.freeze({
+  'vinicius jose de oliveira junior': 'Vini Jr.',
+  'vinicius junior': 'Vini Jr.',
+  'raphael dias belloli': 'Raphinha',
+  'virgil van dijk': 'Van Dijk',
+  'ruben santos gato alves dias': 'Rúben Dias',
+  'c ronaldo dos santos aveiro': 'Cristiano Ronaldo',
+  'carlos henrique venancio casimiro': 'Casemiro',
+  'marcos vinicius sousa natividade': 'Marquinhos',
+  'fabio henrique tavares': 'Fabinho',
+  'endrick felipe moreira de sousa': 'Endrick',
+  'lucas tolentino coelho de lima': 'Lucas Paquetá',
+  'gabriel teodoro martinelli silva': 'Gabriel Martinelli',
+  'rodrigo hernandez cascante': 'Rodri',
+  'pablo martin paez gavira': 'Gavi',
+  'pedro gonzalez lopez': 'Pedri',
+  'vitor manuel carvalho oliveira': 'Vitinha',
+  'bruno guimaraes moura': 'Bruno Guimarães',
+  'bruno miguel borges fernandes': 'Bruno Fernandes',
+  'bernardo mota carvalho e silva': 'Bernardo Silva',
+  'rafael da conceicao leao': 'Rafael Leão',
+  'joao pedro goncalves neves': 'João Neves',
+  'joao pedro cavaco cancelo': 'João Cancelo',
+  'ruben diogo da silva neves': 'Rúben Neves',
+  'nuno alexandre tavares mendes': 'Nuno Mendes',
+  'daniel olmo carvajal': 'Dani Olmo',
+  'nicholas williams arthuer': 'Nico Williams',
+  'alejandro baena rodriguez': 'Álex Baena',
+  'david raya martin': 'David Raya',
+  'fabian ruiz pena': 'Fabián Ruiz',
+  'marc cucurella saseta': 'Marc Cucurella',
+  'unai simon mendibil': 'Unai Simón',
+  'ederson santana de moraes': 'Ederson',
+  'alexis mac allister': 'Mac Allister',
+  'frenkie de jong': 'F. De Jong',
+  'kevin de bruyne': 'K. De Bruyne',
+  'matheus santos carneiro da cunha': 'M. Cunha',
+  'rodrigo de paul': 'R. De Paul',
+  'jose maria gimenez': 'J. Giménez',
+  'charles de ketelaere': 'De Ketelaere',
+  'giovani lo celso': 'Lo Celso',
+});
 
+function normalizePlayerNameKey(name) {
+  return String(name ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
+function formatPlayerName(name) {
+  const normalizedName = String(name ?? '').trim().replace(/\s+/g, ' ');
+  const alias = PLAYER_DISPLAY_ALIASES[normalizePlayerNameKey(normalizedName)];
+  if (alias) return alias;
+
+  const terms = normalizedName.split(' ').filter(Boolean);
   if (terms.length <= 1) return terms[0] || '';
   if (/^[^\s.]+\.$/.test(terms[0])) return `${terms[0]} ${terms[1]}`;
   return `${terms[0][0]}. ${terms[1]}`;
