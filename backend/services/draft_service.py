@@ -310,6 +310,22 @@ def _find_opponent(opponents: list[dict], opponent_id: str) -> dict:
     return opponent
 
 
+def _find_opponent_for_stage(
+    opponents: list[dict],
+    opponent_id: str,
+    stage: str,
+) -> dict:
+    """Resolve the selected opponent and enforce the current cup difficulty."""
+    opponent = _find_opponent(opponents, opponent_id)
+    config = WORLD_CUP_STAGES[stage]
+    opponent_ovr = int(opponent["overall"])
+    if not config["min_ovr"] <= opponent_ovr <= config["max_ovr"]:
+        raise InvalidOpponentError(
+            "O adversário selecionado não pertence à dificuldade da fase atual"
+        )
+    return opponent
+
+
 def _campaign_payload(campaign):
     phase_index = int(campaign["phase_index"])
     return {
@@ -610,11 +626,14 @@ def play_draft(
                 raise InvalidStageError("Amistosos usam a dificuldade da fase de grupos")
 
         opponents = list_opponents(db)
-        opponent = (
-            _find_opponent(opponents, requested_opponent_id)
-            if requested_opponent_id is not None
-            else _select_opponent(opponents, stage)
-        )
+        if requested_opponent_id is not None:
+            opponent = (
+                _find_opponent_for_stage(opponents, requested_opponent_id, stage)
+                if mode == "cup"
+                else _find_opponent(opponents, requested_opponent_id)
+            )
+        else:
+            opponent = _select_opponent(opponents, stage)
         stage_config = WORLD_CUP_STAGES[stage]
 
         result = simulate_match(user_ovr, opponent["overall"])

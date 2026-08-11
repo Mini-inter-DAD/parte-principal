@@ -106,7 +106,32 @@
 
   async function loadOpponents() {
     state.opponents = await api.getOpponents();
-    state.opponent = state.opponents[Math.floor(Math.random() * state.opponents.length)] || null;
+  }
+
+  function currentOpponentStage() {
+    if (state.mode !== 'cup') return 'group_stage';
+    if (state.phaseIndex <= 2) return 'group_stage';
+    if (state.phaseIndex <= 4) return 'round_of_16';
+    if (state.phaseIndex === 5) return 'quarter_final';
+    if (state.phaseIndex === 6) return 'semi_final';
+    return 'final';
+  }
+
+  function selectOpponentForCurrentStage() {
+    const ranges = {
+      group_stage: [70, 78],
+      round_of_16: [76, 82],
+      quarter_final: [80, 85],
+      semi_final: [84, 88],
+      final: [87, 92],
+    };
+    const [minimum, maximum] = ranges[currentOpponentStage()] || ranges.group_stage;
+    const candidates = state.opponents.filter((opponent) => {
+      const overall = Number(opponent.overall);
+      return overall >= minimum && overall <= maximum;
+    });
+    const available = candidates.length ? candidates : state.opponents;
+    state.opponent = available[Math.floor(Math.random() * available.length)] || null;
   }
 
   async function loadHistory() {
@@ -713,6 +738,7 @@
       DraftModes.bind({
         onModeChange: (mode, expanded) => {
           if (expanded) state.mode = mode;
+          if (expanded && state.opponents.length) selectOpponentForCurrentStage();
           renderCupPhase();
           renderPreview();
         },
@@ -742,6 +768,7 @@
         renderCupPhase();
         showPenaltyShootout();
       } else {
+        selectOpponentForCurrentStage();
         renderPreview();
       }
     } catch (error) {
@@ -759,6 +786,7 @@
         try {
           state.campaign = await api.restartCampaign(userId);
           state.phaseIndex = Number(state.campaign.phase_index || 0);
+          selectOpponentForCurrentStage();
         } catch (error) {
           showError(error.message || 'Não foi possível reiniciar a Copa.');
           return;
@@ -771,7 +799,7 @@
       state.events = [];
       state.minute = 0;
       showMode('preview');
-      state.opponent = state.opponents[Math.floor(Math.random() * state.opponents.length)] || null;
+      selectOpponentForCurrentStage();
       renderCupPhase();
       renderPreview();
     });
