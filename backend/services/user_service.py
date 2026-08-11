@@ -72,7 +72,7 @@ def create_user(db, *, username: str, password: str, email: str | None = None):
 def authenticate(db, *, username: str, password: str):
     user = user_repository.get_user_by_username(db, username)
     if user is None or not verify_password(password, user["password_hash"]):
-        raise BusinessRuleError("Invalid username or password")
+        raise BusinessRuleError("Nome de usuário ou senha inválido")
 
     try:
         activity_repository.record_user_activity(

@@ -18,5 +18,5 @@ RUN pip install -r requirements.txt
 COPY . .
 
 # Inicializando App
-RUN chmod +x docker_entrypoint.sh
-CMD [ "./docker_entrypoint.sh" ]
+RUN sed -i 's/\r$//' docker_entrypoint.sh && chmod +x docker_entrypoint.sh
+CMD ["./docker_entrypoint.sh"]

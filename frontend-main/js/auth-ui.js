@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const destination = data.account_type === 'admin' ? 'admin.html' : 'market.html';
       window.location.href = `${destination}${window.location.search}`;
     } catch (err) {
-      setError('login-form-error', err.message || 'Usuário ou senha incorretos.');
+      setError('login-form-error', err.message || 'Nome de usuário ou senha inválido');
     } finally {
       setLoading(btn, false);
     }

@@ -116,7 +116,7 @@ const NATION_FLAGS = {
 };
 
 async function initMarket() {
-  ensureAuth();
+  if (!ensureAuth()) return;
   renderNavbar('market');
   bindFilters();
   bindFilterToggle();
