@@ -57,7 +57,11 @@ function normalizePlayerNameKey(name) {
 }
 
 function formatPlayerName(name) {
-  const normalizedName = String(name ?? '').trim().replace(/\s+/g, ' ');
+  const normalizedName = String(name ?? '')
+    .replace(/Ø/g, 'O')
+    .replace(/ø/g, 'o')
+    .trim()
+    .replace(/\s+/g, ' ');
   const alias = PLAYER_DISPLAY_ALIASES[normalizePlayerNameKey(normalizedName)];
   if (alias) return alias;
 
