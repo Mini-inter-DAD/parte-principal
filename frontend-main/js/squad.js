@@ -344,7 +344,7 @@ function renderField() {
       token.textContent = slot.label;
       el.setAttribute(
         'title',
-        `${slot.player.name} · ${slot.label}`
+        `${formatPlayerName(slot.player.name)} · ${slot.label}`
       );
     } else {
       token.textContent = slot.label;
@@ -353,9 +353,9 @@ function renderField() {
     const nameEl = document.createElement('span');
     nameEl.className = 'field-slot__name';
 
-    // mostra nome completo
+    // mostra nome abreviado
     nameEl.textContent = slot.player
-      ? slot.player.name
+      ? formatPlayerName(slot.player.name)
       : slot.label;
 
     el.appendChild(token);
@@ -398,7 +398,7 @@ function renderBoxscore() {
 
     const name = document.createElement('span');
     name.className = `boxscore-item__name${slot.player ? '' : ' boxscore-item__name--empty'}`;
-    name.textContent = slot.player ? slot.player.name : 'Vazio';
+    name.textContent = slot.player ? formatPlayerName(slot.player.name) : 'Vazio';
 
     const ovr = document.createElement('span');
     ovr.className = `boxscore-item__ovr${slot.player ? '' : ' boxscore-item__ovr--empty'}`;
@@ -434,7 +434,7 @@ function renderBoxscore() {
 
       const name = document.createElement('span');
       name.className = 'boxscore-item__name';
-      name.textContent = player.name;
+      name.textContent = formatPlayerName(player.name);
 
       const ovr = document.createElement('span');
       ovr.className = 'boxscore-item__ovr';

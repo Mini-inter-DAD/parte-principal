@@ -723,14 +723,6 @@ function buyPlayer(playerId) {
   return addPlayerToCart(playerId);
 }
 
-function formatPlayerName(name) {
-  return String(name)
-    .trim()
-    .split(/\s+/)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-    .join(' ');
-}
-
 const NATIONALITY_TRANSLATIONS = {
   Brazil: 'Brasil',
   Argentina: 'Argentina',

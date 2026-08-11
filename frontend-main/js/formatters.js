@@ -3,6 +3,17 @@ function formatCoins(value) {
   return (Number.isFinite(number) ? number : 0).toLocaleString('pt-BR');
 }
 
+function formatPlayerName(name) {
+  const terms = String(name ?? '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (terms.length <= 1) return terms[0] || '';
+  if (/^[^\s.]+\.$/.test(terms[0])) return `${terms[0]} ${terms[1]}`;
+  return `${terms[0][0]}. ${terms[1]}`;
+}
+
 const POSITION_LABELS = Object.freeze({
   GK: 'GOL',
   GOL: 'GOL',
