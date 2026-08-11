@@ -130,7 +130,15 @@
       const overall = Number(opponent.overall);
       return overall >= minimum && overall <= maximum;
     });
-    const available = candidates.length ? candidates : state.opponents;
+    const available = candidates.length
+      ? candidates
+      : state.opponents.filter((opponent) => {
+        const target = (minimum + maximum) / 2;
+        const opponentDistance = Math.abs(Number(opponent.overall) - target);
+        return opponentDistance === Math.min(
+          ...state.opponents.map((item) => Math.abs(Number(item.overall) - target)),
+        );
+      });
     state.opponent = available[Math.floor(Math.random() * available.length)] || null;
   }
 
