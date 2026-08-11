@@ -70,13 +70,25 @@ const api = {
 
   // Draft
   getOpponents:           () => apiFetch("/draft/opponents"),
-  playDraft:              (userId, opponentId, mode = "cup") => apiFetch("/draft/play", {
+  playDraft:              (userId, opponentId = null, mode = "cup", stage = null) => apiFetch(
+    mode === "friendly" ? "/draft/friendly/play" : "/draft/play",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        user_id: userId,
+        ...(opponentId ? { opponent_id: String(opponentId) } : {}),
+        ...(stage ? { stage } : {}),
+      }),
+    },
+  ),
+  getActivePenalty:       (userId) => apiFetch(`/draft/penalty/active/${userId}`),
+  shootPenalty:           (body) => apiFetch("/draft/penalty/shoot", {
     method: "POST",
-    body: JSON.stringify({
-      user_id: userId,
-      mode,
-      ...(opponentId ? { opponent_id: opponentId } : {}),
-    }),
+    body: JSON.stringify(body),
+  }),
+  savePenalty:            (body) => apiFetch("/draft/penalty/save", {
+    method: "POST",
+    body: JSON.stringify(body),
   }),
   getHistory:             (userId, { limit = 20, offset = 0 } = {}) => apiFetch(`/draft/history/${userId}?limit=${limit}&offset=${offset}`),
   getCampaign:            (userId) => apiFetch(`/draft/campaign/${userId}`),

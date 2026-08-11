@@ -12,3 +12,11 @@ class ConflictError(ServiceError):
 
 class BusinessRuleError(ServiceError):
     pass
+
+
+class InvalidStageError(BusinessRuleError):
+    pass
+
+
+class InvalidOpponentError(BusinessRuleError):
+    pass

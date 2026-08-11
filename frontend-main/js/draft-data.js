@@ -30,12 +30,14 @@
   }
 
   function normalizeTeam(team, fallbackTeam) {
-    if (team === 'USER' || team === 'OPPONENT') {
-      return team;
+    const normalizedTeam = String(team || '').trim().toUpperCase();
+    if (normalizedTeam === 'USER' || normalizedTeam === 'OPPONENT') {
+      return normalizedTeam;
     }
 
-    if (fallbackTeam === 'USER' || fallbackTeam === 'OPPONENT') {
-      return fallbackTeam;
+    const normalizedFallback = String(fallbackTeam || '').trim().toUpperCase();
+    if (normalizedFallback === 'USER' || normalizedFallback === 'OPPONENT') {
+      return normalizedFallback;
     }
 
     return 'OPPONENT';
@@ -88,10 +90,16 @@
 
     return {
       minute: Number.isFinite(minute) ? minute : null,
-      playerId: isNonEmptyString(source.playerId) ? source.playerId.trim() : null,
-      playerName: isNonEmptyString(source.playerName) ? source.playerName.trim() : '',
+      playerId: isNonEmptyString(source.playerId || source.player_id)
+        ? String(source.playerId || source.player_id).trim()
+        : null,
+      playerName: isNonEmptyString(
+        source.playerName || source.player_name || source.scorerName || source.scorer_name,
+      )
+        ? String(source.playerName || source.player_name || source.scorerName || source.scorer_name).trim()
+        : '',
       position: isNonEmptyString(source.position) ? source.position.trim() : null,
-      team: normalizeTeam(source.team, fallbackTeam),
+      team: normalizeTeam(source.team || source.side, fallbackTeam),
     };
   }
 

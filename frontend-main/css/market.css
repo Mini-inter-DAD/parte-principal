@@ -592,6 +592,28 @@ body {
   font-size: 1.15rem;
 }
 
+.cart-item--skeleton {
+  display: grid;
+  grid-template-columns: 52px 1fr 32px;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cart-skeleton__photo {
+  width: 52px;
+  height: 52px;
+}
+
+.cart-skeleton__copy {
+  width: 75%;
+  height: 2rem;
+}
+
+.cart-skeleton__action {
+  width: 32px;
+  height: 32px;
+}
+
 .cart-panel__empty {
   padding: 1.5rem 0.5rem;
   color: var(--color-text-muted);
@@ -654,6 +676,45 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.player-card--skeleton {
+  align-content: start;
+  min-height: 445px;
+  pointer-events: none;
+}
+
+.player-card--skeleton:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.player-skeleton__rating {
+  width: 3.5rem;
+  height: 2.5rem;
+}
+
+.player-skeleton__photo {
+  width: 100%;
+  height: 180px;
+  border-radius: 24px;
+}
+
+.player-skeleton__name {
+  width: 72%;
+  height: 1.2rem;
+}
+
+.player-skeleton__meta {
+  width: 58%;
+  height: 1rem;
+}
+
+.player-skeleton__price,
+.player-skeleton__button {
+  width: 100%;
+  height: 48px;
+  border-radius: 14px;
 }
 
 .player-card:hover {

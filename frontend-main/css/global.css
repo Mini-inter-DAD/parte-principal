@@ -168,6 +168,46 @@ img {
   outline-offset: 3px;
 }
 
+/* Loading skeleton shared by async screens. */
+.skeleton-block {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: transparent !important;
+  pointer-events: none;
+  user-select: none;
+}
+
+.skeleton-block::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  animation: skeleton-shimmer 1.35s ease-in-out infinite;
+}
+
+[data-theme="light"] .skeleton-block {
+  background: rgba(15, 23, 42, 0.1);
+}
+
+[data-theme="light"] .skeleton-block::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+}
+
+@keyframes skeleton-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-block::after {
+    animation: none;
+  }
+}
+
 @media (max-width: 600px) {
   .admin-access-link {
     right: 4.75rem;
