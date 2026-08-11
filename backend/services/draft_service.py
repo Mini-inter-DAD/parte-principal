@@ -327,14 +327,16 @@ def _find_opponent_for_stage(
 
 
 def _campaign_payload(campaign):
-    phase_index = int(campaign["phase_index"])
+    phase_index = min(max(int(campaign["phase_index"]), 0), len(CUP_PHASES) - 1)
+    group_matches = min(max(int(campaign["group_matches"]), 0), 3)
+    group_losses = min(max(int(campaign["group_losses"]), 0), 3)
     return {
         "phase_index": phase_index,
         "phase": CUP_PHASES[phase_index],
         "status": campaign["status"],
-        "group_matches": int(campaign["group_matches"]),
+        "group_matches": group_matches,
         "group_points": int(campaign["group_points"]),
-        "group_losses": int(campaign["group_losses"]),
+        "group_losses": group_losses,
         "can_play": campaign["status"] == "ACTIVE",
     }
 

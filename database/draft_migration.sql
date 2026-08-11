@@ -113,6 +113,13 @@ WHERE status = 'ACTIVE'
   AND group_matches BETWEEN 1 AND 2
   AND phase_index < 3;
 
+-- Older databases may have counted losses across more than one campaign.
+-- Keep the persisted value within the current campaign contract.
+UPDATE cup_campaigns
+SET group_matches = LEAST(GREATEST(group_matches, 0), 3),
+    group_losses = LEAST(GREATEST(group_losses, 0), 3),
+    updated_at = now();
+
 CREATE TABLE IF NOT EXISTS goal_events (
     id              BIGSERIAL PRIMARY KEY,
     match_id        INTEGER NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
