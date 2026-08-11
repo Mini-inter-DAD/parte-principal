@@ -62,6 +62,11 @@ test('keeps the generic abbreviation for names without a curated alias', () => {
   assert.equal(browser.formatPlayerName('Kyllian Mbappe'), 'K. Mbappe');
 });
 
+test('replaces the o-slash character before displaying the name', () => {
+  assert.equal(browser.formatPlayerName('Martin Ødegaard'), 'M. Odegaard');
+  assert.equal(browser.formatPlayerName('Ørjan Nyland'), 'O. Nyland');
+});
+
 test('market delegates visible names to the shared formatter', () => {
   const market = fs.readFileSync(
     path.join(__dirname, 'market.js'),
