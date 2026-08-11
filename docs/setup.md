@@ -64,9 +64,10 @@ pip install -r requirements.txt
 uvicorn backend.app:app --reload
 ```
 
-- API disponível em `http://localhost:8000`
+- API disponível em `http://localhost:8000` (endpoints prefixados com `/api`)
+- Frontend servido pelo backend em `http://localhost:8000`
 - Documentação interativa (Swagger): `http://localhost:8000/docs`
-- Health check: `GET http://localhost:8000/health`
+- Health check: `GET http://localhost:8000/api/health`
 
 ### Autenticação
 

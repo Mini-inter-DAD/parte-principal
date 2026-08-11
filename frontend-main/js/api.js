@@ -4,7 +4,7 @@
    ============================================= */
 
 const API_URL_OVERRIDE = new URLSearchParams(window.location.search).get("api");
-const BASE_URL = API_URL_OVERRIDE || "http://localhost:8000"; // TODO: trocar pela URL do backend no Render
+const BASE_URL = (API_URL_OVERRIDE || "http://localhost:8000") + "/api";
 
 function getToken() {
   return localStorage.getItem("token");

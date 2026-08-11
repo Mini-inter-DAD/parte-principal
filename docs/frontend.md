@@ -46,7 +46,7 @@ draft.html (Jogar — partidas)
 
 ## Comunicação com o backend
 
-- **URL da API**: `http://localhost:8000` por padrão; sobrescrita pelo parâmetro `?api=<url>` em qualquer página.
+- **URL da API**: `http://localhost:8000` por padrão; sobrescrita pelo parâmetro `?api=<url>` em qualquer página. Todos os endpoints ficam sob o prefixo `/api` (ex.: `?api=http://localhost:8000` → `http://localhost:8000/api/...`).
 - **Autenticação**: token e usuário no `localStorage`. Toda chamada via `apiFetch` envia `Authorization: Bearer <token>`.
 - **401**: `apiFetch` limpa a sessão e redireciona para `auth.html`.
 - **Modo demo**: quando o token não começa com `user:` (ex.: `demo-token`), as chamadas de carrinho/compra são desativadas e o saldo é mantido localmente.
@@ -55,21 +55,21 @@ Endpoints usados pelo frontend:
 
 | Método | Rota | Uso |
 |---|---|---|
-| POST | `/auth/register` | Cadastro |
-| POST | `/auth/login` | Login |
-| GET | `/market/players` | Catálogo do mercado |
-| GET | `/market/sections` | Seções do mercado |
-| GET | `/cart/{userId}` | Carrinho |
-| POST | `/cart/add` | Adicionar ao carrinho |
-| DELETE | `/cart/remove` | Remover do carrinho |
-| DELETE | `/cart/clear/{userId}` | Limpar carrinho |
-| POST | `/cart/checkout` | Finalizar compra |
-| GET | `/squad/{userId}` | Elenco do usuário |
-| PATCH | `/squad/assign-position` | Escalar jogador em posição |
-| PATCH | `/squad/move-to-bench` | Mover para o banco |
-| GET | `/draft/opponents` | Adversários |
-| POST | `/draft/play` | Jogar partida |
-| GET | `/draft/history/{userId}` | Histórico |
+| POST | `/api/auth/register` | Cadastro |
+| POST | `/api/auth/login` | Login |
+| GET | `/api/market/players` | Catálogo do mercado |
+| GET | `/api/market/sections` | Seções do mercado |
+| GET | `/api/cart/{userId}` | Carrinho |
+| POST | `/api/cart/add` | Adicionar ao carrinho |
+| DELETE | `/api/cart/remove` | Remover do carrinho |
+| DELETE | `/api/cart/clear/{userId}` | Limpar carrinho |
+| POST | `/api/cart/checkout` | Finalizar compra |
+| GET | `/api/squad/{userId}` | Elenco do usuário |
+| PATCH | `/api/squad/assign-position` | Escalar jogador em posição |
+| PATCH | `/api/squad/move-to-bench` | Mover para o banco |
+| GET | `/api/draft/opponents` | Adversários |
+| POST | `/api/draft/play` | Jogar partida |
+| GET | `/api/draft/history/{userId}` | Histórico |
 
 ## Acessibilidade
 
