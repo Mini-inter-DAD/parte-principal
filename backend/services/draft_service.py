@@ -26,28 +26,28 @@ CUP_PHASES = (
 WORLD_CUP_STAGES = {
     "group_stage": {
         "label": "Fase de Grupos",
-        "min_ovr": 70,
-        "max_ovr": 78,
+        "min_ovr": 65,
+        "max_ovr": 75,
     },
     "round_of_16": {
         "label": "Oitavas de Final",
-        "min_ovr": 76,
-        "max_ovr": 82,
+        "min_ovr": 70,
+        "max_ovr": 80,
     },
     "quarter_final": {
         "label": "Quartas de Final",
-        "min_ovr": 80,
-        "max_ovr": 85,
+        "min_ovr": 75,
+        "max_ovr": 82,
     },
     "semi_final": {
         "label": "Semifinal",
-        "min_ovr": 84,
-        "max_ovr": 88,
+        "min_ovr": 78,
+        "max_ovr": 85,
     },
     "final": {
         "label": "Final",
-        "min_ovr": 87,
-        "max_ovr": 92,
+        "min_ovr": 82,
+        "max_ovr": 90,
     },
 }
 

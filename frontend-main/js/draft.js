@@ -119,11 +119,11 @@
 
   function selectOpponentForCurrentStage() {
     const ranges = {
-      group_stage: [70, 78],
-      round_of_16: [76, 82],
-      quarter_final: [80, 85],
-      semi_final: [84, 88],
-      final: [87, 92],
+      group_stage: [65, 75],
+      round_of_16: [70, 80],
+      quarter_final: [75, 82],
+      semi_final: [78, 85],
+      final: [82, 90],
     };
     const [minimum, maximum] = ranges[currentOpponentStage()] || ranges.group_stage;
     const candidates = state.opponents.filter((opponent) => {
