@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Environment Variables
+.env
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python Build
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Database
+*.db
+*.sqlite3
+
+# Output gerado
+output/
+
+# Dados temporários
+data/photos_cache.json
+data/cache/
+
+# Docker
+docker-data/
+
+# Arquivos locais
+*.bak
+*.tmp
+dreamcup_dump.sql
+*.dump
+
+# Arquivos não-produtivos
+docs/
+evidencias/
+slides/
+referencias.md
+makefile
+.git
+**/.env.example
+**/.env
+**/.gitignore
+**/docker-compose.yml
+**/Dockerfile
+**/LICENSE
+**/README.md
