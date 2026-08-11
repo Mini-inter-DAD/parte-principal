@@ -446,15 +446,29 @@ def goalkeeper_decision_time(goalkeeper_overall: int) -> int:
     return round(3 + normalized * 5)
 
 
-def available_penalty_zones(opponent_goalkeeper_overall: int) -> list[str]:
+def get_available_penalty_zones(goalkeeper_overall: int) -> list[str]:
     zones_to_remove = 0
-    if int(opponent_goalkeeper_overall) >= 90:
+    if int(goalkeeper_overall) >= 90:
         zones_to_remove = 2
-    elif int(opponent_goalkeeper_overall) >= 85:
+    elif int(goalkeeper_overall) >= 85:
         zones_to_remove = 1
 
     removed = set(random.sample(PENALTY_ZONES, zones_to_remove))
     return [zone for zone in PENALTY_ZONES if zone not in removed]
+
+
+def _shootout_available_zones(shootout, turn: str) -> list[str]:
+    field = (
+        "available_shoot_zones"
+        if turn == "user_shoot"
+        else "opponent_available_shoot_zones"
+    )
+    zones = [
+        zone
+        for zone in list(shootout.get(field) or [])
+        if zone in PENALTY_ZONES
+    ]
+    return zones or list(PENALTY_ZONES)
 
 
 def _select_goalkeeper(players, *, user_team: bool) -> dict:
@@ -524,11 +538,7 @@ def _penalty_scored(shoot_zone: str, keeper_dive_zone: str) -> bool:
 
 def _penalty_state_payload(shootout) -> dict:
     current_turn = shootout["current_turn"]
-    available_zones = (
-        list(shootout["available_shoot_zones"] or [])
-        if current_turn == "user_shoot"
-        else list(PENALTY_ZONES)
-    )
+    available_zones = _shootout_available_zones(shootout, current_turn)
     goalkeeper_name = (
         shootout["opponent_goalkeeper_name"]
         if current_turn == "user_shoot"
@@ -545,6 +555,9 @@ def _penalty_state_payload(shootout) -> dict:
         "user_attempts": int(shootout["user_attempts"]),
         "opponent_attempts": int(shootout["opponent_attempts"]),
         "available_zones": available_zones,
+        "blocked_zones": [
+            zone for zone in PENALTY_ZONES if zone not in available_zones
+        ],
         "decision_time_seconds": goalkeeper_decision_time(
             int(shootout["user_goalkeeper_overall"])
         ),
@@ -691,8 +704,11 @@ def play_draft(
                     starters,
                     f"Cobrador do {user['username']}",
                 ),
-                available_shoot_zones=available_penalty_zones(
+                available_shoot_zones=get_available_penalty_zones(
                     int(opponent_goalkeeper.get("overall") or opponent["overall"])
+                ),
+                opponent_available_shoot_zones=get_available_penalty_zones(
+                    int(user_goalkeeper.get("overall") or 60)
                 ),
                 user_goalkeeper_name=format_player_name(user_goalkeeper["name"]),
                 user_goalkeeper_overall=int(user_goalkeeper.get("overall") or 60),
@@ -845,10 +861,11 @@ def _take_penalty(db, *, user_id: int, match_id: int, zone: str, expected_turn: 
         user_attempts = int(shootout["user_attempts"])
         opponent_attempts = int(shootout["opponent_attempts"])
 
+        available_zones = _shootout_available_zones(shootout, expected_turn)
+        if zone not in available_zones:
+            raise BusinessRuleError("Zona indisponível para esta cobrança")
+
         if expected_turn == "user_shoot":
-            available_zones = list(shootout["available_shoot_zones"] or [])
-            if zone not in available_zones:
-                raise BusinessRuleError("Zona de chute indisponível para esta cobrança")
             shoot_zone = zone
             keeper_dive_zone = random.choice(PENALTY_ZONES)
             attempt_goalkeeper_name = shootout["opponent_goalkeeper_name"]
@@ -861,7 +878,7 @@ def _take_penalty(db, *, user_id: int, match_id: int, zone: str, expected_turn: 
                 f"Cobrador da {opponent['name']}",
             )
         else:
-            shoot_zone = random.choice(PENALTY_ZONES)
+            shoot_zone = random.choice(available_zones)
             keeper_dive_zone = zone
             attempt_goalkeeper_name = shootout["user_goalkeeper_name"]
             opponent_attempts += 1

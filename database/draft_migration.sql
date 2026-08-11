@@ -154,6 +154,8 @@ CREATE TABLE IF NOT EXISTS penalty_shootouts (
                                 CHECK (current_turn IN ('user_shoot', 'user_save')),
     current_shooter_name        VARCHAR(100) NOT NULL,
     available_shoot_zones       JSONB NOT NULL DEFAULT '[]'::jsonb,
+    opponent_available_shoot_zones JSONB NOT NULL
+                                DEFAULT '["top_left", "top_center", "top_right", "bottom_left", "bottom_right"]'::jsonb,
     user_goalkeeper_name        VARCHAR(100) NOT NULL,
     user_goalkeeper_overall     SMALLINT NOT NULL,
     opponent_goalkeeper_name    VARCHAR(100) NOT NULL,
@@ -163,6 +165,10 @@ CREATE TABLE IF NOT EXISTS penalty_shootouts (
     created_at                  TIMESTAMP NOT NULL DEFAULT now(),
     updated_at                  TIMESTAMP NOT NULL DEFAULT now()
 );
+
+ALTER TABLE penalty_shootouts
+    ADD COLUMN IF NOT EXISTS opponent_available_shoot_zones JSONB NOT NULL
+    DEFAULT '["top_left", "top_center", "top_right", "bottom_left", "bottom_right"]'::jsonb;
 
 CREATE INDEX IF NOT EXISTS idx_penalty_shootouts_user_active
     ON penalty_shootouts(user_id, is_finished);
