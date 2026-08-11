@@ -338,7 +338,10 @@
       if (remaining > 0) return;
 
       clearPenaltyTimer();
-      const randomZone = PENALTY_ZONES[Math.floor(Math.random() * PENALTY_ZONES.length)];
+      const availableZones = (state.penalty?.available_zones || [])
+        .filter((zone) => PENALTY_ZONES.includes(zone));
+      const randomZone = availableZones[Math.floor(Math.random() * availableZones.length)];
+      if (!randomZone) return;
       handlePenaltyZone(randomZone);
     }, 1000);
   }
@@ -348,9 +351,8 @@
     if (!penalty) return;
 
     const isShooting = penalty.current_turn === 'user_shoot';
-    const availableZones = new Set(
-      isShooting ? penalty.available_zones || [] : PENALTY_ZONES,
-    );
+    const availableZones = new Set(penalty.available_zones || []);
+    const blockedZones = new Set(penalty.blocked_zones || []);
 
     setText('penalty-user-name', state.match?.team_name || teamName());
     setText('penalty-opponent-name', state.match?.opponent?.name || 'Adversário');
@@ -362,7 +364,7 @@
       'penalty-instruction',
       isShooting
         ? 'Escolha onde bater. As zonas apagadas estão bloqueadas pelo goleiro.'
-        : 'Escolha rapidamente para onde seu goleiro deve pular.',
+        : 'Escolha onde pular. As zonas apagadas não estão disponíveis para o chute.',
     );
     setText(
       'penalty-match-label',
@@ -371,9 +373,19 @@
     setText('penalty-attempt-result', '');
 
     document.querySelectorAll('[data-penalty-zone]').forEach((button) => {
-      const enabled = availableZones.has(button.dataset.penaltyZone);
+      const zone = button.dataset.penaltyZone;
+      const enabled = availableZones.has(zone);
+      const blocked = blockedZones.has(zone) || !enabled;
+      const baseLabel = button.dataset.zoneLabel || button.title;
+      button.dataset.zoneLabel = baseLabel;
+      button.classList.toggle('penalty-zone--blocked', blocked);
       button.disabled = state.isPenaltyAnimating || !enabled;
       button.setAttribute('aria-disabled', String(button.disabled));
+      button.title = blocked ? `${baseLabel} - bloqueada` : baseLabel;
+      const accessibleLabel = button.querySelector('.sr-only');
+      if (accessibleLabel) {
+        accessibleLabel.textContent = blocked ? `${baseLabel} - bloqueada` : baseLabel;
+      }
     });
 
     resetPenaltyAnimation();
@@ -417,7 +429,7 @@
     if (state.isPenaltyAnimating || !state.penalty || !PENALTY_ZONES.includes(zone)) return;
 
     const isShooting = state.penalty.current_turn === 'user_shoot';
-    if (isShooting && !state.penalty.available_zones?.includes(zone)) return;
+    if (!state.penalty.available_zones?.includes(zone)) return;
 
     clearPenaltyTimer();
     state.isPenaltyAnimating = true;

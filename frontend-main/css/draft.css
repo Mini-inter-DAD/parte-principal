@@ -943,6 +943,21 @@
     background: rgba(255, 255, 255, .25)
 }
 
+.penalty-zone--blocked::before {
+    content: "X";
+    position: absolute;
+    inset: 50% auto auto 50%;
+    color: rgba(255, 255, 255, .72);
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1;
+    transform: translate(-50%, -50%)
+}
+
+.penalty-zone--blocked::after {
+    display: none
+}
+
 .penalty-zone--top-left { left: 14%; top: 16% }
 .penalty-zone--top-center { left: 50%; top: 24%; transform: translateX(-50%) }
 .penalty-zone--top-center:hover:not(:disabled), .penalty-zone--top-center:focus-visible:not(:disabled) { transform: translateX(-50%) scale(1.08) }
