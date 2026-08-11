@@ -3,14 +3,15 @@
 API REST construída com FastAPI e SQLAlchemy Core (SQL puro). Aplicação em `backend/app.py`; documentação interativa em `/docs` (Swagger).
 
 - Base URL padrão: `http://localhost:8000`
+- Todos os endpoints da API são prefixados com `/api` (ex.: `http://localhost:8000/api/market/players`)
 - CORS: aberto (`allow_origins=["*"]`)
 
 ## Rotas de sistema
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/` | Mensagem de boas-vindas |
-| GET | `/health` | Health check (`{"status": "ok"}`) |
+| GET | `/` | Serve o frontend (`frontend-main/index.html`) |
+| GET | `/api/health` | Health check (`{"status": "ok"}`) |
 
 ## Autenticação
 
@@ -18,11 +19,11 @@ API REST construída com FastAPI e SQLAlchemy Core (SQL puro). Aplicação em `b
 
 - Token **stateless**: apenas `user:<id>` (sem expiração). Enviado como `Authorization: Bearer user:<id>`.
 - Nas rotas protegidas por `current_user_id`, o `user_id` é extraído do token (o cliente não envia o id no corpo).
-- Em `/users`, `/market/buy`, `/cart` e `/draft` o `user_id` é enviado no corpo da requisição.
+- Em `/api/users`, `/api/market/buy`, `/api/cart` e `/api/draft` o `user_id` é enviado no corpo da requisição.
 
 ### Administrador
 
-- Login unificado: `POST /auth/login` retorna `account_type: "user" | "admin"`.
+- Login unificado: `POST /api/auth/login` retorna `account_type: "user" | "admin"`.
 - Sessões revogáveis: token aleatório de 32 bytes, armazenado como hash SHA-256, válido por **8 horas**, com logout revogando a sessão (`revoked_at`).
 - Endpoints administrativos exigem `Authorization: Bearer <token_admin>` (resolvido por `current_admin_id`).
 
@@ -33,7 +34,7 @@ API REST construída com FastAPI e SQLAlchemy Core (SQL puro). Aplicação em `b
 
 ## Usuários
 
-### `POST /users` — criar usuário (201)
+### `POST /api/users` — criar usuário (201)
 
 ```json
 { "username": "jose", "password": "123456", "email": "jose@x.com" }
@@ -43,15 +44,15 @@ API REST construída com FastAPI e SQLAlchemy Core (SQL puro). Aplicação em `b
 
 Resposta: `UserResponse` (`id`, `username`, `email`, `coins`).
 
-### `GET /users/{user_id}` — dados do usuário
+### `GET /api/users/{user_id}` — dados do usuário
 
 Resposta: `UserResponse`.
 
-### `POST /auth/register` — criar e autenticar (201)
+### `POST /api/auth/register` — criar e autenticar (201)
 
 Resposta: `{ "token": "user:<id>", "user": UserResponse }`.
 
-### `POST /auth/login` — login unificado
+### `POST /api/auth/login` — login unificado
 
 Corpo: `{ "username", "password" }`.
 
@@ -67,7 +68,7 @@ Resposta:
 
 Para admin: `account_type: "admin"`, campo `admin` com `{ "id", "username" }`, e token de sessão.
 
-### `POST /auth/forgot-password`
+### `POST /api/auth/forgot-password`
 
 Recuperação de senha não implementada no MVP — responde com mensagem informativa.
 
@@ -75,9 +76,9 @@ Recuperação de senha não implementada no MVP — responde com mensagem inform
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/players` | Lista jogadores com filtros `name`, `country`, `position`, `limit` (1–100, padrão 50) |
-| GET | `/players/search?q=` | Busca por nome, insensível a acentos/espaços |
-| GET | `/players/{player_id}` | Jogador por id |
+| GET | `/api/players` | Lista jogadores com filtros `name`, `country`, `position`, `limit` (1–100, padrão 50) |
+| GET | `/api/players/search?q=` | Busca por nome, insensível a acentos/espaços |
+| GET | `/api/players/{player_id}` | Jogador por id |
 
 `PlayerResponse`:
 
@@ -95,15 +96,15 @@ Detalhes de formatação: nome em title case, nacionalidade traduzida para portu
 
 ## Mercado
 
-### `GET /market` e `GET /market/players` — listar mercado
+### `GET /api/market` e `GET /api/market/players` — listar mercado
 
 Filtros: `q`, `nation`, `position`, `ovrMin`, `ovrMax`, `priceMin`, `priceMax`, `section`.
 
 - `nation` aceita nomes em português ou inglês (ex.: `França`, `Brasil`).
-- `section` aceita os valores de [`GET /market/sections`](#get-marketsections).
+- `section` aceita os valores de [`GET /api/market/sections`](#get-apimarketsections).
 - Validação: mínimo ≤ máximo nas faixas de overall e preço.
 
-### `GET /market/sections` — seções do mercado
+### `GET /api/market/sections` — seções do mercado
 
 Seções derivadas do overall:
 
@@ -113,7 +114,7 @@ Seções derivadas do overall:
 | `Destaques da Copa` | overall ≥ 85 |
 | `Veteranos` | demais |
 
-### `POST /market/buy` — comprar jogador
+### `POST /api/market/buy` — comprar jogador
 
 Corpo: `{ "user_id": 1, "player_id": 5 }`.
 
@@ -128,11 +129,11 @@ Resposta: `{ "message", "user_id", "player_id", "price_paid", "coins" }`.
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/cart/{user_id}` | Carrinho do usuário |
-| POST | `/cart/add` | `{ "user_id", "player_id" }` — adiciona item |
-| DELETE | `/cart/remove` | `{ "user_id", "player_id" }` — remove item |
-| DELETE | `/cart/clear/{user_id}` | Esvazia o carrinho |
-| POST | `/cart/checkout` | `{ "user_id" }` — compra tudo |
+| GET | `/api/cart/{user_id}` | Carrinho do usuário |
+| POST | `/api/cart/add` | `{ "user_id", "player_id" }` — adiciona item |
+| DELETE | `/api/cart/remove` | `{ "user_id", "player_id" }` — remove item |
+| DELETE | `/api/cart/clear/{user_id}` | Esvazia o carrinho |
+| POST | `/api/cart/checkout` | `{ "user_id" }` — compra tudo |
 
 `CartResponse`: `{ "user_id", "items": [PlayerResponse], "total", "coins" }`.
 
@@ -145,14 +146,14 @@ Regras:
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/squad` | Elenco do usuário autenticado pelo token |
-| GET | `/squad/{user_id}` | Elenco de um usuário |
-| POST | `/squad/buy/{player_id}` | Compra direta para o usuário autenticado |
-| PATCH | `/squad/substitute` | Substitui titular por reserva |
-| PATCH | `/squad/assign-position` | Escala jogador numa posição do esquema |
-| PATCH | `/squad/move-to-bench` | Move para o banco |
-| PATCH | `/squad/starter` | Define/remove titularidade (corpo) |
-| PATCH | `/squad/starter/{player_id}` | Define como titular pelo token |
+| GET | `/api/squad` | Elenco do usuário autenticado pelo token |
+| GET | `/api/squad/{user_id}` | Elenco de um usuário |
+| POST | `/api/squad/buy/{player_id}` | Compra direta para o usuário autenticado |
+| PATCH | `/api/squad/substitute` | Substitui titular por reserva |
+| PATCH | `/api/squad/assign-position` | Escala jogador numa posição do esquema |
+| PATCH | `/api/squad/move-to-bench` | Move para o banco |
+| PATCH | `/api/squad/starter` | Define/remove titularidade (corpo) |
+| PATCH | `/api/squad/starter/{player_id}` | Define como titular pelo token |
 
 `SquadPlayerResponse` estende `PlayerResponse` com `is_starter`, `squad_position`, `acquired_at`.
 
@@ -167,9 +168,9 @@ Regras:
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/draft/opponents` | Seleções adversárias disponíveis |
-| POST | `/draft/play` | Joga uma partida |
-| GET | `/draft/history/{user_id}` | Histórico (últimas 20) |
+| GET | `/api/draft/opponents` | Seleções adversárias disponíveis |
+| POST | `/api/draft/play` | Joga uma partida |
+| GET | `/api/draft/history/{user_id}` | Histórico (últimas 20) |
 
 Adversários fixos:
 
@@ -181,7 +182,7 @@ Adversários fixos:
 | `morocco` | Marrocos | 82 |
 | `france` | França | 89 |
 
-### `POST /draft/play`
+### `POST /api/draft/play`
 
 Corpo: `{ "user_id": 1, "opponent_id": "france" }` (`opponent_id` opcional — se omitido, adversário aleatório).
 
@@ -207,10 +208,10 @@ Resposta `DraftPlayResponse`:
 
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/admin/auth/logout` | Encerra a sessão do admin (204) |
-| GET | `/admin/metrics/users?month=YYYY-MM` | Métricas de usuários do mês |
-| GET | `/admin/users` | Lista usuários — sem `month`, todos paginados; com `month`, criados no mês |
-| DELETE | `/admin/users/{user_id}` | Bane (exclui) um usuário (204) |
+| POST | `/api/admin/auth/logout` | Encerra a sessão do admin (204) |
+| GET | `/api/admin/metrics/users?month=YYYY-MM` | Métricas de usuários do mês |
+| GET | `/api/admin/users` | Lista usuários — sem `month`, todos paginados; com `month`, criados no mês |
+| DELETE | `/api/admin/users/{user_id}` | Bane (exclui) um usuário (204) |
 
 `UserMetricsResponse`: `{ "month": "2026-06", "new_users": 5, "mau": 3 }`.
 
@@ -218,7 +219,7 @@ Resposta `DraftPlayResponse`:
 - `mau` (Monthly Active Users): usuários distintos com eventos de atividade (`login`) no mês.
 - `month` deve seguir o formato `^\d{4}-(0[1-9]|1[0-2])$`.
 
-### `GET /admin/users` — listar usuários
+### `GET /api/admin/users` — listar usuários
 
 Query params:
 
@@ -242,7 +243,7 @@ Query params:
 - **Com `month`** → `list[AdminUserResponse]` (`id`, `username`, `email`, `coins`, `created_at`) — mesmo contrato usado pelo dashboard.
 - `month`, `limit` ou `offset` inválidos → `422`.
 
-### `DELETE /admin/users/{user_id}` — banir usuário
+### `DELETE /api/admin/users/{user_id}` — banir usuário
 
 - Exige sessão de admin válida (mesmo `current_admin_id` dos demais endpoints administrativos).
 - `204 No Content` em sucesso; `404` se o usuário não existe (ou já foi banido).
