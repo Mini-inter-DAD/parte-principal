@@ -3,6 +3,13 @@
 function getSession() {
   const token = localStorage.getItem('token');
   const rawUser = localStorage.getItem('user');
+
+  if (token === 'demo-token') {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    return { token: null, user: null };
+  }
+
   let user = null;
 
   try {
@@ -41,27 +48,11 @@ function requireAuth() {
   }
 }
 
-function createMockUser() {
-  return {
-    id: 'demo-user',
-    username: 'demo',
-    displayName: 'Jogador Demo',
-    coins: 3200,
-  };
-}
-
-function mockLogin() {
-  const user = createMockUser();
-  saveSession({ token: 'demo-token', user });
-  window.location.href = '/market.html';
-}
-
 function ensureAuth() {
   const session = getSession();
   if (!session.token) {
-    const user = createMockUser();
-    saveSession({ token: 'demo-token', user });
-    return { token: 'demo-token', user };
+    window.location.replace('/auth.html');
+    return null;
   }
   return session;
 }
@@ -84,6 +75,5 @@ window.clearSession = clearSession;
 window.logout = logout;
 window.requireAuth = requireAuth;
 window.ensureAuth = ensureAuth;
-window.mockLogin = mockLogin;
 window.setUserCoins = setUserCoins;
 

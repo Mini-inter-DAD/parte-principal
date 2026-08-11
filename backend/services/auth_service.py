@@ -51,13 +51,13 @@ def current_admin_id(
 def authenticate(db, *, username: str, password: str) -> dict:
     normalized_username = username.strip()
     if not normalized_username:
-        raise BusinessRuleError("Invalid username or password")
+        raise BusinessRuleError("Nome de usuário ou senha inválido")
 
     admin = admin_repository.get_admin_by_username(db, normalized_username)
     user = user_service.get_user_by_username(db, normalized_username)
 
     if admin is not None and user is not None:
-        raise BusinessRuleError("Invalid username or password")
+        raise BusinessRuleError("Nome de usuário ou senha inválido")
 
     if admin is not None:
         result = admin_service.authenticate_admin(
@@ -81,4 +81,4 @@ def authenticate(db, *, username: str, password: str) -> dict:
             "account_type": "user",
         }
 
-    raise BusinessRuleError("Invalid username or password")
+    raise BusinessRuleError("Nome de usuário ou senha inválido")

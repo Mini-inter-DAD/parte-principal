@@ -22,6 +22,8 @@ const ADMIN_ALERT_CLASSES = Object.freeze({
   cancelButton: 'admin-alert__cancel',
 });
 
+const GENERIC_PROFILE_AVATAR = 'assets/generic-avatar.svg';
+
 function initAdmin() {
   configureAdminProfile();
   populateMonthFilter();
@@ -32,15 +34,10 @@ function initAdmin() {
 function configureAdminProfile() {
   const user = getSession().user;
   const avatar = document.getElementById('admin-avatar');
-  const avatarUrl = user?.avatar || user?.photo || user?.image;
-
-  if (avatarUrl) {
-    avatar.src = avatarUrl;
-    avatar.parentElement.classList.remove('admin-profile--card');
-  }
+  avatar.src = GENERIC_PROFILE_AVATAR;
   avatar.alt = user?.displayName || user?.username
-    ? `Avatar de ${user.displayName || user.username}`
-    : 'Avatar do administrador';
+    ? `Avatar genérico de ${user.displayName || user.username}`
+    : 'Avatar genérico do administrador';
 }
 
 function bindAdminEvents() {
@@ -402,8 +399,6 @@ function renderUsers() {
     const row = document.createElement('tr');
     const name = user.displayName || user.display_name || user.name || user.username || 'Usuário';
     const username = user.username || user.login || '';
-    const avatar = user.avatar || user.photo || user.image || '';
-    const initials = collectAdminInitials(name);
     const createdAt = user.createdAt || user.created_at || user.registeredAt || user.registered_at;
     const coins = user.coins ?? user.balance ?? user.wallet ?? 0;
     const userId = getAdminUserId(user);
@@ -412,7 +407,7 @@ function renderUsers() {
       <td>
         <div class="user-cell">
           <span class="user-cell__avatar">
-            ${avatar ? `<img src="${escapeAdminHtml(avatar)}" alt="" loading="lazy" />` : escapeAdminHtml(initials)}
+            <img src="${GENERIC_PROFILE_AVATAR}" alt="" loading="lazy" />
           </span>
           <span>
             <strong>${escapeAdminHtml(name)}</strong>
@@ -589,16 +584,6 @@ function formatDate(value) {
 
 function formatNumber(value) {
   return Number(value || 0).toLocaleString('pt-BR');
-}
-
-function collectAdminInitials(name) {
-  return String(name)
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase();
 }
 
 function escapeAdminHtml(value) {
