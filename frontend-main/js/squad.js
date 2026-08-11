@@ -147,6 +147,7 @@ const SQUAD_STATE = {
   bench: [],
   selectedPlayerId: null,
   selectedSlotPosition: null,
+  loading: true,
 };
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
@@ -198,25 +199,86 @@ function bindReserveTarget() {
 async function loadSquad({ failOnError = false } = {}) {
   const userId = Number(getSession().user?.id);
   if (!userId) {
+    SQUAD_STATE.loading = false;
     SQUAD_STATE.players = [];
     renderField();
     renderBoxscore();
     return;
   }
 
+  setSquadLoading(true);
   try {
     const data = await api.getSquad(userId);
     SQUAD_STATE.players = Array.isArray(data) ? data : [];
   } catch (error) {
-    if (failOnError) throw error;
+    if (failOnError) {
+      renderField();
+      renderBoxscore();
+      updateOVR();
+      throw error;
+    }
     SQUAD_STATE.players = [];
     console.error('Não foi possível carregar o elenco:', error);
+  } finally {
+    setSquadLoading(false);
   }
 
   buildLineup();
   renderField();
   renderBoxscore();
   updateOVR();
+}
+
+function setSquadLoading(isLoading) {
+  SQUAD_STATE.loading = isLoading;
+  const main = document.getElementById('main-content');
+  if (main) main.setAttribute('aria-busy', String(isLoading));
+
+  document.querySelectorAll('.formation-btn').forEach((button) => {
+    button.disabled = isLoading;
+  });
+
+  ['squad-ovr-value', 'ovr-attack', 'ovr-defense'].forEach((id) => {
+    document.getElementById(id)?.classList.toggle('skeleton-block', isLoading);
+  });
+
+  if (isLoading) renderSquadSkeleton();
+}
+
+function renderSquadSkeleton() {
+  const field = document.getElementById('field-players');
+  const starters = document.getElementById('titulares-list');
+  const reserves = document.getElementById('reservas-list');
+  if (!field || !starters || !reserves) return;
+
+  field.innerHTML = '';
+  FORMATIONS[SQUAD_STATE.formation].forEach((slot) => {
+    const item = document.createElement('div');
+    item.className = 'field-slot field-slot--skeleton';
+    item.style.left = `${slot.x}%`;
+    item.style.top = `${slot.y}%`;
+    item.setAttribute('aria-hidden', 'true');
+    item.innerHTML = `
+      <span class="field-slot__token skeleton-block"></span>
+      <span class="field-slot__name skeleton-block"></span>
+    `;
+    field.appendChild(item);
+  });
+
+  starters.innerHTML = Array.from({ length: 11 }, () => `
+    <li class="boxscore-item boxscore-item--skeleton" aria-hidden="true">
+      <span class="skeleton-block squad-skeleton__position"></span>
+      <span class="skeleton-block squad-skeleton__name"></span>
+      <span class="skeleton-block squad-skeleton__ovr"></span>
+    </li>
+  `).join('');
+  reserves.innerHTML = Array.from({ length: 5 }, () => `
+    <li class="boxscore-item boxscore-item--skeleton" aria-hidden="true">
+      <span class="skeleton-block squad-skeleton__position"></span>
+      <span class="skeleton-block squad-skeleton__name"></span>
+      <span class="skeleton-block squad-skeleton__ovr"></span>
+    </li>
+  `).join('');
 }
 
 // Mapeia jogadores nos slots da formação atual

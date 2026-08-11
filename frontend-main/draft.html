@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/global.css?v=loading-skeleton-v1" />
   <link rel="stylesheet" href="css/accessibility.css" />
-  <link rel="stylesheet" href="css/draft.css?v=history-spacing-v1" />
+  <link rel="stylesheet" href="css/draft.css?v=champion-loading-v1" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -127,6 +127,56 @@
         <span>→</span></button>
     </section>
 
+    <section class="penalty-stage" id="penalty-shootout" hidden aria-labelledby="penalty-title">
+      <header class="penalty-stage__header">
+        <p class="penalty-stage__eyebrow">Decisão por pênaltis</p>
+        <h2 id="penalty-title">Escolha o canto</h2>
+        <p id="penalty-match-label">Empate no mata-mata</p>
+      </header>
+
+      <div class="penalty-score" aria-label="Placar da disputa de pênaltis">
+        <span><small id="penalty-user-name">Seu elenco</small><strong id="penalty-user-score">0</strong></span>
+        <i>×</i>
+        <span><strong id="penalty-opponent-score">0</strong><small id="penalty-opponent-name">Adversário</small></span>
+      </div>
+
+      <div class="penalty-turn">
+        <p><strong id="penalty-actor-name">Cobrador</strong><span id="penalty-turn-label">Sua cobrança</span></p>
+        <div class="penalty-timer" id="penalty-timer" hidden>
+          <span id="penalty-time-left">5</span><small>segundos</small>
+        </div>
+      </div>
+
+      <div class="penalty-goal" id="penalty-goal">
+        <div class="penalty-net" aria-hidden="true"></div>
+        <button class="penalty-zone penalty-zone--top-left" type="button" data-penalty-zone="top_left"
+          title="Alto esquerdo"><span class="sr-only">Alto esquerdo</span></button>
+        <button class="penalty-zone penalty-zone--top-center" type="button" data-penalty-zone="top_center"
+          title="Alto centro"><span class="sr-only">Alto centro</span></button>
+        <button class="penalty-zone penalty-zone--top-right" type="button" data-penalty-zone="top_right"
+          title="Alto direito"><span class="sr-only">Alto direito</span></button>
+        <button class="penalty-zone penalty-zone--bottom-left" type="button" data-penalty-zone="bottom_left"
+          title="Baixo esquerdo"><span class="sr-only">Baixo esquerdo</span></button>
+        <button class="penalty-zone penalty-zone--bottom-right" type="button" data-penalty-zone="bottom_right"
+          title="Baixo direito"><span class="sr-only">Baixo direito</span></button>
+
+        <div class="penalty-keeper" id="penalty-keeper" aria-hidden="true">
+          <span class="penalty-keeper__head"></span>
+          <span class="penalty-keeper__body"></span>
+          <span class="penalty-keeper__arm penalty-keeper__arm--left"></span>
+          <span class="penalty-keeper__arm penalty-keeper__arm--right"></span>
+          <span class="penalty-keeper__leg penalty-keeper__leg--left"></span>
+          <span class="penalty-keeper__leg penalty-keeper__leg--right"></span>
+        </div>
+        <span class="penalty-ball" id="penalty-ball" aria-hidden="true">⚽</span>
+      </div>
+
+      <div class="penalty-stage__footer">
+        <p id="penalty-instruction">Toque em uma das cinco zonas.</p>
+        <strong id="penalty-attempt-result" role="status" aria-live="polite"></strong>
+      </div>
+    </section>
+
     <section class="draft-panel result-panel" id="match-result" hidden aria-labelledby="result-title">
       <div class="result-panel__icon" id="result-icon">✓</div>
       <p class="draft-eyebrow" id="result-kicker">Fim de jogo</p>
@@ -136,6 +186,19 @@
       <p class="result-panel__copy" id="result-copy">Seu elenco foi superior e garantiu mais uma vitória.</p>
       <div class="result-reward" id="result-reward">Recompensa calculada ao finalizar</div><button class="btn btn--primary" id="btn-play-again"
         type="button">JOGAR NOVAMENTE <span>→</span></button>
+    </section>
+
+    <section class="champion-stage" id="champion-screen" hidden aria-labelledby="champion-title">
+      <div class="champion-stage__confetti" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <p class="champion-stage__eyebrow">Copa do Mundo concluída</p>
+      <div class="champion-stage__trophy" aria-hidden="true">&#127942;</div>
+      <h2 id="champion-title">Campeão da Copa!</h2>
+      <p class="champion-stage__team" id="champion-team">Seu elenco levantou a taça!</p>
+      <p class="champion-stage__reward" id="champion-reward">Recompensa: 0 coins</p>
+      <button class="btn btn--primary" id="btn-champion-new-cup" type="button">JOGAR NOVA COPA <span>→</span></button>
     </section>
 
     <section class="history-section" aria-labelledby="history-title">
@@ -152,15 +215,15 @@
 
   <script src="js/accessibility.js"></script>
   <script src="js/admin-access.js"></script>
-  <script src="js/api.js?v=backend-history-v1"></script>
+  <script src="js/api.js?v=interactive-penalties-v1"></script>
   <script src="js/formatters.js?v=shared-coins-v2"></script>
   <script src="js/auth.js"></script>
   <script src="js/navbar.js"></script>
   <script src="js/draft-modes.js?v=backend-draft-v4"></script>
-  <script src="js/draft-data.js?v=backend-draft-v6"></script>
-  <script src="js/draft-events.js"></script>
-  <script src="js/draft-history.js?v=backend-history-v1"></script>
-  <script src="js/draft.js?v=backend-history-v1"></script>
+  <script src="js/draft-data.js?v=draft-stages-goals-v1"></script>
+  <script src="js/draft-events.js?v=draft-stages-goals-v1"></script>
+  <script src="js/draft-history.js?v=history-penalties-v2"></script>
+  <script src="js/draft.js?v=champion-loading-v1"></script>
   <script>document.addEventListener("DOMContentLoaded", () => { initDraft(); initAccessibility(); });</script>
   <script src="js/notify.js"></script>
 </body>

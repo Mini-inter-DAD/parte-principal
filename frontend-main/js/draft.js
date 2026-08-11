@@ -15,7 +15,19 @@
     minute: 0,
     events: [],
     timer: null,
+    penalty: null,
+    penaltyTimer: null,
+    isPenaltyAnimating: false,
+    isLoading: true,
   };
+
+  const PENALTY_ZONES = [
+    'top_left',
+    'top_center',
+    'top_right',
+    'bottom_left',
+    'bottom_right',
+  ];
 
   const $ = (id) => document.getElementById(id);
   const setText = (id, value) => {
@@ -55,6 +67,43 @@
       .replace(/'/g, '&#039;');
   }
 
+  function renderPreviewSkeleton() {
+    ['player-team-ovr', 'opponent-team-name', 'opponent-team-ovr'].forEach((id) => {
+      const node = $(id);
+      if (!node) return;
+      node.textContent = '';
+      node.classList.add('skeleton-block');
+    });
+    const crest = $('opponent-flag');
+    if (crest) {
+      crest.innerHTML = '';
+      crest.classList.add('skeleton-block');
+    }
+  }
+
+  function clearPreviewSkeleton() {
+    ['player-team-ovr', 'opponent-team-name', 'opponent-team-ovr', 'opponent-flag'].forEach((id) => {
+      $(id)?.classList.remove('skeleton-block');
+    });
+  }
+
+  function renderHistorySkeleton(count = 4) {
+    const container = $('match-history');
+    if (!container) return;
+    container.setAttribute('aria-busy', 'true');
+    container.innerHTML = Array.from({ length: count }, () => `
+      <article class="history-row history-row--skeleton" aria-hidden="true">
+        <span class="skeleton-block history-skeleton__opponent"></span>
+        <span class="skeleton-block history-skeleton__score"></span>
+        <span class="skeleton-block history-skeleton__competition"></span>
+        <span class="skeleton-block history-skeleton__result"></span>
+      </article>
+    `).join('');
+    setText('history-count', 'Carregando');
+    const pagination = $('history-pagination');
+    if (pagination) pagination.hidden = true;
+  }
+
   async function loadOpponents() {
     state.opponents = await api.getOpponents();
     state.opponent = state.opponents[Math.floor(Math.random() * state.opponents.length)] || null;
@@ -62,18 +111,28 @@
 
   async function loadHistory() {
     const userId = Number(sessionUser()?.id);
-    if (!userId) return;
+    renderHistorySkeleton();
+    if (!userId) {
+      state.history = [];
+      renderHistory();
+      return;
+    }
     const pageSize = 50;
     const history = [];
     let offset = 0;
     let page;
-    do {
-      page = await api.getHistory(userId, { limit: pageSize, offset });
-      history.push(...page);
-      offset += page.length;
-    } while (page.length === pageSize);
-    state.history = history;
-    state.historyPage = 1;
+    try {
+      do {
+        page = await api.getHistory(userId, { limit: pageSize, offset });
+        history.push(...page);
+        offset += page.length;
+      } while (page.length === pageSize);
+      state.history = history;
+      state.historyPage = 1;
+    } catch (error) {
+      renderHistory();
+      throw error;
+    }
     renderHistory();
   }
 
@@ -93,6 +152,12 @@
     if (!userId || typeof api.getCampaign !== 'function') return;
     state.campaign = await api.getCampaign(userId);
     state.phaseIndex = Number(state.campaign?.phase_index || 0);
+  }
+
+  async function loadActivePenalty() {
+    const userId = Number(sessionUser()?.id);
+    if (!userId || typeof api.getActivePenalty !== 'function') return null;
+    return api.getActivePenalty(userId);
   }
 
   function updateStarterGate() {
@@ -115,13 +180,20 @@
   }
 
   function renderPreview() {
+    clearPreviewSkeleton();
     setText('player-team-name', teamName());
     updateStarterGate();
     renderCupPhase();
 
     if (!state.opponent) {
-      setText('opponent-team-name', 'Nenhum adversário');
+      setText('opponent-team-name', 'Selecione um adversário');
       setText('opponent-team-ovr', '--');
+      const flag = $('opponent-flag');
+      if (flag) {
+        flag.innerHTML = '';
+        flag.removeAttribute('aria-label');
+      }
+      setText('draft-status', 'Escolha o adversário da partida.');
       return;
     }
 
@@ -135,6 +207,167 @@
     $('match-preview').hidden = mode !== 'preview';
     $('live-match').hidden = mode !== 'live';
     $('match-result').hidden = mode !== 'result';
+    $('penalty-shootout').hidden = mode !== 'penalty';
+    $('champion-screen').hidden = mode !== 'champion';
+  }
+
+  function clearPenaltyTimer() {
+    if (state.penaltyTimer) {
+      clearInterval(state.penaltyTimer);
+      state.penaltyTimer = null;
+    }
+  }
+
+  function resetPenaltyAnimation() {
+    const keeper = $('penalty-keeper');
+    const ball = $('penalty-ball');
+    if (keeper) {
+      PENALTY_ZONES.forEach((zone) => keeper.classList.remove(`dive-${zone}`));
+    }
+    if (ball) {
+      PENALTY_ZONES.forEach((zone) => ball.classList.remove(`shot-${zone}`));
+    }
+  }
+
+  function startPenaltyDecisionTimer(seconds) {
+    clearPenaltyTimer();
+    let remaining = Math.max(3, Number(seconds) || 3);
+    setText('penalty-time-left', remaining);
+    $('penalty-timer').hidden = false;
+
+    state.penaltyTimer = setInterval(() => {
+      remaining -= 1;
+      setText('penalty-time-left', Math.max(remaining, 0));
+      if (remaining > 0) return;
+
+      clearPenaltyTimer();
+      const randomZone = PENALTY_ZONES[Math.floor(Math.random() * PENALTY_ZONES.length)];
+      handlePenaltyZone(randomZone);
+    }, 1000);
+  }
+
+  function renderPenaltyState() {
+    const penalty = state.penalty;
+    if (!penalty) return;
+
+    const isShooting = penalty.current_turn === 'user_shoot';
+    const availableZones = new Set(
+      isShooting ? penalty.available_zones || [] : PENALTY_ZONES,
+    );
+
+    setText('penalty-user-name', state.match?.team_name || teamName());
+    setText('penalty-opponent-name', state.match?.opponent?.name || 'Adversário');
+    setText('penalty-user-score', penalty.user_penalties ?? 0);
+    setText('penalty-opponent-score', penalty.opponent_penalties ?? 0);
+    setText('penalty-actor-name', penalty.shooter_name || 'Cobrador');
+    setText('penalty-turn-label', isShooting ? 'Sua cobrança' : 'Sua defesa');
+    setText(
+      'penalty-instruction',
+      isShooting
+        ? 'Escolha onde bater. As zonas apagadas estão bloqueadas pelo goleiro.'
+        : 'Escolha rapidamente para onde seu goleiro deve pular.',
+    );
+    setText(
+      'penalty-match-label',
+      `${state.match?.stage_label || 'Mata-mata'} · ${state.match?.score?.user ?? 0} a ${state.match?.score?.opponent ?? 0}`,
+    );
+    setText('penalty-attempt-result', '');
+
+    document.querySelectorAll('[data-penalty-zone]').forEach((button) => {
+      const enabled = availableZones.has(button.dataset.penaltyZone);
+      button.disabled = state.isPenaltyAnimating || !enabled;
+      button.setAttribute('aria-disabled', String(button.disabled));
+    });
+
+    resetPenaltyAnimation();
+    if (isShooting) {
+      clearPenaltyTimer();
+      $('penalty-timer').hidden = true;
+    } else if (!state.isPenaltyAnimating) {
+      startPenaltyDecisionTimer(penalty.decision_time_seconds);
+    }
+  }
+
+  function showPenaltyShootout() {
+    if (!state.match?.penalty) return;
+    state.penalty = state.match.penalty;
+    state.isPenaltyAnimating = false;
+    showMode('penalty');
+    renderPenaltyState();
+  }
+
+  async function animatePenaltyAttempt(attempt) {
+    const keeper = $('penalty-keeper');
+    const ball = $('penalty-ball');
+    resetPenaltyAnimation();
+    void keeper?.offsetWidth;
+    keeper?.classList.add(`dive-${attempt.keeper_dive_zone}`);
+    ball?.classList.add(`shot-${attempt.shoot_zone}`);
+
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    setText('penalty-user-score', attempt.user_penalties);
+    setText('penalty-opponent-score', attempt.opponent_penalties);
+    setText(
+      'penalty-attempt-result',
+      attempt.scored
+        ? `Gol de ${attempt.attempt_shooter_name}.`
+        : `Defesa de ${attempt.attempt_goalkeeper_name}.`,
+    );
+    await new Promise((resolve) => setTimeout(resolve, 850));
+  }
+
+  async function handlePenaltyZone(zone) {
+    if (state.isPenaltyAnimating || !state.penalty || !PENALTY_ZONES.includes(zone)) return;
+
+    const isShooting = state.penalty.current_turn === 'user_shoot';
+    if (isShooting && !state.penalty.available_zones?.includes(zone)) return;
+
+    clearPenaltyTimer();
+    state.isPenaltyAnimating = true;
+    document.querySelectorAll('[data-penalty-zone]').forEach((button) => {
+      button.disabled = true;
+      button.setAttribute('aria-disabled', 'true');
+    });
+
+    const userId = Number(sessionUser()?.id);
+    const baseBody = { user_id: userId, match_id: state.match.match_id };
+
+    try {
+      const attempt = isShooting
+        ? await api.shootPenalty({ ...baseBody, shoot_zone: zone })
+        : await api.savePenalty({ ...baseBody, dive_zone: zone });
+      await animatePenaltyAttempt(attempt);
+
+      state.penalty = attempt;
+      state.match.penalty = attempt;
+      if (attempt.is_finished) {
+        state.match.requires_penalties = false;
+        state.match.decided_on_penalties = true;
+        state.match.penalties_user_score = attempt.user_penalties;
+        state.match.penalties_opponent_score = attempt.opponent_penalties;
+        state.match.result = attempt.result;
+        state.match.result_label = attempt.result_label;
+        state.match.coins_earned = attempt.coins_earned;
+        state.match.new_balance = attempt.new_balance;
+        state.match.campaign = attempt.campaign;
+        if (attempt.campaign) {
+          state.campaign = attempt.campaign;
+          state.phaseIndex = Number(attempt.campaign.phase_index || 0);
+        }
+        setUserCoins(attempt.new_balance);
+        state.isPenaltyAnimating = false;
+        clearPenaltyTimer();
+        await showResult();
+        return;
+      }
+
+      state.isPenaltyAnimating = false;
+      renderPenaltyState();
+    } catch (error) {
+      state.isPenaltyAnimating = false;
+      showError(error.message || 'Não foi possível registrar a cobrança.');
+      renderPenaltyState();
+    }
   }
 
   function createEvents(match) {
@@ -154,6 +387,8 @@
   function resetLive(match) {
     state.minute = 0;
     state.events = createEvents(match);
+    state.penalty = match.penalty || null;
+    clearPenaltyTimer();
     setText('player-score', 0);
     setText('opponent-score', 0);
     setText('match-minute', '00');
@@ -165,6 +400,7 @@
     setText('live-kicker', 'Ao vivo');
     setText('live-title', 'A partida começou');
     setText('live-hint', 'A bola está rolando. Os principais lances aparecerão aqui.');
+    $('btn-next-result').innerHTML = 'PRÓXIMO <span>→</span>';
     $('btn-next-result').hidden = true;
   }
 
@@ -214,7 +450,8 @@
       return;
     }
     const row = document.createElement('div');
-    row.className = 'match-event';
+    row.className = 'match-event match-event--goal ' + (event.team === 'home' ? 'goal-left' : 'goal-right');
+    row.dataset.team = event.team === 'home' ? 'USER' : 'OPPONENT';
     if (event.minute !== null && event.minute !== undefined) row.dataset.minute = String(event.minute);
     row.innerHTML = `<span class="match-event__minute">${String(event.minute).padStart(2, '0')}'</span><span class="match-event__icon">⚽</span><span class="match-event__text"><strong>Gol de ${escapeHtml(event.scorer)}</strong><small>${event.team === 'home' ? 'Que jogada do seu elenco!' : 'O adversário aproveita.'}</small></span><span class="match-event__team">${escapeHtml(team)}</span>`;
     $('match-events').prepend(row);
@@ -262,11 +499,20 @@
         state.phaseIndex = Number(state.campaign.phase_index || 0);
         renderCupPhase();
       }
-      state.match = await api.playDraft(userId, state.opponent?.id, state.mode);
+      state.match = await api.playDraft(
+        userId,
+        state.opponent?.id || null,
+        state.mode,
+      );
+      // A resposta do backend define o confronto efetivamente jogado.
+      state.opponent = state.match.opponent || state.opponent;
       if (state.match.campaign) {
         state.campaign = state.match.campaign;
         state.phaseIndex = Number(state.match.campaign.phase_index || 0);
         renderCupPhase();
+      }
+      if (state.mode === 'cup' && state.match.stage_label) {
+        setText('cup-phase-label', 'Fase atual: ' + state.match.stage_label);
       }
       setUserCoins(state.match.new_balance);
       resetLive(state.match);
@@ -289,10 +535,23 @@
       state.timer = null;
     }
     setText('live-kicker', 'Partida encerrada');
-    setText('live-title', state.match.result_label);
-    setText('live-hint', `Resultado final: ${state.match.score.user} a ${state.match.score.opponent}.`);
+    setText('live-title', state.match.requires_penalties ? 'Empate no mata-mata' : state.match.result_label);
+    setText(
+      'live-hint',
+      state.match.requires_penalties
+        ? 'A vaga será decidida em uma disputa de pênaltis.'
+        : `Resultado final: ${state.match.score.user} a ${state.match.score.opponent}.`,
+    );
+    if (state.match.requires_penalties) {
+      $('btn-next-result').innerHTML = 'DISPUTAR PÊNALTIS <span>→</span>';
+    }
     $('btn-next-result').hidden = false;
-    setText('draft-status', `${state.match.result_label}: ${state.match.score.user} a ${state.match.score.opponent}.`);
+    setText(
+      'draft-status',
+      state.match.requires_penalties
+        ? 'Empate no mata-mata. Disputa de pênaltis disponível.'
+        : `${state.match.result_label}: ${state.match.score.user} a ${state.match.score.opponent}.`,
+    );
   }
 
   function resultClass(result) {
@@ -316,6 +575,7 @@
     const pagination = $('history-pagination');
     if (!container) return;
     container.innerHTML = '';
+    container.setAttribute('aria-busy', 'false');
     setText('history-count', `${state.history.length} partidas`);
 
     if (!state.history.length) {
@@ -383,16 +643,42 @@
     container.appendChild(next);
   }
 
+  function isWorldCupChampion() {
+    return state.match?.mode === 'cup'
+      && state.match?.stage === 'final'
+      && state.match?.result === 'W';
+  }
+
+  function renderChampion() {
+    const reward = Number(state.match?.coins_earned || 0);
+    setText('champion-team', `${teamName()} levantou a taça!`);
+    setText('champion-reward', `Recompensa: ${formatCoins(reward)} coins`);
+    showMode('champion');
+  }
+
   async function showResult() {
+    if (state.match?.requires_penalties && !state.penalty?.is_finished) {
+      $('btn-next-result').hidden = true;
+      showPenaltyShootout();
+      return;
+    }
+
+    clearPenaltyTimer();
     $('btn-next-result').hidden = true;
     $('match-result').classList.toggle('result-panel--loss', state.match.result !== 'W');
     setText('result-title', state.match.result_label);
     setText('result-player-score', state.match.score.user);
     setText('result-opponent-score', state.match.score.opponent);
-    setText('result-copy', `OVR do seu elenco: ${state.match.user_ovr}.`);
+    setText(
+      'result-copy',
+      state.match.decided_on_penalties
+        ? `Pênaltis: ${state.match.penalties_user_score} a ${state.match.penalties_opponent_score}. OVR do seu elenco: ${state.match.user_ovr}.`
+        : `OVR do seu elenco: ${state.match.user_ovr}.`,
+    );
     const reward = Number(state.match.coins_earned || 0);
     setText('result-reward', reward > 0 ? `+ ⚽ ${formatCoins(reward)}` : '⚽ 0 coins');
     setText('result-icon', state.match.result === 'W' ? '✓' : state.match.result === 'L' ? '×' : '—');
+    setText('result-kicker', state.match.decided_on_penalties ? 'Decisão por pênaltis' : 'Fim de jogo');
     if (state.match.campaign) {
       state.campaign = state.match.campaign;
       state.phaseIndex = Number(state.match.campaign.phase_index || 0);
@@ -407,7 +693,11 @@
       setResultActionLabel('JOGAR NOVAMENTE');
     }
     renderCupPhase();
-    showMode('result');
+    if (isWorldCupChampion()) {
+      renderChampion();
+    } else {
+      showMode('result');
+    }
     try {
       await loadHistory();
     } catch (error) {
@@ -430,11 +720,36 @@
     }
     renderCupPhase();
     setText('player-team-name', teamName());
+    state.isLoading = true;
+    $('main-content')?.setAttribute('aria-busy', 'true');
+    renderPreviewSkeleton();
+    renderHistorySkeleton();
     try {
-      await Promise.all([loadOpponents(), loadHistory(), loadSquad(), loadCampaign()]);
-      renderPreview();
+      const [, , , , activePenalty] = await Promise.all([
+        loadOpponents(),
+        loadHistory(),
+        loadSquad(),
+        loadCampaign(),
+        loadActivePenalty(),
+      ]);
+      if (activePenalty) {
+        state.match = activePenalty;
+        state.opponent = activePenalty.opponent;
+        state.mode = activePenalty.mode;
+        state.penalty = activePenalty.penalty;
+        state.campaign = activePenalty.campaign || state.campaign;
+        state.phaseIndex = Number(activePenalty.phase_index || 0);
+        renderCupPhase();
+        showPenaltyShootout();
+      } else {
+        renderPreview();
+      }
     } catch (error) {
       showError(error.message || 'Não foi possível carregar o Draft.');
+    } finally {
+      state.isLoading = false;
+      $('main-content')?.setAttribute('aria-busy', 'false');
+      clearPreviewSkeleton();
     }
     $('btn-start-draft').addEventListener('click', startDraftMatch);
     $('btn-next-result').addEventListener('click', showResult);
@@ -452,12 +767,19 @@
 
       $('match-result').classList.remove('result-panel--loss');
       state.match = null;
+      state.penalty = null;
       state.events = [];
       state.minute = 0;
       showMode('preview');
       state.opponent = state.opponents[Math.floor(Math.random() * state.opponents.length)] || null;
       renderCupPhase();
       renderPreview();
+    });
+
+    $('btn-champion-new-cup')?.addEventListener('click', () => $('btn-play-again')?.click());
+
+    document.querySelectorAll('[data-penalty-zone]').forEach((button) => {
+      button.addEventListener('click', () => handlePenaltyZone(button.dataset.penaltyZone));
     });
   }
 

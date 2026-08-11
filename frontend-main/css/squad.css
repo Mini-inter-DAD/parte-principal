@@ -241,6 +241,21 @@ body {
   z-index: 2;
 }
 
+.field-slot--skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
+.field-slot--skeleton .field-slot__token {
+  border: 0;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.field-slot--skeleton .field-slot__name {
+  width: 58px;
+  height: 8px;
+}
+
 .field-slot__token {
   width: 44px;
   height: 44px;
@@ -391,6 +406,38 @@ body {
   border-left: 3px solid transparent;
   border-radius: 6px;
   transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.boxscore-item--skeleton {
+  min-height: 39px;
+  pointer-events: none;
+}
+
+.squad-skeleton__position {
+  width: 32px;
+  height: 18px;
+}
+
+.squad-skeleton__name {
+  width: 62%;
+  height: 12px;
+}
+
+.squad-skeleton__ovr {
+  width: 28px;
+  height: 20px;
+  margin-left: auto;
+}
+
+.ovr-big.skeleton-block {
+  width: 72px;
+  height: 72px;
+  margin-inline: auto;
+}
+
+.ovr-breakdown__value.skeleton-block {
+  width: 28px;
+  height: 18px;
 }
 
 .boxscore-item:last-child {

@@ -12,10 +12,16 @@
     const minute = source.minute === null || source.minute === undefined || source.minute === ''
       ? NaN
       : Number(source.minute);
-    const team = source.team === 'USER' ? 'USER' : 'OPPONENT';
+    const teamValue = String(source.team ?? source.side ?? '').trim().toUpperCase();
+    const team = teamValue === 'USER' ? 'USER' : 'OPPONENT';
+    const playerName = source.playerName
+      ?? source.player_name
+      ?? source.scorerName
+      ?? source.scorer_name
+      ?? '';
     return {
       minute: Number.isFinite(minute) ? minute : null,
-      playerName: String(source.playerName || ''),
+      playerName: String(playerName || ''),
       team,
     };
   }
@@ -32,7 +38,8 @@
     const documentRef = container.ownerDocument;
     const normalized = normalize(event);
     const row = documentRef.createElement('div');
-    row.className = 'match-event';
+    const sideClass = normalized.team === 'USER' ? 'goal-left' : 'goal-right';
+    row.className = 'match-event match-event--goal ' + sideClass;
     row.setAttribute('role', 'article');
     row.setAttribute('data-team', normalized.team);
     if (normalized.minute !== null) row.dataset.minute = String(normalized.minute);

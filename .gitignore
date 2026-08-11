@@ -54,3 +54,8 @@ docker-data/
 *.tmp
 dreamcup_dump.sql
 *.dump
+
+# Teste visual local do Draft
+frontend-main/draft-test.html
+frontend-main/css/draft-test.css
+frontend-main/js/draft-test.js

@@ -25,6 +25,10 @@ const MARKET_STATE = {
     coins: 0,
   },
   ownedPlayerIds: new Set(),
+  loading: {
+    players: true,
+    cart: true,
+  },
 };
 
 const FALLBACK_SECTIONS = ['Estrelas', 'Destaques da Copa', 'Veteranos'];
@@ -151,8 +155,11 @@ function bindCartControls() {
 async function loadCart() {
   const session = getSession();
   const userId = Number(session.user?.id);
+  MARKET_STATE.loading.cart = true;
+  renderCart();
   if (!userId || !session.token?.startsWith('user:')) {
     MARKET_STATE.cart.coins = Number(session.user?.coins || 0);
+    MARKET_STATE.loading.cart = false;
     renderCart();
     return;
   }
@@ -162,6 +169,8 @@ async function loadCart() {
     if (data) applyCartState(data);
   } catch (error) {
     notify.error(error.message || 'Não foi possível carregar o carrinho.');
+  } finally {
+    MARKET_STATE.loading.cart = false;
     renderCart();
   }
 }
@@ -375,6 +384,11 @@ function buildFilterParams() {
 }
 
 async function loadPlayers() {
+  if (!MARKET_STATE.catalogLoaded) {
+    MARKET_STATE.loading.players = true;
+    renderPlayers();
+  }
+
   try {
     if (!MARKET_STATE.catalogLoaded) {
       const data = await api.getMarket({});
@@ -387,6 +401,8 @@ async function loadPlayers() {
     MARKET_STATE.players = [];
     MARKET_STATE.catalogLoaded = false;
     notify.error(error.message || 'Não foi possível carregar os jogadores do mercado.');
+  } finally {
+    MARKET_STATE.loading.players = false;
   }
 
   renderPlayers();
@@ -445,6 +461,13 @@ function renderPlayers() {
   const grid = document.getElementById('player-grid');
   if (!grid) return;
   grid.innerHTML = '';
+  grid.setAttribute('aria-busy', String(MARKET_STATE.loading.players));
+
+  if (MARKET_STATE.loading.players) {
+    renderPlayerSkeletons(grid);
+    renderPagination(0);
+    return;
+  }
 
   const pageCount = getPageCount();
   MARKET_STATE.pagination.page = Math.min(MARKET_STATE.pagination.page, pageCount);
@@ -488,6 +511,23 @@ function renderPlayers() {
   });
 
   renderPagination(pageCount);
+}
+
+function renderPlayerSkeletons(grid, count = 8) {
+  for (let index = 0; index < count; index += 1) {
+    const item = document.createElement('article');
+    item.className = 'player-card player-card--skeleton';
+    item.setAttribute('aria-hidden', 'true');
+    item.innerHTML = `
+      <span class="skeleton-block player-skeleton__rating"></span>
+      <span class="skeleton-block player-skeleton__photo"></span>
+      <span class="skeleton-block player-skeleton__name"></span>
+      <span class="skeleton-block player-skeleton__meta"></span>
+      <span class="skeleton-block player-skeleton__price"></span>
+      <span class="skeleton-block player-skeleton__button"></span>
+    `;
+    grid.appendChild(item);
+  }
 }
 
 function renderPagination(pageCount) {
@@ -566,6 +606,20 @@ function renderCart() {
   const clearButton = document.getElementById('btn-clear-cart');
   const checkoutButton = document.getElementById('btn-checkout');
   if (!container) return;
+
+  container.setAttribute('aria-busy', String(MARKET_STATE.loading.cart));
+  if (MARKET_STATE.loading.cart) {
+    if (clearButton) clearButton.disabled = true;
+    if (checkoutButton) checkoutButton.disabled = true;
+    container.innerHTML = Array.from({ length: 3 }, () => `
+      <div class="cart-item cart-item--skeleton" aria-hidden="true">
+        <span class="skeleton-block cart-skeleton__photo"></span>
+        <span class="skeleton-block cart-skeleton__copy"></span>
+        <span class="skeleton-block cart-skeleton__action"></span>
+      </div>
+    `).join('');
+    return;
+  }
 
   const items = MARKET_STATE.cart.items;
   if (count) count.textContent = String(items.length);

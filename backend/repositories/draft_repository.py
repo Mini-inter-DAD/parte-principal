@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -231,12 +233,247 @@ def create_match(
     return created.mappings().one()
 
 
+def create_penalty_shootout(
+    db: Session,
+    *,
+    match_id: int,
+    user_id: int,
+    current_shooter_name: str,
+    available_shoot_zones: list[str],
+    user_goalkeeper_name: str,
+    user_goalkeeper_overall: int,
+    opponent_goalkeeper_name: str,
+    opponent_goalkeeper_overall: int,
+):
+    result = db.execute(
+        text("""
+            INSERT INTO penalty_shootouts (
+                match_id, user_id, current_shooter_name, available_shoot_zones,
+                user_goalkeeper_name, user_goalkeeper_overall,
+                opponent_goalkeeper_name, opponent_goalkeeper_overall
+            )
+            VALUES (
+                :match_id, :user_id, :current_shooter_name,
+                CAST(:available_shoot_zones AS JSONB),
+                :user_goalkeeper_name, :user_goalkeeper_overall,
+                :opponent_goalkeeper_name, :opponent_goalkeeper_overall
+            )
+            RETURNING *
+        """),
+        {
+            "match_id": match_id,
+            "user_id": user_id,
+            "current_shooter_name": current_shooter_name,
+            "available_shoot_zones": json.dumps(available_shoot_zones),
+            "user_goalkeeper_name": user_goalkeeper_name,
+            "user_goalkeeper_overall": user_goalkeeper_overall,
+            "opponent_goalkeeper_name": opponent_goalkeeper_name,
+            "opponent_goalkeeper_overall": opponent_goalkeeper_overall,
+        },
+    )
+    return result.mappings().one()
+
+
+def get_active_penalty_shootout(db: Session, user_id: int):
+    result = db.execute(
+        text("""
+            SELECT
+                shootout.id AS shootout_id,
+                shootout.match_id,
+                shootout.user_id,
+                shootout.user_score,
+                shootout.opponent_score,
+                shootout.user_attempts,
+                shootout.opponent_attempts,
+                shootout.current_turn,
+                shootout.current_shooter_name,
+                shootout.available_shoot_zones,
+                shootout.user_goalkeeper_name,
+                shootout.user_goalkeeper_overall,
+                shootout.opponent_goalkeeper_name,
+                shootout.opponent_goalkeeper_overall,
+                shootout.is_finished,
+                shootout.winner,
+                match.user_ovr,
+                match.opponent_name,
+                match.opponent_ovr,
+                match.user_score AS regulation_user_score,
+                match.opponent_score AS regulation_opponent_score,
+                match.result,
+                match.coins_earned,
+                match.mode,
+                match.phase_index,
+                match.played_at
+            FROM penalty_shootouts shootout
+            JOIN matches match ON match.id = shootout.match_id
+            WHERE shootout.user_id = :user_id
+              AND shootout.is_finished = FALSE
+            ORDER BY shootout.created_at DESC, shootout.id DESC
+            LIMIT 1
+        """),
+        {"user_id": user_id},
+    )
+    return result.mappings().first()
+
+
+def get_penalty_shootout_for_update(db: Session, user_id: int, match_id: int):
+    result = db.execute(
+        text("""
+            SELECT
+                shootout.id AS shootout_id,
+                shootout.match_id,
+                shootout.user_id,
+                shootout.user_score,
+                shootout.opponent_score,
+                shootout.user_attempts,
+                shootout.opponent_attempts,
+                shootout.current_turn,
+                shootout.current_shooter_name,
+                shootout.available_shoot_zones,
+                shootout.user_goalkeeper_name,
+                shootout.user_goalkeeper_overall,
+                shootout.opponent_goalkeeper_name,
+                shootout.opponent_goalkeeper_overall,
+                shootout.is_finished,
+                shootout.winner,
+                match.user_ovr,
+                match.opponent_name,
+                match.opponent_ovr,
+                match.user_score AS regulation_user_score,
+                match.opponent_score AS regulation_opponent_score,
+                match.result,
+                match.coins_earned,
+                match.mode,
+                match.phase_index,
+                match.played_at
+            FROM penalty_shootouts shootout
+            JOIN matches match ON match.id = shootout.match_id
+            WHERE shootout.user_id = :user_id
+              AND shootout.match_id = :match_id
+            FOR UPDATE OF shootout, match
+        """),
+        {"user_id": user_id, "match_id": match_id},
+    )
+    return result.mappings().first()
+
+
+def update_penalty_shootout(
+    db: Session,
+    shootout_id: int,
+    *,
+    user_score: int,
+    opponent_score: int,
+    user_attempts: int,
+    opponent_attempts: int,
+    current_turn: str,
+    current_shooter_name: str,
+    is_finished: bool,
+    winner: str | None,
+):
+    result = db.execute(
+        text("""
+            UPDATE penalty_shootouts
+            SET user_score = :user_score,
+                opponent_score = :opponent_score,
+                user_attempts = :user_attempts,
+                opponent_attempts = :opponent_attempts,
+                current_turn = :current_turn,
+                current_shooter_name = :current_shooter_name,
+                is_finished = :is_finished,
+                winner = :winner,
+                updated_at = now()
+            WHERE id = :shootout_id
+            RETURNING *
+        """),
+        {
+            "shootout_id": shootout_id,
+            "user_score": user_score,
+            "opponent_score": opponent_score,
+            "user_attempts": user_attempts,
+            "opponent_attempts": opponent_attempts,
+            "current_turn": current_turn,
+            "current_shooter_name": current_shooter_name,
+            "is_finished": is_finished,
+            "winner": winner,
+        },
+    )
+    return result.mappings().one()
+
+
+def create_penalty_attempt(
+    db: Session,
+    *,
+    shootout_id: int,
+    turn: str,
+    shooter_name: str,
+    goalkeeper_name: str,
+    shoot_zone: str,
+    keeper_dive_zone: str,
+    scored: bool,
+):
+    result = db.execute(
+        text("""
+            INSERT INTO penalty_attempts (
+                shootout_id, turn, shooter_name, goalkeeper_name,
+                shoot_zone, keeper_dive_zone, scored
+            )
+            VALUES (
+                :shootout_id, :turn, :shooter_name, :goalkeeper_name,
+                :shoot_zone, :keeper_dive_zone, :scored
+            )
+            RETURNING *
+        """),
+        {
+            "shootout_id": shootout_id,
+            "turn": turn,
+            "shooter_name": shooter_name,
+            "goalkeeper_name": goalkeeper_name,
+            "shoot_zone": shoot_zone,
+            "keeper_dive_zone": keeper_dive_zone,
+            "scored": scored,
+        },
+    )
+    return result.mappings().one()
+
+
+def finish_match_on_penalties(
+    db: Session,
+    match_id: int,
+    *,
+    result: str,
+    user_penalties: int,
+    opponent_penalties: int,
+    coins_earned: int,
+):
+    updated = db.execute(
+        text("""
+            UPDATE matches
+            SET result = :result,
+                coins_earned = :coins_earned,
+                decided_on_penalties = TRUE,
+                penalties_user_score = :user_penalties,
+                penalties_opponent_score = :opponent_penalties
+            WHERE id = :match_id
+            RETURNING *
+        """),
+        {
+            "match_id": match_id,
+            "result": result,
+            "coins_earned": coins_earned,
+            "user_penalties": user_penalties,
+            "opponent_penalties": opponent_penalties,
+        },
+    )
+    return updated.mappings().one()
+
+
 def list_history(db: Session, user_id: int, limit: int = 20, offset: int = 0):
     result = db.execute(
         text("""
             SELECT id, user_ovr, opponent_name, opponent_ovr,
                    user_score, opponent_score, result, coins_earned, played_at,
-                   mode, phase_index
+                   mode, phase_index, decided_on_penalties,
+                   penalties_user_score, penalties_opponent_score
             FROM matches
             WHERE user_id = :user_id
             ORDER BY played_at DESC, id DESC
