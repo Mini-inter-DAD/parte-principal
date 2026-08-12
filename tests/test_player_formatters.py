@@ -1,6 +1,10 @@
 import unittest
 
-from backend.services.player_formatters import format_player_name, normalize_o_slash
+from backend.services.player_formatters import (
+    format_player_name,
+    normalize_o_slash,
+    translate_nationality,
+)
 
 
 class PlayerFormatterTest(unittest.TestCase):
@@ -14,6 +18,20 @@ class PlayerFormatterTest(unittest.TestCase):
             format_player_name("Martin ?degaard", ea_id=222665),
             "Martin Odegaard",
         )
+
+    def test_collapses_nationality_aliases_into_one_portuguese_label(self):
+        self.assertEqual(translate_nationality("Cape Verde"), "Cabo Verde")
+        self.assertEqual(
+            translate_nationality("Cape Verde Islands"),
+            "Cabo Verde",
+        )
+        self.assertEqual(
+            translate_nationality("DR Congo"),
+            "República Democrática do Congo",
+        )
+
+    def test_repairs_corrupted_curacao_label(self):
+        self.assertEqual(translate_nationality("Cura?ao"), "Curaçao")
 
 
 if __name__ == "__main__":

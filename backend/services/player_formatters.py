@@ -30,6 +30,66 @@ NATIONALITY_TRANSLATIONS = {
     "egypt": "Egito",
 }
 
+NATIONALITY_LABELS = {
+    "algeria": "Argélia",
+    "argentina": "Argentina",
+    "australia": "Austrália",
+    "austria": "Áustria",
+    "belgium": "Bélgica",
+    "bosnia and herzegovina": "Bósnia e Herzegovina",
+    "brazil": "Brasil",
+    "canada": "Canadá",
+    "cape verde": "Cabo Verde",
+    "cape verde islands": "Cabo Verde",
+    "colombia": "Colômbia",
+    "congo dr": "República Democrática do Congo",
+    "côte d'ivoire": "Costa do Marfim",
+    "croatia": "Croácia",
+    "czech republic": "República Tcheca",
+    "cura?ao": "Curaçao",
+    "curaçao": "Curaçao",
+    "dr congo": "República Democrática do Congo",
+    "ecuador": "Equador",
+    "egypt": "Egito",
+    "england": "Inglaterra",
+    "france": "França",
+    "germany": "Alemanha",
+    "ghana": "Gana",
+    "haiti": "Haiti",
+    "holland": "Holanda",
+    "iran": "Irã",
+    "iraq": "Iraque",
+    "italy": "Itália",
+    "ivory coast": "Costa do Marfim",
+    "japan": "Japão",
+    "jordan": "Jordânia",
+    "korea republic": "Coreia do Sul",
+    "mexico": "México",
+    "morocco": "Marrocos",
+    "netherlands": "Holanda",
+    "new zealand": "Nova Zelândia",
+    "norway": "Noruega",
+    "panama": "Panamá",
+    "paraguay": "Paraguai",
+    "portugal": "Portugal",
+    "qatar": "Catar",
+    "republic of ireland": "Irlanda",
+    "saudi arabia": "Arábia Saudita",
+    "scotland": "Escócia",
+    "senegal": "Senegal",
+    "south africa": "África do Sul",
+    "south korea": "Coreia do Sul",
+    "spain": "Espanha",
+    "sweden": "Suécia",
+    "switzerland": "Suíça",
+    "tunisia": "Tunísia",
+    "turkey": "Turquia",
+    "united states": "Estados Unidos",
+    "uruguay": "Uruguai",
+    "uzbekistan": "Uzbequistão",
+    "venezuela": "Venezuela",
+}
+
 NATIONALITY_CODES = {
     "brazil": "BR",
     "brasil": "BR",
@@ -107,7 +167,11 @@ def format_player_name(name: str, *, ea_id: int | None = None) -> str:
 
 def translate_nationality(nationality: str) -> str:
     value = str(nationality).strip()
-    return NATIONALITY_TRANSLATIONS.get(value.casefold(), value)
+    normalized = value.casefold()
+    return NATIONALITY_LABELS.get(
+        normalized,
+        NATIONALITY_TRANSLATIONS.get(normalized, value),
+    )
 
 
 def source_nationality(nationality: str) -> str:
@@ -115,7 +179,7 @@ def source_nationality(nationality: str) -> str:
     normalized = value.casefold()
     source_aliases = {
         translated.casefold(): source.title()
-        for source, translated in NATIONALITY_TRANSLATIONS.items()
+        for source, translated in NATIONALITY_LABELS.items()
     }
     source_aliases.update({
         "brasil": "Brazil",
@@ -131,7 +195,7 @@ def source_nationality(nationality: str) -> str:
     })
     if normalized in source_aliases:
         return source_aliases[normalized]
-    for source, translated in NATIONALITY_TRANSLATIONS.items():
+    for source, translated in NATIONALITY_LABELS.items():
         if normalized == translated.casefold():
             return source.title() if source != "united states" else "United States"
     return value
