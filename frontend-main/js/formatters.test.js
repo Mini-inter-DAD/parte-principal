@@ -62,6 +62,24 @@ test('keeps the generic abbreviation for names without a curated alias', () => {
   assert.equal(browser.formatPlayerName('Kyllian Mbappe'), 'K. Mbappe');
 });
 
+test('keeps two-term names complete for the field layout', () => {
+  assert.equal(
+    browser.formatPlayerNameForField('Dayot Upamecano'),
+    'Dayot Upamecano',
+  );
+  assert.equal(
+    browser.formatPlayerNameForField('  Dayot   Upamecano  '),
+    'Dayot Upamecano',
+  );
+});
+
+test('keeps curated aliases for multi-term field names', () => {
+  assert.equal(
+    browser.formatPlayerNameForField('Marc Cucurella Saseta'),
+    'Marc Cucurella',
+  );
+});
+
 test('replaces the o-slash character before displaying the name', () => {
   assert.equal(browser.formatPlayerName('Martin Ødegaard'), 'M. Odegaard');
   assert.equal(browser.formatPlayerName('Ørjan Nyland'), 'O. Nyland');
@@ -78,7 +96,7 @@ test('market delegates visible names to the shared formatter', () => {
 
 test('squad delegates field and roster names to the shared formatter', () => {
   const squad = fs.readFileSync(path.join(__dirname, 'squad.js'), 'utf8');
-  assert.match(squad, /formatPlayerName\(slot\.player\.name\)/);
+  assert.match(squad, /formatPlayerNameForField\(slot\.player\.name\)/);
   assert.match(squad, /formatPlayerName\(player\.name\)/);
 });
 

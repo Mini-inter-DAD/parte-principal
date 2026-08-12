@@ -71,6 +71,19 @@ function formatPlayerName(name) {
   return `${terms[0][0]}. ${terms[1]}`;
 }
 
+function formatPlayerNameForField(name) {
+  const normalizedName = String(name ?? '')
+    .replace(/Ã˜/g, 'O')
+    .replace(/Ã¸/g, 'o')
+    .trim()
+    .replace(/\s+/g, ' ');
+  const terms = normalizedName.split(' ').filter(Boolean);
+
+  return terms.length === 2
+    ? normalizedName
+    : formatPlayerName(normalizedName);
+}
+
 const POSITION_LABELS = Object.freeze({
   GK: 'GOL',
   GOL: 'GOL',
