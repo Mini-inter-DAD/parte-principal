@@ -253,6 +253,7 @@ body {
 
 .field-slot--skeleton .field-slot__name {
   width: 58px;
+  max-width: 58px;
   height: 8px;
 }
 
@@ -314,10 +315,16 @@ body {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.8);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  max-width: 110px;
+  max-width: min(110px, var(--field-slot-name-max-width, 110px));
+  min-width: 0;
   text-align: center;
-  white-space: nowrap;
+  line-height: 1.15;
+  white-space: normal;
   overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   text-overflow: ellipsis;
 }
 
