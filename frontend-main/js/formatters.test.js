@@ -94,6 +94,35 @@ test('market delegates visible names to the shared formatter', () => {
   assert.doesNotMatch(market, /function formatPlayerName\(name\)/);
 });
 
+test('market uses one label for nationality aliases', () => {
+  const market = fs.readFileSync(path.join(__dirname, 'market.js'), 'utf8');
+  const browser = {};
+  browser.window = browser;
+  vm.runInNewContext(market, browser);
+
+  assert.equal(
+    browser.marketTranslateNationality('Cape Verde Islands'),
+    'Cabo Verde',
+  );
+  assert.equal(
+    browser.marketTranslateNationality('Cape Verde'),
+    'Cabo Verde',
+  );
+  assert.equal(
+    browser.marketMatchesNationalityFilter('Cape Verde Islands', 'Cabo Verde'),
+    true,
+  );
+  assert.equal(
+    browser.marketMatchesNationalityFilter('Cape Verde', 'Cabo Verde'),
+    true,
+  );
+  assert.equal(
+    browser.marketMatchesNationalityFilter('Ghana', 'Cabo Verde'),
+    false,
+  );
+  assert.equal(browser.marketTranslateNationality('Cura?ao'), 'Curaçao');
+});
+
 test('squad delegates field and roster names to the shared formatter', () => {
   const squad = fs.readFileSync(path.join(__dirname, 'squad.js'), 'utf8');
   assert.match(squad, /formatPlayerNameForField\(slot\.player\.name\)/);

@@ -413,7 +413,7 @@ async function loadPlayers() {
 function filterPlayer(player) {
   const filters = MARKET_STATE.filters;
   const normalizedName = player.name?.toLowerCase() || '';
-  const normalizedNation = player.nationality?.toLowerCase() || '';
+  const normalizedNation = translateNationality(player.nationality).toLowerCase();
   const normalizedQuery = filters.query?.toLowerCase() || '';
   const ovr = Number(player.ovr ?? player.rating ?? player.overall ?? 0);
   const price = Number(player.price ?? player.value ?? player.cost ?? 0);
@@ -422,7 +422,7 @@ function filterPlayer(player) {
     return false;
   }
 
-  if (filters.nation && normalizedNation !== filters.nation.toLowerCase()) {
+  if (!matchesNationalityFilter(player.nationality, filters.nation)) {
     return false;
   }
 
@@ -443,6 +443,12 @@ function filterPlayer(player) {
   }
 
   return true;
+}
+
+function matchesNationalityFilter(playerNationality, selectedNationality) {
+  if (!selectedNationality) return true;
+  return translateNationality(playerNationality).toLowerCase()
+    === translateNationality(selectedNationality).toLowerCase();
 }
 
 function matchesPositionFilter(playerPosition, selectedPosition) {
@@ -563,7 +569,9 @@ function populateNationOptions() {
   const selectedNation = MARKET_STATE.filters.nation;
   select.innerHTML = '<option value="">Todas</option>';
   const nations = [...new Set(
-    (MARKET_STATE.catalog || []).map((player) => player.nationality).filter(Boolean),
+    (MARKET_STATE.catalog || [])
+      .map((player) => translateNationality(player.nationality))
+      .filter(Boolean),
   )].sort((a, b) => String(a).localeCompare(String(b), 'pt-BR'));
 
   nations.forEach((nation) => {
@@ -747,9 +755,24 @@ const NATIONALITY_TRANSLATIONS = {
   Egypt: 'Egito',
 };
 
+const MARKET_NATIONALITY_ALIASES = Object.freeze({
+  'cape verde': 'Cabo Verde',
+  'cape verde islands': 'Cabo Verde',
+  'congo dr': 'República Democrática do Congo',
+  'dr congo': 'República Democrática do Congo',
+  'côte d\'ivoire': 'Costa do Marfim',
+  'ivory coast': 'Costa do Marfim',
+  'korea republic': 'Coreia do Sul',
+  'south korea': 'Coreia do Sul',
+  'cura?ao': 'Curaçao',
+});
+
 function translateNationality(nationality) {
   const value = String(nationality || '').trim();
-  return NATIONALITY_TRANSLATIONS[value] || value;
+  const normalized = value.toLowerCase();
+  return MARKET_NATIONALITY_ALIASES[normalized]
+    || NATIONALITY_TRANSLATIONS[value]
+    || value;
 }
 
 function collectInitials(name) {
@@ -835,6 +858,8 @@ function debounce(fn, wait = 200) {
 }
 
 window.initMarket = initMarket;
+window.marketTranslateNationality = translateNationality;
+window.marketMatchesNationalityFilter = matchesNationalityFilter;
 window.buyPlayer = buyPlayer;
 window.addPlayerToCart = addPlayerToCart;
 window.removePlayerFromCart = removePlayerFromCart;
