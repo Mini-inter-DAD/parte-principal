@@ -41,6 +41,20 @@ Cache por **fingerprint** (SHA-256) para evitar recomputo:
 
 Arquivos: `data/cache/manifest.json` (fingerprints) e `data/cache/<step>.json` (resultados). Bypass com a variável de ambiente `PIPELINE_NO_CACHE` (qualquer valor que não seja vazio/`0`/`false`).
 
+As funções de fingerprint compartilhadas ficam em `pipeline/fingerprints.py` (constantes da origem, `build_squads_fingerprint`, `fill_missing_inputs_fingerprint` e `current_pipeline_state`).
+
+## Verificação de pipeline — `database/verify_pipeline.py`
+
+No deploy (Render free tier), o filesystem é **efêmero** — o cache local não sobrevive entre builds. Para não repetir o pipeline caro a cada build, os fingerprints aplicados são persistidos no banco (tabela `pipeline_state`):
+
+1. O entrypoint roda `python -m database.verify_pipeline`.
+2. Ele busca os elencos do openfootball (1 requisição), computa os fingerprints atuais e compara com a tabela `pipeline_state`.
+3. **Iguais** → exit 0: pula o pipeline e o seed, subindo direto a app.
+4. **Diferentes** (ou tabela vazia, ex. primeiro deploy) → exit 1: roda `run.py` e depois `database/seed_players.py`, que registra os novos fingerprints **somente após o seed ter sucesso** (`record_pipeline_state` em `seed_players.py`).
+5. Se o openfootball estiver indisponível, o verify **assume dados inalterados** e pula o pipeline.
+
+O cache local continua útil para desenvolvimento local e para a trilha de atualização (dados mudaram), mas a persistência entre builds é garantida pelo banco.
+
 ## Etapa 3 — `metrics/summer_squads.py`
 
 Lê `output/players.json` e imprime, por seleção, o total de convocados (padrão **26** por seleção), ausentes, % de cobertura e uma barra visual.
