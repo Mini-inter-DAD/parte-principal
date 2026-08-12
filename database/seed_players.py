@@ -81,9 +81,11 @@ def seed_players():
     ea_positions = load_ea_positions()
 
     inserted = 0
+    total = len(players)
 
     with engine.begin() as conn:
 
+        print(f"Processando jogadores...  0/{total}")
         for player in players:
             raw_source_ea_id = player.get("ea_id")
             source_ea_id = int(raw_source_ea_id) if raw_source_ea_id is not None else None
@@ -228,8 +230,10 @@ def seed_players():
             )
 
             inserted += 1
+            if inserted % 10 == 0:
+                print(f"Processando jogadores...  {inserted}/{total}")
 
-    print(f"{inserted} jogadores processados")
+    print(f"Processando jogadores...  {inserted}/{total}")
 
     record_pipeline_state()
 
