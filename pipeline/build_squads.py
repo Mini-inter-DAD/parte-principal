@@ -2,6 +2,7 @@ import json
 import requests
 import unicodedata
 import re
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pipeline.cache import get_cache, set_cache
 from pipeline.fingerprints import SQUADS_URL, build_squads_fingerprint
