@@ -13,8 +13,10 @@ try:
     from database.connection import engine
 except ModuleNotFoundError:
     from connection import engine
+from database.pipeline_state import write_state
 from backend.services.player_pricing import calculate_player_price
 from backend.services.player_formatters import normalize_o_slash
+from pipeline.fingerprints import current_pipeline_state
 
 OUTPUT_FILE = PROJECT_ROOT / "output" / "players.json"
 ARTIFACT_FILE = PROJECT_ROOT / "artifacts" / "players.json"
@@ -228,6 +230,23 @@ def seed_players():
             inserted += 1
 
     print(f"{inserted} jogadores processados")
+
+    record_pipeline_state()
+
+
+def record_pipeline_state() -> None:
+    try:
+        state = current_pipeline_state()
+    except Exception as exc:
+        print(
+            f"[seed] Não foi possível computar fingerprints ({exc}); "
+            "a próxima execução revalidará o pipeline"
+        )
+        return
+
+    with engine.begin() as conn:
+        write_state(conn, state)
+    print("[seed] Fingerprints do pipeline registrados no banco")
 
 
 if __name__ == "__main__":

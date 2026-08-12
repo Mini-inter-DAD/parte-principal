@@ -2,16 +2,11 @@ import json
 import requests
 import unicodedata
 import re
-from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from pipeline.cache import get_cache, set_cache, file_hash, text_hash
+from pipeline.cache import get_cache, set_cache
+from pipeline.fingerprints import SQUADS_URL, build_squads_fingerprint
 from pipeline.source.fifa_source import get_players
 from pipeline.source.photo_source import FootballApiService
-
-SQUADS_URL = "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.squads.json"
-
-EA_CSV = Path("data/ea_fc26_players.csv")
-MATCH_VERSION = "1"
 
 def normalize(name: str) -> str:
     name = name.lower().strip()
@@ -89,16 +84,16 @@ def find_player_match(wc_name: str, nation: str, wc_position: str, ea_index):
         return None
     return ranked[0][1]
 
-def main():
+def fetch_squads():
     print("Baixando elencos do openfootball...")
     squads = requests.get(SQUADS_URL).json()
     print(f"{len(squads)} seleções carregadas")
+    return squads
 
-    fingerprint = text_hash(
-        json.dumps(squads, ensure_ascii=False, sort_keys=True)
-        + file_hash(EA_CSV)
-        + MATCH_VERSION
-    )
+
+def main():
+    squads = fetch_squads()
+    fingerprint = build_squads_fingerprint(squads)
 
     result = get_cache("build_squads", fingerprint)
     if result is not None:

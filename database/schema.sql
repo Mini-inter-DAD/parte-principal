@@ -117,6 +117,17 @@ CREATE INDEX idx_activity_events_user_date
     ON user_activity_events(user_id, occurred_at);
 
 -- ============================================================
+-- TABLE: pipeline_state
+-- Fingerprints do pipeline já aplicados ao banco. Permite
+-- pular o pipeline quando a origem dos dados não mudou.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS pipeline_state (
+    step         VARCHAR(50) PRIMARY KEY,
+    fingerprint  TEXT NOT NULL,
+    updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ============================================================
 -- PLAYERS
 -- Catálogo global de jogadores
 -- ============================================================

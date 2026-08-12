@@ -8,6 +8,11 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from pipeline.cache import get_cache, set_cache, file_hash, text_hash
+from pipeline.fingerprints import (
+    FILL_MISSING_MODEL,
+    FILL_MISSING_SYSTEM_PROMPT,
+    FILL_MISSING_TEMPERATURE,
+)
 
 load_dotenv()
 
@@ -20,16 +25,6 @@ players_json = ROOT / "output" / "players.json"
 
 MISSING = json.loads(missing_json.read_text(encoding="utf-8"))
 
-MODEL = "llama-3.3-70b-versatile"
-TEMPERATURE = 0.1
-
-SYSTEM_PROMPT = (
-    "You are a football analyst. For each player, estimate their EA FC 26 overall rating "
-    "as an integer between 55 and 91. Base it on real-world reputation, league level, and performance. "
-    "Respond ONLY with a JSON array of integers in the same order as the input. "
-    "Example: [72, 68, 81, 75]. No explanation, no text, just the array."
-)
-
 
 def estimate_batch(batch: list) -> list:
     players_text = "\n".join(
@@ -38,11 +33,11 @@ def estimate_batch(batch: list) -> list:
     )
 
     response = client.chat.completions.create(
-        model=MODEL,
+        model=FILL_MISSING_MODEL,
         messages=[
             {
                 "role": "system",
-                "content": SYSTEM_PROMPT
+                "content": FILL_MISSING_SYSTEM_PROMPT
             },
             {
                 "role": "user",
@@ -50,7 +45,7 @@ def estimate_batch(batch: list) -> list:
             }
         ],
         max_tokens=200,
-        temperature=TEMPERATURE,
+        temperature=FILL_MISSING_TEMPERATURE,
     )
 
     raw = response.choices[0].message.content.strip()
@@ -64,9 +59,9 @@ def main():
     fingerprint = text_hash(
         file_hash(missing_json)
         + json.dumps(players, ensure_ascii=False, sort_keys=True)
-        + text_hash(SYSTEM_PROMPT)
-        + MODEL
-        + str(TEMPERATURE)
+        + text_hash(FILL_MISSING_SYSTEM_PROMPT)
+        + FILL_MISSING_MODEL
+        + str(FILL_MISSING_TEMPERATURE)
     )
 
     generated = get_cache("fill_missing", fingerprint)
