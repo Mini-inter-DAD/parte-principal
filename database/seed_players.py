@@ -14,6 +14,7 @@ try:
 except ModuleNotFoundError:
     from connection import engine
 from backend.services.player_pricing import calculate_player_price
+from backend.services.player_formatters import normalize_o_slash
 
 OUTPUT_FILE = PROJECT_ROOT / "output" / "players.json"
 ARTIFACT_FILE = PROJECT_ROOT / "artifacts" / "players.json"
@@ -33,6 +34,7 @@ def format_player_name(value: object) -> str | None:
     raw_name = " ".join(str(value or "").strip().split())
     if not raw_name:
         return None
+    raw_name = normalize_o_slash(raw_name)
     if any(character.isupper() for character in raw_name):
         return raw_name
     return " ".join(

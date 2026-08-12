@@ -71,7 +71,12 @@
       const event = createNode(documentRef, 'div', 'history-goal ' + sideClass);
       event.appendChild(createNode(documentRef, 'span', 'history-goal__minute', minute));
       event.appendChild(createNode(documentRef, 'span', 'history-goal__icon', '⚽'));
-      event.appendChild(createNode(documentRef, 'strong', 'history-goal__player', goal.playerName || 'Jogador não identificado'));
+      event.appendChild(createNode(
+        documentRef,
+        'strong',
+        'history-goal__player',
+        formatPlayerName(goal.playerName) || 'Jogador não identificado',
+      ));
       event.appendChild(createNode(documentRef, 'small', 'history-goal__team', team || ''));
       details.appendChild(event);
     });

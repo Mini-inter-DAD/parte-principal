@@ -162,7 +162,7 @@ def _team_id(name: str) -> str:
 def _serialize_team_player(player) -> dict:
     return {
         "id": int(player["id"]),
-        "name": format_player_name(player["name"]),
+        "name": format_player_name(player["name"], ea_id=player.get("ea_id")),
         "position": player["position"],
         "overall": int(player["overall"]),
         "club": player["club"],
@@ -179,7 +179,10 @@ def _build_opponent(team_name: str, roster: list[dict]) -> dict | None:
     scorers = [
         {
             "playerId": str(player["id"]),
-            "playerName": format_player_name(player["name"]),
+            "playerName": format_player_name(
+                player["name"],
+                ea_id=player.get("ea_id"),
+            ),
             "position": player["position"],
         }
         for player in roster
@@ -384,12 +387,13 @@ def _choose_goal_scorer(players):
 
 def _player_identity(player):
     if not player:
-        return None, None, None
+        return None, None, None, None
 
     return (
         player.get("id") or player.get("playerId"),
         player.get("name") or player.get("playerName"),
         player.get("position"),
+        player.get("ea_id"),
     )
 
 
@@ -414,11 +418,11 @@ def _generate_goal_events(
 
     for index in range(user_score):
         scorer = _choose_goal_scorer(user_players)
-        player_id, player_name, position = _player_identity(scorer)
+        player_id, player_name, position, ea_id = _player_identity(scorer)
         events.append(
             {
                 "player_id": str(player_id) if player_id is not None else "user-team",
-                "player_name": format_player_name(player_name) if player_name else f"Jogador do {user_team_name}",
+                "player_name": format_player_name(player_name, ea_id=ea_id) if player_name else f"Jogador do {user_team_name}",
                 "minute": minutes[len(events)],
                 "position": position,
                 "team": "USER",
@@ -427,11 +431,11 @@ def _generate_goal_events(
 
     for index in range(opponent_score):
         scorer = _choose_goal_scorer(opponent_players)
-        player_id, player_name, position = _player_identity(scorer)
+        player_id, player_name, position, ea_id = _player_identity(scorer)
         events.append(
             {
                 "player_id": str(player_id) if player_id is not None else "opponent-team",
-                "player_name": format_player_name(player_name) if player_name else f"Atacante da {opponent_name}",
+                "player_name": format_player_name(player_name, ea_id=ea_id) if player_name else f"Atacante da {opponent_name}",
                 "minute": minutes[len(events)],
                 "position": position,
                 "team": "OPPONENT",
@@ -492,7 +496,10 @@ def _penalty_shooter_name(players, fallback: str) -> str:
     scorer = _choose_goal_scorer(list(players or []))
     if scorer is None:
         return fallback
-    return format_player_name(scorer.get("name") or scorer.get("playerName") or fallback)
+    return format_player_name(
+        scorer.get("name") or scorer.get("playerName") or fallback,
+        ea_id=scorer.get("ea_id"),
+    )
 
 
 def _find_opponent_by_name(opponents: list[dict], name: str) -> dict:

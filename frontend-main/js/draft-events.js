@@ -46,7 +46,7 @@
 
     const minute = normalized.minute === null ? '—' : `${String(normalized.minute).padStart(2, '0')}'`;
     const teamName = normalized.team === 'USER' ? context.teamName : context.opponentName;
-    const text = normalized.playerName || 'Jogador não identificado';
+    const text = formatPlayerName(normalized.playerName) || 'Jogador não identificado';
     row.appendChild(makeText(documentRef, 'match-event__minute', minute));
     row.appendChild(makeText(documentRef, 'match-event__icon', '⚽'));
     const description = makeText(documentRef, 'match-event__text', `Gol de ${text}`);

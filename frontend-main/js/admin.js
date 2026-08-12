@@ -16,6 +16,14 @@ const MONTH_NAMES = [
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
 ];
 
+const ADMIN_ALERT_CLASSES = Object.freeze({
+  popup: 'admin-alert',
+  confirmButton: 'admin-alert__confirm',
+  cancelButton: 'admin-alert__cancel',
+});
+
+const GENERIC_PROFILE_AVATAR = 'assets/generic-avatar.svg';
+
 function initAdmin() {
   configureAdminProfile();
   populateMonthFilter();
@@ -26,15 +34,10 @@ function initAdmin() {
 function configureAdminProfile() {
   const user = getSession().user;
   const avatar = document.getElementById('admin-avatar');
-  const avatarUrl = user?.avatar || user?.photo || user?.image;
-
-  if (avatarUrl) {
-    avatar.src = avatarUrl;
-    avatar.parentElement.classList.remove('admin-profile--card');
-  }
+  avatar.src = GENERIC_PROFILE_AVATAR;
   avatar.alt = user?.displayName || user?.username
-    ? `Avatar de ${user.displayName || user.username}`
-    : 'Avatar do administrador';
+    ? `Avatar genérico de ${user.displayName || user.username}`
+    : 'Avatar genérico do administrador';
 }
 
 function bindAdminEvents() {
@@ -42,8 +45,10 @@ function bindAdminEvents() {
   document.getElementById('month-filter').addEventListener('change', (event) => {
     ADMIN_STATE.selectedMonth = event.target.value;
     ADMIN_STATE.currentPage = 1;
+    syncMonthFilterUi();
     loadAdminData();
   });
+  bindMonthFilterEvents();
 
   document.getElementById('users-pagination').addEventListener('click', (event) => {
     const button = event.target.closest('[data-page]');
@@ -52,6 +57,14 @@ function bindAdminEvents() {
     ADMIN_STATE.currentPage = Number(button.dataset.page);
     renderUsers();
     document.getElementById('users-heading').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  document.getElementById('users-table-body').addEventListener('click', (event) => {
+    const button = event.target.closest('[data-ban-user]');
+    if (!button || button.disabled) return;
+
+    const user = ADMIN_STATE.users.find((item) => getAdminUserId(item) === button.dataset.userId);
+    if (user) confirmUserBan(user, button);
   });
 }
 
@@ -73,6 +86,124 @@ function populateMonthFilter(availableMonths = []) {
     ? previousSelection
     : uniqueMonths[0];
   select.value = ADMIN_STATE.selectedMonth;
+  renderMonthFilterOptions(uniqueMonths);
+  syncMonthFilterUi();
+}
+
+function bindMonthFilterEvents() {
+  const control = document.getElementById('month-filter-control');
+  const trigger = document.getElementById('month-filter-trigger');
+  const options = document.getElementById('month-filter-options');
+
+  trigger.addEventListener('click', () => {
+    setMonthFilterOpen(trigger.getAttribute('aria-expanded') !== 'true', true);
+  });
+
+  trigger.addEventListener('keydown', (event) => {
+    if (!['ArrowDown', 'ArrowUp'].includes(event.key)) return;
+    event.preventDefault();
+    setMonthFilterOpen(true);
+    focusMonthFilterOption(event.key === 'ArrowUp' ? 'last' : 'selected');
+  });
+
+  options.addEventListener('click', (event) => {
+    const option = event.target.closest('[data-month]');
+    if (!option) return;
+    selectMonthFilterOption(option.dataset.month);
+  });
+
+  options.addEventListener('keydown', (event) => {
+    if (['Enter', ' '].includes(event.key)) {
+      const option = event.target.closest('[data-month]');
+      if (!option) return;
+      event.preventDefault();
+      selectMonthFilterOption(option.dataset.month);
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      setMonthFilterOpen(false);
+      trigger.focus();
+      return;
+    }
+
+    const directions = { ArrowDown: 1, ArrowUp: -1, Home: 'first', End: 'last' };
+    if (!(event.key in directions)) return;
+    event.preventDefault();
+    focusMonthFilterOption(directions[event.key]);
+  });
+
+  control.addEventListener('focusout', (event) => {
+    if (!control.contains(event.relatedTarget)) setMonthFilterOpen(false);
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!control.contains(event.target)) setMonthFilterOpen(false);
+  });
+}
+
+function renderMonthFilterOptions(months) {
+  const options = document.getElementById('month-filter-options');
+  options.innerHTML = months.map((month) => `
+    <button class="month-filter__option" type="button" role="option" data-month="${month}">
+      ${formatMonthLabel(month)}
+    </button>
+  `).join('');
+}
+
+function syncMonthFilterUi() {
+  const select = document.getElementById('month-filter');
+  const value = document.getElementById('month-filter-value');
+  const selectedLabel = select.selectedOptions[0]?.textContent || '';
+
+  value.textContent = selectedLabel;
+  document.querySelectorAll('.month-filter__option').forEach((option) => {
+    const selected = option.dataset.month === select.value;
+    option.setAttribute('aria-selected', String(selected));
+    option.tabIndex = selected ? 0 : -1;
+  });
+}
+
+function selectMonthFilterOption(month) {
+  const select = document.getElementById('month-filter');
+  const changed = select.value !== month;
+  select.value = month;
+  syncMonthFilterUi();
+  setMonthFilterOpen(false);
+  document.getElementById('month-filter-trigger').focus();
+  if (changed) select.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+function setMonthFilterOpen(open, focusSelected = false) {
+  const trigger = document.getElementById('month-filter-trigger');
+  const options = document.getElementById('month-filter-options');
+  const shouldOpen = Boolean(open && !trigger.disabled);
+
+  trigger.setAttribute('aria-expanded', String(shouldOpen));
+  options.hidden = !shouldOpen;
+  if (shouldOpen && focusSelected) focusMonthFilterOption('selected');
+}
+
+function focusMonthFilterOption(direction) {
+  requestAnimationFrame(() => {
+    const options = [...document.querySelectorAll('.month-filter__option')];
+    if (!options.length) return;
+
+    const activeIndex = options.indexOf(document.activeElement);
+    const selectedIndex = Math.max(options.findIndex((option) => option.getAttribute('aria-selected') === 'true'), 0);
+    let targetIndex = selectedIndex;
+
+    if (direction === 'first') targetIndex = 0;
+    else if (direction === 'last') targetIndex = options.length - 1;
+    else if (typeof direction === 'number') {
+      const origin = activeIndex >= 0 ? activeIndex : selectedIndex;
+      targetIndex = (origin + direction + options.length) % options.length;
+    }
+
+    options.forEach((option, index) => { option.tabIndex = index === targetIndex ? 0 : -1; });
+    options[targetIndex].focus();
+  });
 }
 
 function getCompleteMonths(amount) {
@@ -268,16 +399,15 @@ function renderUsers() {
     const row = document.createElement('tr');
     const name = user.displayName || user.display_name || user.name || user.username || 'Usuário';
     const username = user.username || user.login || '';
-    const avatar = user.avatar || user.photo || user.image || '';
-    const initials = collectAdminInitials(name);
     const createdAt = user.createdAt || user.created_at || user.registeredAt || user.registered_at;
     const coins = user.coins ?? user.balance ?? user.wallet ?? 0;
+    const userId = getAdminUserId(user);
 
     row.innerHTML = `
       <td>
         <div class="user-cell">
           <span class="user-cell__avatar">
-            ${avatar ? `<img src="${escapeAdminHtml(avatar)}" alt="" loading="lazy" />` : escapeAdminHtml(initials)}
+            <img src="${GENERIC_PROFILE_AVATAR}" alt="" loading="lazy" />
           </span>
           <span>
             <strong>${escapeAdminHtml(name)}</strong>
@@ -288,12 +418,91 @@ function renderUsers() {
       <td class="users-table__muted">${escapeAdminHtml(user.id ?? user.userId ?? user.user_id ?? '—')}</td>
       <td class="users-table__coins">⚽ ${formatCoins(coins)}</td>
       <td>${createdAt ? formatDate(createdAt) : '<span class="users-table__muted">—</span>'}</td>
+      <td class="users-table__actions">
+        <button class="user-ban-button" type="button" data-ban-user data-user-id="${escapeAdminHtml(userId)}"
+          aria-label="Banir ${escapeAdminHtml(name)}" title="Banir usuário">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 7H20M9 7V4H15V7M6.5 7L7.4 20H16.6L17.5 7M10 11V16M14 11V16"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </td>
     `;
 
     tbody.appendChild(row);
   });
 
   renderPagination(totalPages);
+}
+
+function getAdminUserId(user) {
+  return String(user.id ?? user.userId ?? user.user_id ?? '');
+}
+
+async function confirmUserBan(user, button) {
+  const userId = getAdminUserId(user);
+  const name = user.displayName || user.display_name || user.name || user.username || 'Usuário';
+
+  const confirmation = await Swal.fire({
+    customClass: ADMIN_ALERT_CLASSES,
+    buttonsStyling: false,
+    icon: 'warning',
+    title: 'Confirmar banimento',
+    text: `Digite "${name}" para confirmar a exclusão permanente deste usuário.`,
+    input: 'text',
+    inputLabel: 'Nome do usuário',
+    inputPlaceholder: name,
+    inputAttributes: {
+      autocomplete: 'off',
+      autocapitalize: 'off',
+      spellcheck: 'false',
+    },
+    showCancelButton: true,
+    confirmButtonText: 'Banir usuário',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#dc3545',
+    reverseButtons: true,
+    focusCancel: true,
+    inputValidator: (value) => {
+      if (value.trim() !== name) return `Digite "${name}" exatamente como exibido.`;
+      return undefined;
+    },
+  });
+
+  if (!confirmation.isConfirmed) return;
+
+  button.disabled = true;
+  Swal.fire({
+    customClass: ADMIN_ALERT_CLASSES,
+    buttonsStyling: false,
+    title: 'Banindo usuário...',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    didOpen: () => Swal.showLoading(),
+  });
+
+  try {
+    await api.banAdminUser(userId);
+    await loadAdminData();
+    await Swal.fire({
+      customClass: ADMIN_ALERT_CLASSES,
+      buttonsStyling: false,
+      icon: 'success',
+      title: 'Usuário banido',
+      text: `${name} foi excluído com sucesso.`,
+      confirmButtonText: 'Concluir',
+    });
+  } catch (error) {
+    button.disabled = false;
+    await Swal.fire({
+      customClass: ADMIN_ALERT_CLASSES,
+      buttonsStyling: false,
+      icon: 'error',
+      title: 'Não foi possível banir',
+      text: error.message || 'Tente novamente em instantes.',
+      confirmButtonText: 'Fechar',
+    });
+  }
 }
 
 function renderPagination(totalPages) {
@@ -332,7 +541,10 @@ function renderPagination(totalPages) {
 function setAdminLoading(loading) {
   const status = document.getElementById('admin-status');
   const select = document.getElementById('month-filter');
+  const trigger = document.getElementById('month-filter-trigger');
   select.disabled = loading;
+  trigger.disabled = loading;
+  if (loading) setMonthFilterOpen(false);
 
   if (loading) {
     status.textContent = 'Carregando dados...';
@@ -372,16 +584,6 @@ function formatDate(value) {
 
 function formatNumber(value) {
   return Number(value || 0).toLocaleString('pt-BR');
-}
-
-function collectAdminInitials(name) {
-  return String(name)
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase();
 }
 
 function escapeAdminHtml(value) {

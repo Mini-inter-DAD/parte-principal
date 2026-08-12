@@ -150,13 +150,39 @@ const SQUAD_STATE = {
   loading: true,
 };
 
+let fieldNameLayoutFrame = null;
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 function initSquad() {
   ensureAuth();
   renderSquadName();
   bindFormationButtons();
   bindReserveTarget();
+  bindFieldNameResize();
   loadSquad();
+}
+
+function recalculateFieldNameWidths() {
+  const container = document.getElementById('field-players');
+  if (!container) return;
+  applyFieldNameWidths(container, SQUAD_STATE.lineup);
+}
+
+function scheduleFieldNameLayout() {
+  if (fieldNameLayoutFrame !== null) return;
+
+  const schedule = typeof window.requestAnimationFrame === 'function'
+    ? window.requestAnimationFrame.bind(window)
+    : callback => window.setTimeout(callback, 0);
+  fieldNameLayoutFrame = schedule(() => {
+    fieldNameLayoutFrame = null;
+    recalculateFieldNameWidths();
+  });
+}
+
+function bindFieldNameResize() {
+  if (typeof window === 'undefined') return;
+  window.addEventListener('resize', scheduleFieldNameLayout, { passive: true });
 }
 
 // ─── Auth guard ───────────────────────────────────────────────────────────────
@@ -342,9 +368,10 @@ function renderField() {
     if (slot.player) {
       // mostra APENAS a posição dentro da bolinha
       token.textContent = slot.label;
+      const fullPlayerName = String(slot.player.name ?? '').trim() || 'Jogador';
       el.setAttribute(
         'title',
-        `${slot.player.name} · ${slot.label}`
+        `${fullPlayerName} · ${slot.label}`
       );
     } else {
       token.textContent = slot.label;
@@ -353,15 +380,17 @@ function renderField() {
     const nameEl = document.createElement('span');
     nameEl.className = 'field-slot__name';
 
-    // mostra nome completo
+    // mostra nome adaptado ao espaço disponível no campo
     nameEl.textContent = slot.player
-      ? slot.player.name
+      ? formatPlayerNameForField(slot.player.name)
       : slot.label;
 
     el.appendChild(token);
     el.appendChild(nameEl);
     container.appendChild(el);
   });
+
+  recalculateFieldNameWidths();
 }
 
 // ─── Renderiza o boxscore (coluna direita) ────────────────────────────────────
@@ -398,7 +427,7 @@ function renderBoxscore() {
 
     const name = document.createElement('span');
     name.className = `boxscore-item__name${slot.player ? '' : ' boxscore-item__name--empty'}`;
-    name.textContent = slot.player ? slot.player.name : 'Vazio';
+    name.textContent = slot.player ? formatPlayerName(slot.player.name) : 'Vazio';
 
     const ovr = document.createElement('span');
     ovr.className = `boxscore-item__ovr${slot.player ? '' : ' boxscore-item__ovr--empty'}`;
@@ -434,7 +463,7 @@ function renderBoxscore() {
 
       const name = document.createElement('span');
       name.className = 'boxscore-item__name';
-      name.textContent = player.name;
+      name.textContent = formatPlayerName(player.name);
 
       const ovr = document.createElement('span');
       ovr.className = 'boxscore-item__ovr';

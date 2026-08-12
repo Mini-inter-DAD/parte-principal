@@ -38,7 +38,7 @@ def authenticate_admin(db, *, username: str, password: str):
         or not admin["is_active"]
         or not verify_password(password, admin["password_hash"])
     ):
-        raise BusinessRuleError("Invalid username or password")
+        raise BusinessRuleError("Nome de usuário ou senha inválido")
 
     token = secrets.token_urlsafe(32)
     expires_at = datetime.now(timezone.utc) + ADMIN_SESSION_TTL

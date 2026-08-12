@@ -1,3 +1,11 @@
+import csv
+from functools import lru_cache
+from pathlib import Path
+
+
+EA_PLAYERS_FILE = Path(__file__).resolve().parents[2] / "data" / "ea_fc26_players.csv"
+
+
 NATIONALITY_TRANSLATIONS = {
     "brazil": "Brasil",
     "argentina": "Argentina",
@@ -20,6 +28,66 @@ NATIONALITY_TRANSLATIONS = {
     "uruguay": "Uruguai",
     "ecuador": "Equador",
     "egypt": "Egito",
+}
+
+NATIONALITY_LABELS = {
+    "algeria": "Argélia",
+    "argentina": "Argentina",
+    "australia": "Austrália",
+    "austria": "Áustria",
+    "belgium": "Bélgica",
+    "bosnia and herzegovina": "Bósnia e Herzegovina",
+    "brazil": "Brasil",
+    "canada": "Canadá",
+    "cape verde": "Cabo Verde",
+    "cape verde islands": "Cabo Verde",
+    "colombia": "Colômbia",
+    "congo dr": "República Democrática do Congo",
+    "côte d'ivoire": "Costa do Marfim",
+    "croatia": "Croácia",
+    "czech republic": "República Tcheca",
+    "cura?ao": "Curaçao",
+    "curaçao": "Curaçao",
+    "dr congo": "República Democrática do Congo",
+    "ecuador": "Equador",
+    "egypt": "Egito",
+    "england": "Inglaterra",
+    "france": "França",
+    "germany": "Alemanha",
+    "ghana": "Gana",
+    "haiti": "Haiti",
+    "holland": "Holanda",
+    "iran": "Irã",
+    "iraq": "Iraque",
+    "italy": "Itália",
+    "ivory coast": "Costa do Marfim",
+    "japan": "Japão",
+    "jordan": "Jordânia",
+    "korea republic": "Coreia do Sul",
+    "mexico": "México",
+    "morocco": "Marrocos",
+    "netherlands": "Holanda",
+    "new zealand": "Nova Zelândia",
+    "norway": "Noruega",
+    "panama": "Panamá",
+    "paraguay": "Paraguai",
+    "portugal": "Portugal",
+    "qatar": "Catar",
+    "republic of ireland": "Irlanda",
+    "saudi arabia": "Arábia Saudita",
+    "scotland": "Escócia",
+    "senegal": "Senegal",
+    "south africa": "África do Sul",
+    "south korea": "Coreia do Sul",
+    "spain": "Espanha",
+    "sweden": "Suécia",
+    "switzerland": "Suíça",
+    "tunisia": "Tunísia",
+    "turkey": "Turquia",
+    "united states": "Estados Unidos",
+    "uruguay": "Uruguai",
+    "uzbekistan": "Uzbequistão",
+    "venezuela": "Venezuela",
 }
 
 NATIONALITY_CODES = {
@@ -67,13 +135,43 @@ NATIONALITY_CODES = {
 }
 
 
-def format_player_name(name: str) -> str:
-    return " ".join(str(name).strip().split()).title()
+def normalize_o_slash(name: str) -> str:
+    return str(name).replace("Ø", "O").replace("ø", "o")
+
+
+@lru_cache(maxsize=1)
+def _source_names_with_o_slash() -> dict[int, str]:
+    if not EA_PLAYERS_FILE.exists():
+        return {}
+
+    with EA_PLAYERS_FILE.open(encoding="utf-8-sig", newline="") as csv_file:
+        source_names = {}
+        for row in csv.DictReader(csv_file):
+            source_name = f"{row.get('firstName', '')} {row.get('lastName', '')}".strip()
+            if row.get("id") and ("Ø" in source_name or "ø" in source_name):
+                source_names[int(row["id"])] = source_name
+        return source_names
+
+
+def _recover_legacy_name(name: str, ea_id: int | None) -> str:
+    if "?" not in name or ea_id is None:
+        return name
+    return _source_names_with_o_slash().get(int(ea_id), name)
+
+
+def format_player_name(name: str, *, ea_id: int | None = None) -> str:
+    normalized = " ".join(str(name).strip().split())
+    normalized = _recover_legacy_name(normalized, ea_id)
+    return normalize_o_slash(normalized).title()
 
 
 def translate_nationality(nationality: str) -> str:
     value = str(nationality).strip()
-    return NATIONALITY_TRANSLATIONS.get(value.casefold(), value)
+    normalized = value.casefold()
+    return NATIONALITY_LABELS.get(
+        normalized,
+        NATIONALITY_TRANSLATIONS.get(normalized, value),
+    )
 
 
 def source_nationality(nationality: str) -> str:
@@ -81,7 +179,7 @@ def source_nationality(nationality: str) -> str:
     normalized = value.casefold()
     source_aliases = {
         translated.casefold(): source.title()
-        for source, translated in NATIONALITY_TRANSLATIONS.items()
+        for source, translated in NATIONALITY_LABELS.items()
     }
     source_aliases.update({
         "brasil": "Brazil",
@@ -97,7 +195,7 @@ def source_nationality(nationality: str) -> str:
     })
     if normalized in source_aliases:
         return source_aliases[normalized]
-    for source, translated in NATIONALITY_TRANSLATIONS.items():
+    for source, translated in NATIONALITY_LABELS.items():
         if normalized == translated.casefold():
             return source.title() if source != "united states" else "United States"
     return value
