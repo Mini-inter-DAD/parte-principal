@@ -155,7 +155,8 @@
 .auth-forgot-row {
   display: flex;
   justify-content: flex-end;
-  margin-top: -0.5rem; /* aperta um pouco o espaço acima sem grudar */
+  margin-top: -0.5rem;
+  /* aperta um pouco o espaço acima sem grudar */
 }
 
 .auth-forgot {
@@ -233,7 +234,7 @@
   right: 0.75rem;
   background: none;
   border: none;
-  color: var(--color-text-muted);
+  color: #000;
   cursor: pointer;
   padding: 0.25rem;
   display: flex;
@@ -243,7 +244,7 @@
 }
 
 .auth-input__toggle-pw:hover {
-  color: var(--color-text);
+  color: #000;
 }
 
 .auth-input__toggle-pw:focus-visible {
@@ -326,7 +327,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ─── LINK DE TROCA DE ABA ───────────────────────────────────────────────── */
@@ -433,5 +436,169 @@
     animation: none;
     border-top-color: currentColor;
     opacity: 0.4;
+  }
+}
+
+/* Cidade em Jogo: credencial de entrada do torneio. */
+.auth-page {
+  background-color: #171717;
+  background-image: none;
+}
+
+.auth-card {
+  position: relative;
+  overflow: visible;
+  border: 3px solid var(--color-text);
+  border-radius: 0;
+  background-color: #252525;
+  box-shadow: 10px 10px 0 var(--color-accent);
+}
+
+.auth-card::before {
+  content: "DREAM CUP";
+  position: absolute;
+  top: -1.1rem;
+  left: 1.2rem;
+  padding: 0.25rem 0.7rem;
+  background-color: var(--color-secondary);
+  color: #171717;
+  font: 800 0.75rem var(--font-main);
+  letter-spacing: 0.13em;
+}
+
+.auth-title,
+.auth-card h1,
+.auth-panel h2 {
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.auth-tabs {
+  gap: 0;
+  border-bottom: 3px solid var(--color-text);
+}
+
+.auth-tab {
+  border: 0;
+  border-radius: 0;
+  background-color: #171717;
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.auth-tab[aria-selected="true"] {
+  background-color: var(--color-primary);
+  color: #171717;
+}
+
+.auth-field label {
+  color: var(--color-text);
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.auth-field input {
+  border: 2px solid #706a62;
+  border-radius: 0;
+  background-color: #171717;
+  color: var(--color-text);
+}
+
+.auth-field input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 3px 3px 0 var(--color-primary);
+}
+
+.auth-input__toggle-pw {
+  border-radius: 0;
+  color: #000;
+}
+
+.auth-submit,
+.auth-demo-btn,
+.auth-forgot-row button,
+.auth-back-btn {
+  border: 2px solid #171717;
+  border-radius: 0;
+  box-shadow: 4px 4px 0 #000;
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.auth-submit {
+  background-color: var(--color-primary);
+  color: #171717;
+}
+
+.auth-demo-btn {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+.auth-forgot-row button,
+.auth-back-btn {
+  background: transparent;
+  color: var(--color-text);
+  box-shadow: none;
+}
+
+.auth-success {
+  border: 2px solid var(--color-primary);
+  border-radius: 0;
+  background-color: #171717;
+}
+
+[data-theme="light"] .auth-card {
+  border-color: #171717;
+  background-color: #fffaf0;
+  box-shadow: 10px 10px 0 var(--color-accent);
+}
+
+[data-theme="light"] .auth-tab {
+  background-color: #ded8ca;
+  color: #554f49;
+}
+
+[data-theme="light"] .auth-tab[aria-selected="true"] {
+  background-color: var(--color-primary);
+  color: #171717;
+}
+
+/* Modo claro: credencial e campos legíveis sobre as superfícies de papel da identidade. */
+[data-theme="light"] .auth-page {
+  background-color: #f4ecd8;
+}
+
+[data-theme="light"] .auth-field input {
+  border-color: #171717;
+  background-color: #fffaf0;
+  color: #171717;
+}
+
+[data-theme="light"] .auth-field label,
+[data-theme="light"] .auth-forgot-row button,
+[data-theme="light"] .auth-back-btn {
+  color: #171717;
+}
+
+[data-theme="light"] .auth-success {
+  background-color: #fffaf0;
+  color: #171717;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    box-shadow: 6px 6px 0 var(--color-accent);
   }
 }

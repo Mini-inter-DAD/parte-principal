@@ -63,7 +63,7 @@ body {
   place-items: center;
   padding: 0 0.3rem;
   border-radius: 999px;
-  background: var(--color-accent);
+  background: var(--color-secondary);
   color: #05141d;
   font-size: 0.75rem;
 }
@@ -185,7 +185,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 1rem 1.75rem;
-  background: linear-gradient(135deg, var(--color-accent), var(--color-secondary));
+  background: var(--color-primary);
   color: #05141d;
   font-weight: 700;
   box-shadow: 0 18px 40px rgba(0, 212, 255, 0.22);
@@ -204,7 +204,7 @@ body {
   justify-content: space-between;
   padding: 2rem;
   border-radius: 28px;
-  background: linear-gradient(180deg, rgba(0, 212, 255, 0.14), rgba(26, 107, 46, 0.1));
+  background: #252525;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
@@ -276,7 +276,7 @@ body {
 .filter-card {
   padding: 1.75rem;
   border-radius: 22px;
-  background: linear-gradient(135deg, rgba(16, 32, 54, 0.98), rgba(21, 51, 72, 0.92));
+  background: #252525;
   border: 1px solid rgba(0, 212, 255, 0.16);
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.16);
 }
@@ -356,7 +356,7 @@ body {
 
 /* Style the native option dropdown where supported */
 .filter-field select option {
-  background: linear-gradient(180deg, rgba(12, 22, 34, 0.98), rgba(18, 30, 44, 0.98));
+  background: #252525;
   color: var(--color-text);
 }
 
@@ -653,6 +653,7 @@ body {
 .btn-buy:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+  color: gray;
   transform: none;
 }
 
@@ -753,7 +754,7 @@ body {
   overflow: hidden;
   display: grid;
   place-items: center;
-  background: linear-gradient(180deg, rgba(0, 212, 255, 0.12), rgba(26, 107, 46, 0.08));
+  background: #303030;
 }
 
 .player-card__photo img {
@@ -773,7 +774,7 @@ body {
   color: rgba(255, 255, 255, 0.75);
   font-size: 2rem;
   letter-spacing: 0.12em;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.08));
+  background: #303030;
 }
 
 .player-card__info {
@@ -1045,12 +1046,12 @@ body {
 }
 
 [data-theme="light"] .player-card__photo {
-  background: linear-gradient(180deg, #eaf7fb, #f3f8f3);
+  background: #e8e1d0;
 }
 
 [data-theme="light"] .player-card__fallback {
   color: #5b6878;
-  background: linear-gradient(180deg, #f4f7fa, #e8eef3);
+  background: #e8e1d0;
 }
 
 [data-theme="light"] .player-card__price {
@@ -1108,4 +1109,498 @@ body {
 [data-theme="light"] .cart-panel__checkout {
   background: #00a8cc;
   color: #ffffff;
+}
+
+/* Cidade em Jogo: mural de atletas e tickets de compra. */
+.market-page {
+  max-width: 1540px;
+  padding: 2.25rem 2rem 4rem;
+  background-color: var(--color-bg);
+}
+
+.market-hero,
+.market-toolbar,
+.market-content {
+  border: 0;
+}
+
+.market-hero {
+  position: relative;
+  padding: 2.25rem;
+  border: 3px solid var(--color-text);
+  background-color: #252525;
+  box-shadow: 10px 10px 0 #000;
+}
+
+.market-hero::before {
+  content: "MERCADO DE RUA";
+  position: absolute;
+  top: -0.9rem;
+  left: 1.25rem;
+  padding: 0.18rem 0.7rem;
+  background-color: var(--color-secondary);
+  color: #171717;
+  font: 800 0.9rem var(--font-main);
+  letter-spacing: 0.12em;
+}
+
+.market-hero h1,
+.filter-card__header h2,
+.cart-panel__header h2,
+.no-results h2 {
+  font-family: var(--font-display);
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+.market-hero h1 {
+  max-width: 14ch;
+  color: var(--color-text);
+  font-size: clamp(3rem, 6vw, 5.8rem);
+  line-height: 0.86;
+}
+
+.eyebrow,
+.filter-field span,
+.cart-panel__eyebrow {
+  color: var(--color-primary);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.hero-card,
+.hero-panel,
+.filter-card,
+.cart-panel,
+.no-results {
+  border: 3px solid var(--color-text);
+  border-radius: 0;
+  background-color: #252525;
+  box-shadow: 7px 7px 0 #000;
+}
+
+.hero-card--coins {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+.hero-card--coins strong {
+  color: #fff;
+}
+
+.hero-panel {
+  box-shadow: none;
+}
+
+.hero-panel__badge {
+  border-radius: 0;
+  background-color: var(--color-primary);
+  color: #171717;
+}
+
+.btn,
+.btn-primary,
+.btn-secondary,
+.filter-card__toggle,
+.cart-panel__close,
+.cart-panel__clear,
+.cart-item__remove,
+.market-pagination__button {
+  border: 2px solid currentColor;
+  border-radius: 0;
+  box-shadow: 3px 3px 0 #000;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.btn-primary,
+.cart-panel__checkout {
+  background-color: var(--color-primary);
+  color: #171717;
+}
+
+.btn-secondary {
+  background: var(--color-secondary);
+  color: #fff;
+}
+
+.btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.market-toolbar {
+  margin-top: 2.5rem;
+}
+
+.filter-card {
+  padding: 1.35rem;
+}
+
+.filter-card__header {
+  border-bottom: 2px solid var(--color-text);
+  padding-bottom: 0.9rem;
+}
+
+.filter-field input,
+.filter-field select {
+  border: 2px solid #706a62;
+  border-radius: 0;
+  background-color: #171717;
+  color: var(--color-text);
+}
+
+.filter-field input:focus,
+.filter-field select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 3px 3px 0 var(--color-primary);
+}
+
+.chip {
+  border: 2px solid var(--color-text-muted);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text);
+}
+
+.chip:hover,
+.chip--active {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: #171717;
+}
+
+.market-grid {
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.player-card {
+  min-height: 415px;
+  display: grid;
+  grid-template-rows: auto minmax(190px, 1fr) auto auto;
+  overflow: hidden;
+  border: 3px solid var(--color-text);
+  border-radius: 0;
+  background-color: #252525;
+  box-shadow: 7px 7px 0 #000;
+}
+
+.player-card:hover {
+  transform: translate(-3px, -3px) rotate(-0.6deg);
+  box-shadow: 11px 11px 0 var(--color-secondary);
+}
+
+.player-card__header {
+  position: relative;
+  z-index: 1;
+  border-bottom: 2px solid var(--color-text);
+  background: #171717;
+}
+
+.player-card__badge {
+  border-radius: 0;
+  background-color: var(--color-accent);
+  color: #fff;
+  font-weight: 800;
+}
+
+.player-card__rating {
+  color: #171717;
+  background-color: var(--color-primary);
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+}
+
+.player-card__photo {
+  min-height: 210px;
+  border-bottom: 3px solid var(--color-text);
+  background-color: #303030;
+}
+
+.player-card__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  filter: grayscale(0.15) contrast(1.08);
+}
+
+.player-card__fallback {
+  background-color: #303030;
+  color: var(--color-primary);
+}
+
+.player-card__info {
+  padding: 0.8rem 0.9rem 0.45rem;
+}
+
+.player-card__name {
+  font: 800 clamp(1.45rem, 2vw, 1.9rem)/0.95 var(--font-display);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.player-card__meta {
+  margin-top: 0.55rem;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.player-card__price {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.8rem 0.9rem;
+  border-top: 2px solid var(--color-text);
+  background-color: #171717;
+  color: var(--color-text);
+}
+
+.btn-buy {
+  border: 2px solid #171717;
+  border-radius: 0;
+  background-color: var(--color-secondary);
+  color: #171717;
+  box-shadow: 3px 3px 0 #000;
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+}
+
+.btn-buy--added {
+  background-color: var(--color-primary);
+}
+
+.market-pagination {
+  margin-top: 2rem;
+}
+
+.market-pagination__button {
+  background-color: #252525;
+  color: var(--color-text);
+}
+
+.market-pagination__button:not(:disabled):hover {
+  background-color: var(--color-primary);
+  color: #171717;
+}
+
+.cart-panel {
+  border-right: 0;
+}
+
+.cart-panel__header,
+.cart-panel__summary,
+.cart-item {
+  border-color: #706a62;
+}
+
+.cart-item__photo,
+.cart-item__fallback {
+  border-radius: 0;
+  background-color: #303030;
+}
+
+.cart-panel__checkout {
+  border: 3px solid #171717;
+  border-radius: 0;
+  box-shadow: 4px 4px 0 var(--color-secondary);
+}
+
+[data-theme="light"] .market-hero,
+[data-theme="light"] .filter-card,
+[data-theme="light"] .cart-panel,
+[data-theme="light"] .player-card,
+[data-theme="light"] .hero-panel,
+[data-theme="light"] .no-results {
+  border-color: #171717;
+  background-color: #fffaf0;
+  box-shadow: 7px 7px 0 #171717;
+}
+
+[data-theme="light"] .player-card__header,
+[data-theme="light"] .player-card__price,
+[data-theme="light"] .filter-field input,
+[data-theme="light"] .filter-field select {
+  background-color: #171717;
+  color: #f4ecd8;
+}
+
+@media (max-width: 720px) {
+  .market-page {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .market-hero {
+    padding: 1.7rem 1.2rem;
+    box-shadow: 6px 6px 0 #000;
+  }
+
+  .market-hero h1 {
+    font-size: clamp(2.7rem, 16vw, 4.4rem);
+  }
+
+  .market-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Ação da carta: o carrinho vira um ticket separado, não um bloco colado ao perfil. */
+.player-card {
+  position: relative;
+}
+
+.player-card__info {
+  display: grid;
+  grid-template-areas:
+    "name name"
+    "meta meta"
+    "price price"
+    "buy buy";
+  gap: 0;
+  padding: 0.9rem 0.9rem 0;
+}
+
+.player-card__name {
+  grid-area: name;
+}
+
+.player-card__meta {
+  grid-area: meta;
+}
+
+.player-card__price {
+  grid-area: price;
+  min-height: 46px;
+  margin-top: 0.85rem;
+  padding: 0.55rem 0;
+  justify-content: flex-start;
+  border-top: 2px dashed #706a62;
+  background-color: transparent;
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  font-size: 1.28rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.player-card .btn-buy {
+  grid-area: buy;
+  width: calc(100% + 1.8rem);
+  min-height: 56px;
+  margin: 0 -0.9rem;
+  border: 0;
+  border-top: 3px solid #171717;
+  box-shadow: none;
+  clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 12px 50%);
+  transition: background-color 0.18s ease, color 0.18s ease, letter-spacing 0.18s ease;
+}
+
+.player-card .btn-buy:hover:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+  background-color: var(--color-primary);
+  letter-spacing: 0.12em;
+}
+
+.player-card:focus-within {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 5px;
+}
+
+.player-card:has(.btn-buy--added),
+.player-card:has(.btn-buy--owned) {
+  border-color: var(--color-primary);
+  box-shadow: 9px 9px 0 var(--color-primary);
+}
+
+.player-card:has(.btn-buy--added)::after {
+  content: "NO CARRINHO";
+  position: absolute;
+  top: 4.1rem;
+  right: -1.45rem;
+  z-index: 4;
+  padding: 0.26rem 0.75rem;
+  transform: rotate(8deg);
+  border: 2px solid #171717;
+  background-color: var(--color-primary);
+  color: #171717;
+  box-shadow: 3px 3px 0 #000;
+  font: 800 0.72rem var(--font-main);
+  letter-spacing: 0.11em;
+}
+
+.player-card .btn-buy--added {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+.player-card .btn-buy--owned {
+  background-color: #45413a;
+  color: #f4ecd8;
+  clip-path: none;
+}
+
+[data-theme="light"] .player-card__price {
+  background-color: transparent;
+  color: #171717;
+}
+
+[data-theme="light"] .player-card:has(.btn-buy--added),
+[data-theme="light"] .player-card:has(.btn-buy--owned) {
+  border-color: #171717;
+  box-shadow: 9px 9px 0 var(--color-primary);
+}
+
+/* Modo claro: tickets e cartinhas recebem superfícies claras, sem texto escuro sobre bloco escuro. */
+[data-theme="light"] .filter-field input,
+[data-theme="light"] .filter-field select {
+  border-color: #171717;
+  background-color: #fffaf0;
+  color: #171717;
+}
+
+[data-theme="light"] .filter-field select option {
+  background-color: #fffaf0;
+  color: #171717;
+}
+
+[data-theme="light"] .player-card__header {
+  background-color: var(--color-accent);
+  color: #ffffff;
+}
+
+[data-theme="light"] .player-card__header .player-card__name,
+[data-theme="light"] .player-card__header .player-card__meta {
+  color: #ffffff;
+}
+
+[data-theme="light"] .player-card__photo,
+[data-theme="light"] .player-card__fallback,
+[data-theme="light"] .cart-item__photo,
+[data-theme="light"] .cart-item__fallback {
+  background-color: #ded8ca;
+}
+
+[data-theme="light"] .player-card__price {
+  border-top-color: #171717;
+  background-color: var(--color-primary);
+  color: #171717;
+}
+
+[data-theme="light"] .player-card .btn-buy--owned {
+  background-color: #45413a;
+  color: #fffaf0;
+}
+
+[data-theme="light"] .market-pagination__button {
+  border-color: #171717;
+  background-color: #fffaf0;
+  color: #171717;
 }

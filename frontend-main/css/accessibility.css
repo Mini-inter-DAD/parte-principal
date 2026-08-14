@@ -9,38 +9,38 @@
 
 :root {
   /* Dark (padrão) */
-  --a11y-bg:          #1c2b3a;
-  --a11y-border:      rgba(255, 255, 255, 0.1);
-  --a11y-text:        #e8e8e8;
-  --a11y-text-muted:  #8a9bb0;
-  --a11y-btn-hover:   rgba(255, 255, 255, 0.08);
-  --a11y-btn-active:  rgba(0, 212, 255, 0.15);
-  --a11y-btn-active-color: #00d4ff;
-  --a11y-shadow:      0 8px 32px rgba(0, 0, 0, 0.5);
-  --a11y-toggle-bg:   #1c2b3a;
-  --a11y-toggle-border: rgba(255, 255, 255, 0.15);
+  --a11y-bg: #252525;
+  --a11y-border: #f4ecd8;
+  --a11y-text: #f4ecd8;
+  --a11y-text-muted: #afa99f;
+  --a11y-btn-hover: #3a3a3a;
+  --a11y-btn-active: #d6ff32;
+  --a11y-btn-active-color: #171717;
+  --a11y-shadow: 6px 6px 0 #000000;
+  --a11y-toggle-bg: #ef4a2a;
+  --a11y-toggle-border: #171717;
 }
 
 [data-theme="light"] {
-  --a11y-bg:          #ffffff;
-  --a11y-border:      rgba(0, 0, 0, 0.1);
-  --a11y-text:        #1a1a2e;
-  --a11y-text-muted:  #555e6d;
-  --a11y-btn-hover:   rgba(0, 0, 0, 0.06);
-  --a11y-btn-active:  rgba(0, 100, 200, 0.1);
-  --a11y-btn-active-color: #0064c8;
-  --a11y-shadow:      0 8px 32px rgba(0, 0, 0, 0.15);
-  --a11y-toggle-bg:   #ffffff;
-  --a11y-toggle-border: rgba(0, 0, 0, 0.15);
+  --a11y-bg: #f4ecd8;
+  --a11y-border: #171717;
+  --a11y-text: #171717;
+  --a11y-text-muted: #554f49;
+  --a11y-btn-hover: #ded8ca;
+  --a11y-btn-active: #2454ff;
+  --a11y-btn-active-color: #ffffff;
+  --a11y-shadow: 6px 6px 0 #171717;
+  --a11y-toggle-bg: #ef4a2a;
+  --a11y-toggle-border: #171717;
 }
 
 /* ─── Modo claro: variáveis globais da página ─────────────────────────────── */
 
 [data-theme="light"] {
-  --color-bg:         #f0f4f8;
-  --color-surface:    #ffffff;
-  --color-text:       #1a1a2e;
-  --color-text-muted: #555e6d;
+  --color-bg: #f4ecd8;
+  --color-surface: #fffaf0;
+  --color-text: #171717;
+  --color-text-muted: #625c54;
 }
 
 /* ─── Widget: container fixo ─────────────────────────────────────────────── */
@@ -61,10 +61,10 @@
 .a11y-toggle {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
-  border: 1.5px solid var(--a11y-toggle-border);
+  border-radius: 0;
+  border: 2px solid var(--a11y-toggle-border);
   background-color: var(--a11y-toggle-bg);
-  color: var(--a11y-text);
+  color: #171717;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -85,12 +85,16 @@
   outline-offset: 3px;
 }
 
+.a11y-toggle:focus-visible {
+  outline-color: var(--color-text);
+}
+
 /* ─── Painel ─────────────────────────────────────────────────────────────── */
 
 .a11y-panel {
   background-color: var(--a11y-bg);
   border: 1px solid var(--a11y-border);
-  border-radius: 12px;
+  border-radius: 0;
   padding: 1rem;
   min-width: 200px;
   box-shadow: var(--a11y-shadow);
@@ -110,8 +114,15 @@
 }
 
 @keyframes a11y-slide-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ─── Título do painel ───────────────────────────────────────────────────── */
@@ -145,7 +156,7 @@
 .a11y-btn {
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid var(--a11y-border);
   background: transparent;
   color: var(--a11y-text);
@@ -201,6 +212,7 @@
   .a11y-panel:not([hidden]) {
     animation: none;
   }
+
   .a11y-toggle {
     transition: none;
   }

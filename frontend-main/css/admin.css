@@ -294,8 +294,15 @@ body {
 }
 
 @keyframes month-filter-open {
-  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .month-filter:focus-within {
@@ -341,6 +348,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .month-filter,
   .month-filter__trigger svg,
   .month-filter__option,
@@ -527,7 +535,7 @@ body {
   place-items: center;
   overflow: hidden;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--admin-blue), #21415f);
+  background: var(--admin-blue);
   color: var(--admin-heading);
   font-weight: 700;
 }
@@ -606,12 +614,21 @@ body {
 }
 
 @keyframes trash-wiggle {
-  0%, 100% { transform: rotate(0); }
-  30% { transform: rotate(-10deg); }
-  65% { transform: rotate(8deg); }
+  0%, 100% {
+    transform: rotate(0);
+  }
+
+  30% {
+    transform: rotate(-10deg);
+  }
+
+  65% {
+    transform: rotate(8deg);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .user-ban-button,
   .user-ban-button:hover svg {
     animation: none;
@@ -736,6 +753,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .admin-alert__confirm,
   .admin-alert__cancel {
     transition: none;
@@ -896,5 +914,266 @@ body {
 
   .users-pagination {
     justify-content: center;
+  }
+}
+
+/* Cidade em Jogo: painel de organização do torneio. */
+:root {
+  --admin-bg: #171717;
+  --admin-surface: #252525;
+  --admin-surface-soft: #303030;
+  --admin-border: #f4ecd8;
+  --admin-blue: #2454ff;
+  --admin-blue-light: #d6ff32;
+  --admin-heading: #f4ecd8;
+  --admin-muted: #afa99f;
+  --admin-header-bg: #171717;
+  --admin-sidebar-bg: #252525;
+  --admin-divider: #706a62;
+  --admin-table-hover: #303030;
+  --admin-chart-grid: #706a62;
+  --admin-chart-area: #2454ff;
+  --admin-chart-line: #d6ff32;
+  --admin-chart-point: #f4ecd8;
+  --admin-chart-label: #afa99f;
+  --admin-control-border: #706a62;
+  --admin-pagination-bg: #d6ff32;
+  --admin-pagination-text: #171717;
+  --admin-card-shadow: 7px 7px 0 #000;
+}
+
+.admin-header {
+  border-bottom: 3px solid var(--admin-blue-light);
+  background-color: var(--admin-header-bg);
+  backdrop-filter: none;
+}
+
+.admin-header__logo,
+.admin-page h1,
+.users-section__header h2 {
+  color: var(--admin-heading);
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+.admin-profile {
+  border: 2px solid var(--admin-heading);
+  border-radius: 0;
+  background-color: var(--admin-blue);
+}
+
+.admin-layout {
+  grid-template-columns: 236px minmax(0, 1fr);
+}
+
+.admin-sidebar {
+  border-right: 3px solid var(--admin-divider);
+  background-color: var(--admin-sidebar-bg);
+}
+
+.admin-logout {
+  border: 2px solid var(--color-secondary);
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--admin-heading);
+  box-shadow: 4px 4px 0 #000;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.07em;
+}
+
+.admin-logout:hover {
+  background-color: var(--color-secondary);
+  color: #171717;
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+.admin-page {
+  padding: 3rem clamp(1.25rem, 5vw, 5rem) 5rem;
+}
+
+.admin-eyebrow {
+  color: var(--admin-blue-light);
+}
+
+.month-filter {
+  border: 3px solid var(--admin-heading);
+  border-radius: 0;
+  background: #252525;
+  box-shadow: 5px 5px 0 #000;
+}
+
+.month-filter:hover,
+.month-filter:focus-within {
+  border-color: var(--admin-blue-light);
+  transform: translate(1px, 1px);
+  box-shadow: 3px 3px 0 #000;
+}
+
+.month-filter__trigger {
+  color: var(--admin-heading);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+}
+
+.month-filter__options {
+  border: 3px solid var(--admin-heading);
+  border-radius: 0;
+  background-color: #252525;
+  box-shadow: 6px 6px 0 #000;
+}
+
+.month-filter__option {
+  border-radius: 0;
+  color: var(--admin-heading);
+}
+
+.month-filter__option:hover,
+.month-filter__option:focus-visible,
+.month-filter__option[aria-selected="true"] {
+  background-color: var(--admin-blue-light);
+  color: #171717;
+}
+
+.chart-container,
+.users-table-wrap {
+  border: 3px solid var(--admin-heading);
+  border-radius: 0;
+  background-color: var(--admin-surface);
+  box-shadow: var(--admin-card-shadow);
+}
+
+.dashboard-chart__header h2,
+.dashboard-chart__header strong {
+  color: var(--admin-heading);
+}
+
+.chart-area {
+  fill: var(--admin-chart-area);
+  opacity: 0.28;
+}
+
+.chart-line {
+  stroke: var(--admin-chart-line);
+}
+
+.chart-point {
+  fill: var(--admin-chart-point);
+  stroke: var(--admin-chart-line);
+}
+
+.users-table th {
+  color: var(--admin-blue-light);
+}
+
+.users-table tbody tr:hover {
+  background-color: var(--admin-table-hover);
+}
+
+.user-cell__avatar {
+  border-radius: 0;
+  background-color: var(--admin-blue);
+  color: #fff;
+}
+
+.data-source-badge {
+  border-radius: 0;
+  background-color: var(--color-secondary);
+  color: #171717;
+}
+
+.user-ban-button,
+.pagination-button {
+  border: 2px solid var(--admin-control-border);
+  border-radius: 0;
+  background-color: #171717;
+  color: var(--admin-heading);
+}
+
+.user-ban-button:hover {
+  border-color: var(--color-secondary);
+  background-color: var(--color-secondary);
+  color: #171717;
+}
+
+.pagination-button:hover:not(:disabled),
+.pagination-button[aria-current="page"] {
+  border-color: var(--admin-pagination-bg);
+  background-color: var(--admin-pagination-bg);
+  color: var(--admin-pagination-text);
+}
+
+[data-theme="light"] {
+  --admin-bg: #f4ecd8;
+  --admin-surface: #fffaf0;
+  --admin-surface-soft: #ded8ca;
+  --admin-border: #171717;
+  --admin-heading: #171717;
+  --admin-muted: #625c54;
+  --admin-header-bg: #f4ecd8;
+  --admin-sidebar-bg: #fffaf0;
+  --admin-divider: #958e84;
+  --admin-table-hover: #ded8ca;
+  --admin-chart-grid: #958e84;
+  --admin-chart-point: #171717;
+}
+
+[data-theme="light"] .admin-logout {
+  background-color: transparent;
+  color: #171717;
+}
+
+[data-theme="light"] .month-filter,
+[data-theme="light"] .month-filter__options,
+[data-theme="light"] .pagination-button,
+[data-theme="light"] .user-ban-button {
+  background-color: #fffaf0;
+  color: #171717;
+}
+
+/* Modo claro: central administrativa segue a mesma hierarquia de papel, tinta e marcação. */
+[data-theme="light"] .admin-header {
+  border-bottom-color: #171717;
+}
+
+[data-theme="light"] .admin-sidebar {
+  background-color: #fffaf0;
+}
+
+[data-theme="light"] .admin-profile {
+  border-color: #171717;
+  background-color: var(--admin-blue);
+}
+
+[data-theme="light"] .admin-page__heading {
+  padding-left: 1.25rem;
+  border-left: 6px solid var(--admin-blue-light);
+}
+
+[data-theme="light"] .dashboard-chart__header,
+[data-theme="light"] .users-section__header {
+  padding: 1rem 1.25rem;
+  border-left: 4px solid var(--admin-blue-light);
+  background-color: #fffaf0;
+}
+
+[data-theme="light"] .month-filter:hover,
+[data-theme="light"] .month-filter:focus-within {
+  background-color: var(--admin-blue-light);
+  color: #171717;
+}
+
+@media (max-width: 1100px) {
+  .admin-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-sidebar {
+    border-right: 0;
+    border-bottom: 3px solid var(--admin-divider);
   }
 }
