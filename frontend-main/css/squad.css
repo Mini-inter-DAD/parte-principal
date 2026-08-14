@@ -149,12 +149,7 @@ body {
   overflow: hidden;
   /* Gramado com listras, igual ao estilo da referência */
   background-color: #2d7a3a;
-  background-image:
-    repeating-linear-gradient(180deg,
-      rgba(0, 0, 0, 0.06) 0px,
-      rgba(0, 0, 0, 0.06) 40px,
-      transparent 40px,
-      transparent 80px);
+  background-image: none;
   border: 2px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
 }
@@ -268,7 +263,7 @@ body {
   justify-content: center;
   font-family: var(--font-display);
   font-size: 1rem;
-  color: #fff;
+  color: #000;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -311,7 +306,7 @@ body {
 .field-slot__name {
   font-size: 0.65rem;
   font-weight: 700;
-  color: #fff;
+  color: #000;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.8);
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -657,5 +652,244 @@ body {
   .field-slot__token,
   .formation-btn {
     transition: none;
+  }
+}
+
+/* Cidade em Jogo: prancheta, quadra e convocação. */
+.squad-page {
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background-color: #171717;
+}
+
+.squad-sidebar,
+.squad-boxscore {
+  border: 3px solid var(--color-text);
+  border-radius: 0;
+  background-color: #252525;
+  box-shadow: 7px 7px 0 #000;
+}
+
+.sidebar-section {
+  border-color: #706a62;
+}
+
+.sidebar-title,
+.boxscore-title,
+.squad-group-title {
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.formation-btn {
+  border: 2px solid #706a62;
+  border-radius: 0;
+  background-color: #171717;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+}
+
+.formation-btn:hover,
+.formation-btn--active {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: #171717;
+}
+
+.formation-btn:focus-visible {
+  outline-color: var(--color-primary);
+}
+
+.squad-ovr-display {
+  border: 3px solid var(--color-primary);
+  border-radius: 0;
+  background-color: #171717;
+}
+
+.ovr-big {
+  color: var(--color-primary);
+  font-family: var(--font-display);
+}
+
+.ovr-label {
+  color: var(--color-text-muted);
+  letter-spacing: 0.12em;
+}
+
+.ovr-breakdown__item {
+  border-radius: 0;
+  background-color: #303030;
+}
+
+.squad-field-wrapper {
+  border: 3px solid var(--color-text);
+  box-shadow: 9px 9px 0 var(--color-accent);
+}
+
+.field {
+  border-radius: 0;
+  background-color: #287244;
+}
+
+.field::before {
+  content: "QUADRA 01";
+  position: absolute;
+  top: 0.8rem;
+  left: 0.8rem;
+  z-index: 1;
+  padding: 0.22rem 0.5rem;
+  background-color: var(--color-primary);
+  color: #171717;
+  font: 800 0.68rem var(--font-main);
+  letter-spacing: 0.1em;
+}
+
+.field__line,
+.field__circle,
+.field__lines::before,
+.field__lines::after {
+  border-color: rgba(244, 236, 216, 0.9);
+}
+
+.field-slot__token {
+  border: 3px solid #171717;
+  border-radius: 0;
+  background-color: var(--color-primary);
+  box-shadow: 3px 3px 0 #171717;
+}
+
+.field-slot--empty .field-slot__token {
+  background-color: #f4ecd8;
+  border-style: dashed;
+}
+
+.field-slot--selected .field-slot__token {
+  background-color: var(--color-secondary);
+}
+
+.field-slot--incompatible .field-slot__token {
+  background-color: #ef4a2a;
+}
+
+.field-slot__name {
+  border-radius: 0;
+  background-color: #171717;
+  color: var(--color-text);
+  font-weight: 800;
+}
+
+.field-slot__ovr {
+  border-radius: 0;
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+.field-slot__pos {
+  color: #171717;
+  font-weight: 900;
+}
+
+.boxscore-header {
+  border-bottom: 3px solid var(--color-text);
+}
+
+.boxscore-score-item {
+  border-radius: 0;
+  background-color: #171717;
+}
+
+.boxscore-score-value {
+  color: var(--color-primary);
+  font-family: var(--font-display);
+}
+
+.boxscore-item {
+  border-left: 3px solid transparent;
+  border-radius: 0;
+  background-color: transparent;
+}
+
+.boxscore-item:hover,
+.boxscore-item--selected,
+.boxscore-item[aria-pressed="true"] {
+  border-left-color: var(--color-primary);
+  background-color: #303030;
+}
+
+.boxscore-item__pos,
+.boxscore-item__pos-badge {
+  border-radius: 0;
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+.boxscore-item__ovr {
+  color: var(--color-primary);
+  font-family: var(--font-display);
+}
+
+.squad-toast {
+  border: 3px solid var(--color-text);
+  border-radius: 0;
+  background-color: #171717;
+  box-shadow: 5px 5px 0 #000;
+}
+
+[data-theme="light"] .squad-sidebar,
+[data-theme="light"] .squad-boxscore {
+  border-color: #171717;
+  background-color: #fffaf0;
+  box-shadow: 7px 7px 0 #171717;
+}
+
+[data-theme="light"] .formation-btn,
+[data-theme="light"] .squad-ovr-display,
+[data-theme="light"] .boxscore-score-item {
+  border-color: #171717;
+}
+
+/* Modo claro: painéis claros; placar e etiquetas escuras continuam como contraste pontual. */
+[data-theme="light"] .squad-page {
+  background-color: #f4ecd8;
+}
+
+[data-theme="light"] .formation-btn {
+  background-color: #fffaf0;
+  color: #171717;
+}
+
+[data-theme="light"] .squad-ovr-display,
+[data-theme="light"] .boxscore-score-item,
+[data-theme="light"] .field-slot__name,
+[data-theme="light"] .squad-toast {
+  background-color: #171717;
+  color: #fffaf0;
+}
+
+[data-theme="light"] .squad-ovr-display .ovr-label,
+[data-theme="light"] .field-slot__name,
+[data-theme="light"] .squad-toast {
+  color: #fffaf0;
+}
+
+[data-theme="light"] .ovr-breakdown__item,
+[data-theme="light"] .boxscore-item:hover,
+[data-theme="light"] .boxscore-item--selected,
+[data-theme="light"] .boxscore-item[aria-pressed="true"] {
+  background-color: #ded8ca;
+}
+
+@media (max-width: 760px) {
+  .squad-page {
+    padding: 1rem;
+  }
+
+  .squad-field-wrapper {
+    box-shadow: 6px 6px 0 var(--color-accent);
   }
 }

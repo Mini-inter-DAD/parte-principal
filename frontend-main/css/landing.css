@@ -16,7 +16,7 @@
   border: 2px solid transparent;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease,
     color 0.15s ease, border-color 0.15s ease;
-  min-height: 44px; /* tap target WCAG */
+  min-height: 44px;
 }
 
 .btn:focus-visible {
@@ -167,17 +167,23 @@
   min-height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center; /* Centraliza a estrutura interna na tela */
-  gap: 2rem;               /* Espaço exato que você quer entre o texto e as cartas */
-  padding: 8rem 4rem 4rem; /* Aumentei um pouco o padding lateral para garantir o respiro da margem */
+  justify-content: center;
+  /* Centraliza a estrutura interna na tela */
+  gap: 2rem;
+  /* Espaço exato que você quer entre o texto e as cartas */
+  padding: 8rem 4rem 4rem;
+  /* Aumentei um pouco o padding lateral para garantir o respiro da margem */
   overflow: hidden;
-  max-width: 1200px;       /* Mantém o mesmo alinhamento das outras seções (.feature) */
-  margin: 0 auto;          /* Centraliza o bloco hero como um todo */
+  max-width: 1200px;
+  /* Mantém o mesmo alinhamento das outras seções (.feature) */
+  margin: 0 auto;
+  /* Centraliza o bloco hero como um todo */
 }
 
 .hero__content {
   width: 100%;
-  max-width: 540px; /* Mantém o tamanho bom para leitura */
+  max-width: 540px;
+  /* Mantém o tamanho bom para leitura */
   z-index: 1;
 }
 
@@ -212,7 +218,8 @@
 
 .hero__cards {
   width: 100%;
-  max-width: 460px; /* Limita o tamanho do container das cartas */
+  max-width: 460px;
+  /* Limita o tamanho do container das cartas */
   position: relative;
   display: flex;
   align-items: center;
@@ -245,7 +252,7 @@
   height: auto;
   display: block;
   border-radius: 14px;
-  filter: drop-shadow(0 16px 40px rgba(0,0,0,.7));
+  filter: drop-shadow(0 16px 40px rgba(0, 0, 0, .7));
 }
 
 
@@ -263,9 +270,7 @@
   z-index: 5;
 
   filter:
-    brightness(1)
-    blur(0)
-    drop-shadow(0 0 30px rgba(245,166,35,.3));
+    brightness(1) blur(0) drop-shadow(0 0 30px rgba(245, 166, 35, .3));
 
   opacity: 1;
 }
@@ -276,9 +281,7 @@
   --card-rotation: -14deg;
 
   transform:
-    rotate(-14deg)
-    translateX(-100px)
-    translateY(20px);
+    rotate(-14deg) translateX(-100px) translateY(20px);
 
   z-index: 1;
 }
@@ -288,9 +291,7 @@
   --card-rotation: 12deg;
 
   transform:
-    rotate(12deg)
-    translateX(100px)
-    translateY(30px);
+    rotate(12deg) translateX(100px) translateY(30px);
 
   z-index: 1;
 }
@@ -301,7 +302,7 @@
    apaga todos */
 .hero__cards:hover .card-mock {
   filter: brightness(.45) blur(2px);
-  opacity:.6;
+  opacity: .6;
 }
 
 
@@ -311,11 +312,9 @@
   z-index: 20;
 
   filter:
-    brightness(1)
-    blur(0)
-    drop-shadow(0 0 30px rgba(245,166,35,.3));
+    brightness(1) blur(0) drop-shadow(0 0 30px rgba(245, 166, 35, .3));
 
-  opacity:1;
+  opacity: 1;
 }
 
 
@@ -324,9 +323,7 @@
 .hero__cards .card-mock--back-left:hover {
 
   transform:
-    rotate(-14deg)
-    translateX(-100px)
-    translateY(20px);
+    rotate(-14deg) translateX(-100px) translateY(20px);
 }
 
 
@@ -334,9 +331,7 @@
 .hero__cards .card-mock--back-right:hover {
 
   transform:
-    rotate(12deg)
-    translateX(100px)
-    translateY(30px);
+    rotate(12deg) translateX(100px) translateY(30px);
 }
 
 
@@ -409,7 +404,7 @@
 /* ─── CAMPO MOCK ─────────────────────────────────────────────────────────── */
 
 .squad-mock__img {
-    border-radius: 16px;
+  border-radius: 16px;
 }
 
 /* ─── LOOP (Seção 4) ─────────────────────────────────────────────────────── */
@@ -424,7 +419,7 @@
 .loop-section__glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0, 212, 255, 0.06) 0%, transparent 70%);
+  background: transparent;
   pointer-events: none;
 }
 
@@ -464,14 +459,14 @@
   gap: 0.5rem;
   padding: 1.5rem 1rem;
   background: var(--color-surface);
-  border: 1px solid rgba(255,255,255,0.07);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: var(--radius-card);
 }
 
 [data-theme="light"] .loop-step {
   background: #ffffff;
-  border-color: rgba(0,0,0,0.08);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
 .loop-step__icon {
@@ -516,7 +511,7 @@
 .cta-final__glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(80, 30, 160, 0.25) 0%, transparent 70%);
+  background: transparent;
   pointer-events: none;
 }
 
@@ -541,7 +536,7 @@
 
 .footer {
   padding: 2rem 2.5rem;
-  border-top: 1px solid rgba(255,255,255,0.07);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -550,7 +545,7 @@
 }
 
 [data-theme="light"] .footer {
-  border-top-color: rgba(0,0,0,0.08);
+  border-top-color: rgba(0, 0, 0, 0.08);
 }
 
 .footer__logo {
@@ -585,14 +580,14 @@
   }
 
   .hero__cards {
-  flex: 1;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 520px;
-  z-index: 1;
-}
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 520px;
+    z-index: 1;
+  }
 
   .feature,
   .feature--reverse {
@@ -637,29 +632,29 @@
   }
 
   /* 1. Remova ou simplifique o hover geral (tire o transform daqui) */
-.card-mock:hover {
-  z-index: 10 !important;
-  filter: brightness(1) blur(0px) !important;
-}
+  .card-mock:hover {
+    z-index: 10 !important;
+    filter: brightness(1) blur(0px) !important;
+  }
 
-/* 2. Aplique o hover mantendo a identidade de cada carta */
+  /* 2. Aplique o hover mantendo a identidade de cada carta */
 
-/* Carta da Esquerda */
-.card-mock--back-left:hover {
-  transform: rotate(-14deg) translateX(-100px) translateY(8px) !important; 
-  /* subiu 12px em relação aos 20px originais */
-}
+  /* Carta da Esquerda */
+  .card-mock--back-left:hover {
+    transform: rotate(-14deg) translateX(-100px) translateY(8px) !important;
+    /* subiu 12px em relação aos 20px originais */
+  }
 
-/* Carta da Direita */
-.card-mock--back-right:hover {
-  transform: rotate(12deg) translateX(100px) translateY(18px) !important;
-  /* subiu 12px em relação aos 30px originais */
-}
+  /* Carta da Direita */
+  .card-mock--back-right:hover {
+    transform: rotate(12deg) translateX(100px) translateY(18px) !important;
+    /* subiu 12px em relação aos 30px originais */
+  }
 
-/* Carta do Centro (Front) */
-.card-mock--front:hover {
-  transform: rotate(-2deg) translateY(-12px) !important;
-}
+  /* Carta do Centro (Front) */
+  .card-mock--front:hover {
+    transform: rotate(-2deg) translateY(-12px) !important;
+  }
 
   .cta-final,
   .loop-section {
@@ -675,8 +670,307 @@
 /* ─── Reduz movimento (WCAG 2.3.3) ──────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
+
   .card-mock,
   .field-player__card {
     transition: none;
   }
+}
+
+/* Cidade em Jogo: a landing mantém a narrativa e muda a rua. */
+body {
+  background-color: var(--color-bg);
+}
+
+.nav {
+  border-bottom: 3px solid var(--color-primary);
+  background-color: #171717;
+}
+
+.nav__logo,
+.footer__logo {
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.nav__cta,
+.btn {
+  border: 2px solid #171717;
+  border-radius: 0;
+  box-shadow: 4px 4px 0 #000;
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.07em;
+}
+
+.nav__cta,
+.btn--primary {
+  background-color: var(--color-primary);
+  color: #171717;
+}
+
+.btn--outline {
+  border-color: var(--color-text);
+  background-color: transparent;
+  color: var(--color-text);
+}
+
+.nav__cta:hover,
+.btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+.btn--outline:hover {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.hero {
+  min-height: min(760px, 86vh);
+  overflow: hidden;
+  border-bottom: 3px solid var(--color-text);
+  background-color: #171717;
+}
+
+.hero::before {
+  content: "TORNEIO DE RUA / 2026";
+  position: absolute;
+  top: 1.35rem;
+  right: -3.5rem;
+  z-index: 0;
+  padding: 0.3rem 4rem;
+  transform: rotate(8deg);
+  background-color: var(--color-secondary);
+  color: #171717;
+  font: 800 0.75rem var(--font-main);
+  letter-spacing: 0.13em;
+}
+
+.hero__content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero__eyebrow,
+.feature__eyebrow {
+  color: var(--color-primary);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.hero__title,
+.feature__title,
+.cta-final__title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 0.88;
+  text-transform: uppercase;
+}
+
+.hero__title--highlight,
+.feature__title--highlight {
+  color: #171717;
+  background-color: var(--color-primary);
+  padding: 0 0.16em;
+}
+
+.hero__description,
+.feature__description,
+.cta-final__sub {
+  color: var(--color-text-muted);
+}
+
+.hero__cards {
+  z-index: 1;
+}
+
+.card-mock {
+  overflow: hidden;
+  border: 3px solid var(--color-text);
+  border-radius: 0;
+  background-color: #303030;
+  box-shadow: 9px 9px 0 var(--color-accent);
+}
+
+.card-mock--front {
+  box-shadow: 10px 10px 0 var(--color-secondary);
+}
+
+.card-mock__img {
+  filter: grayscale(0.12) contrast(1.1);
+}
+
+.feature {
+  gap: clamp(2rem, 7vw, 8rem);
+  border-bottom: 3px solid #45413a;
+  background-color: #252525;
+}
+
+.feature--reverse {
+  background-color: #1d1d1d;
+}
+
+.squad-mock {
+  border: 3px solid var(--color-text);
+  box-shadow: 9px 9px 0 var(--color-accent);
+}
+
+.squad-mock__img {
+  filter: saturate(0.82) contrast(1.08);
+}
+
+.cta-final {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 3px solid var(--color-text);
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+.cta-final::after {
+  content: "JOGUE AGORA";
+  position: absolute;
+  right: -0.15em;
+  bottom: -0.32em;
+  color: rgba(244, 236, 216, 0.2);
+  font: 800 clamp(4rem, 15vw, 13rem)/0.8 var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+.cta-final>* {
+  position: relative;
+  z-index: 1;
+}
+
+.cta-final .btn--primary {
+  background-color: var(--color-primary);
+}
+
+.footer {
+  border-top: 0;
+  background-color: #171717;
+}
+
+@media (max-width: 900px) {
+  .hero::before {
+    right: -5rem;
+  }
+
+  .feature {
+    padding: 4.5rem 1.5rem;
+  }
+}
+
+[data-theme="light"] .nav {
+  background-color: #171717;
+  border-color: var(--color-primary);
+}
+
+[data-theme="light"] .nav__logo {
+  color: #f4ecd8;
+}
+
+[data-theme="light"] .nav__cta,
+[data-theme="light"] .btn--primary {
+  border-color: #171717;
+  background-color: var(--color-primary);
+  color: #171717;
+}
+
+[data-theme="light"] .btn--outline {
+  border-color: #f4ecd8;
+  background-color: transparent;
+  color: #f4ecd8;
+}
+
+[data-theme="light"] .hero,
+[data-theme="light"] .feature,
+[data-theme="light"] .feature--reverse {
+  background-color: #171717;
+}
+
+[data-theme="light"] .hero__title,
+[data-theme="light"] .feature__title {
+  color: #f4ecd8;
+}
+
+[data-theme="light"] .hero__title--highlight,
+[data-theme="light"] .feature__title--highlight {
+  background-color: var(--color-primary);
+  color: #171717;
+}
+
+[data-theme="light"] .hero__description,
+[data-theme="light"] .feature__description {
+  color: #afa99f;
+}
+
+/* CTA sólido no hover e destaque por tipografia, não por uma tarja. */
+.hero .btn--primary:hover,
+.cta-final .btn--primary:hover,
+[data-theme="light"] .hero .btn--primary:hover,
+[data-theme="light"] .cta-final .btn--primary:hover {
+  border-color: #171717;
+  background-color: var(--color-primary);
+  color: #171717;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.hero__title--highlight,
+.feature__title--highlight,
+[data-theme="light"] .hero__title--highlight,
+[data-theme="light"] .feature__title--highlight {
+  padding: 0;
+  background-color: transparent;
+  color: var(--color-primary);
+  text-decoration: underline 0.075em var(--color-secondary);
+  text-underline-offset: 0.13em;
+  text-shadow: 3px 3px 0 var(--color-accent);
+}
+
+.cta-final__sub {
+  color: #ffffff;
+}
+
+/* Modo claro: landing aberta e urbana, com a faixa azul reservada ao convite final. */
+[data-theme="light"] .nav {
+  background-color: #fffaf0;
+  border-color: #171717;
+}
+
+[data-theme="light"] .nav__logo,
+[data-theme="light"] .nav__links a {
+  color: #171717;
+}
+
+[data-theme="light"] .hero {
+  background-color: #f4ecd8;
+}
+
+[data-theme="light"] .feature {
+  background-color: #fffaf0;
+}
+
+[data-theme="light"] .feature--reverse {
+  background-color: #ded8ca;
+}
+
+[data-theme="light"] .hero__title,
+[data-theme="light"] .feature__title {
+  color: #171717;
+}
+
+[data-theme="light"] .hero__description,
+[data-theme="light"] .feature__description {
+  color: #554f49;
+}
+
+[data-theme="light"] .btn--outline {
+  border-color: #171717;
+  color: #171717;
 }
